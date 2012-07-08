@@ -239,6 +239,36 @@ namespace MyApps.DCView
             NavigationService.Navigate(new Uri("/Views/Login.xaml?action=back", UriKind.Relative));
         }
 
+        void OnRefreshStatusChangedEventHandler(GalleryList.RefreshStatus status, DownloadProgressChangedEventArgs downloadArgs)
+        {
+            switch(status)
+            {
+                case GalleryList.RefreshStatus.Downloading:
+                    Dispatcher.BeginInvoke(() => 
+                    {
+                        RefreshStatus.Text = string.Format("다운로드 중... {0}/{1} ", downloadArgs.BytesReceived, downloadArgs.TotalBytesToReceive);
+                        RefreshProgress.Value = downloadArgs.ProgressPercentage * 0.8;
+                    });
+                    break;
+
+                case GalleryList.RefreshStatus.Parsing:
+                    Dispatcher.BeginInvoke(() => 
+                    {
+                        RefreshStatus.Text = "결과 분석중입니다";
+                        RefreshProgress.Value = 80;
+                    });
+                    break;
+
+                case GalleryList.RefreshStatus.Saving:
+                    Dispatcher.BeginInvoke(() =>
+                    {
+                        RefreshStatus.Text = "리스트를 저장합니다";
+                        RefreshProgress.Value = 90;
+                    });
+                    break;
+            }
+        }
+
         private void RefreshGalleryListButton_Click(object sender, RoutedEventArgs e)
         {
             SearchBox.Visibility = Visibility.Collapsed;
@@ -246,29 +276,9 @@ namespace MyApps.DCView
             RefreshGalleryListButton.Visibility = Visibility.Collapsed;
             RefreshPanel.Visibility = Visibility.Visible;
 
-            galleryList.RefreshAll((o1, e1) =>
-            {
-                RefreshStatus.Text = string.Format("다운로드 중... {0}/{1} ", e1.BytesReceived, e1.TotalBytesToReceive);
-                RefreshProgress.Value = e1.ProgressPercentage * 0.8;
+            var refreshTask = galleryList.RefreshAll(OnRefreshStatusChangedEventHandler);
 
-                // 2. 파싱해서
-                Dispatcher.BeginInvoke(() =>
-                {
-                    RefreshStatus.Text = "결과 분석중입니다";
-                    RefreshProgress.Value = 80;
-                });
-
-                Dispatcher.BeginInvoke(() =>
-                {
-                    RefreshStatus.Text = "설정 파일에 저장합니다";
-                    RefreshProgress.Value = 90;
-                });
-
-
-
-
-
-            }).ContinueWith(prevTask =>
+            refreshTask.ContinueWith(prevTask =>
             {
                 if (prevTask.Result)
                 {
@@ -276,13 +286,22 @@ namespace MyApps.DCView
                     return;
                 }
 
-                
+                // 5. 
+                Dispatcher.BeginInvoke(() =>
+                {
+                    RefreshStatus.Text = "리스트 갱신";
+                    RefreshProgress.Value = 95;
 
-                
+                    SearchResult.ItemsSource = galleryList.All;
+
+                    SearchBox.Text = "";
+                    SearchBox.Visibility = Visibility.Visible;
+                    SearchResult.Visibility = Visibility.Visible;
+                    RefreshGalleryListButton.Visibility = Visibility.Visible;
+                    RefreshPanel.Visibility = Visibility.Collapsed;
+                });
 
             }).Start();
-
-
         }
 
         private void SearchBox_KeyUp(object sender, KeyEventArgs e)

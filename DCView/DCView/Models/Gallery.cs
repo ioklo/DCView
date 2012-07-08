@@ -14,9 +14,14 @@ namespace MyApps.DCView
 {
     public class Gallery : INotifyPropertyChanged
     {
-        public string ID { get; set; }
-        public string Name { get; set; }
-        public bool Adult { get; set; }
+        public Gallery(string id, string name)
+        {
+            this.ID = id;
+            this.Name = name;            
+        }
+
+        public string ID { get; private set; }
+        public string Name { get; private set; }
 
         public string PCSite
         {
