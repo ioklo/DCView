@@ -22,104 +22,26 @@ using System.Windows.Threading;
 using System.Windows.Navigation;
 using System.Text;
 using System.Text.RegularExpressions;
+using MyApps.Models;
 
 namespace MyApps.DCView
 {
     public partial class SelectGallery : PhoneApplicationPage
     {
-        Dictionary<string, Gallery> galleries = new Dictionary<string, Gallery>();
-        bool bModified = false;
+        GalleryList galleryList = new GalleryList();
 
         // 하는 일        
         // 1. 즐겨찾기로부터 갤러리 들어가기
         // 2. 전체 갤러리 리스트를 클릭해서 갤러리 들어가기
         // 3. 즐겨찾기 추가, 제거
-
-        void LoadGalleryList()
-        {
-            // DCView_list.txt 생성 
-            Util.CopyResourceToStorage("Data/idlist.txt", "/DCView_list.txt");
-
-            var storage = IsolatedStorageFile.GetUserStoreForApplication();
-            using( var reader = new StreamReader(storage.OpenFile("/DCView_list.txt", FileMode.Open), Encoding.UTF8))
-            {
-                string line = null;
-                while (true)
-                {
-                    var gallery = new Gallery();
-                    
-                    if ((line = reader.ReadLine())== null) break;
-                    gallery.ID = line;
-
-                    if ((line = reader.ReadLine()) == null) break;
-                    gallery.Name = line;
-
-                    if ((line = reader.ReadLine()) == null) break;
-                    gallery.Adult = line == "1";
-
-                    gallery.IsFavorite = false;
-      
-                    gallery.PropertyChanged += (o, e) => 
-                    { 
-                        bModified = true;
-                        if (gallery.IsFavorite)
-                            Favorites.Items.Add(gallery);
-                        else
-                            Favorites.Items.Remove(gallery);
-                    };
-
-                    galleries[gallery.ID] = gallery;
-                }
-            }
-
-            
-            if (!storage.FileExists("/DCView_favorites.txt"))
-            {
-                using (var stream = new StreamWriter(storage.CreateFile("/DCView_favorites.txt")))
-                {
-                    stream.WriteLine("windowsphone");
-                }
-            }
-
-            // favorite 리스트를 얻어온다..
-            using (var reader = new StreamReader(storage.OpenFile("/DCView_favorites.txt", FileMode.Open)))
-            {
-                string line = null;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    Gallery gal;
-                    if (!galleries.TryGetValue(line, out gal)) continue;
-
-                    gal.IsFavorite = true;
-                }
-            }
-        }        
-
         public SelectGallery()
         {
             InitializeComponent();
-          
-            // 갤러리 목록 읽어들이기..            
-            LoadGalleryList();
-            SearchResult.ItemsSource = new List<Gallery>(galleries.Values);
-        }
 
-        void SaveFavorite()
-        {
-            if (!bModified)
-                return;
-
-            // favorite 저장
-            var storage = IsolatedStorageFile.GetUserStoreForApplication();
-            using (var writer = new StreamWriter(storage.OpenFile("/DCView_favorites.txt", FileMode.Create)))
-            {
-                foreach (var gal in galleries.Values)
-                {
-                    if (gal.IsFavorite)
-                        writer.WriteLine(gal.ID);
-                }
-            }
-        }
+            // 갤러리 목록 읽어들이기
+            galleryList.Load();            
+            SearchResult.ItemsSource = new List<Gallery>(galleryList.All);
+        }        
         
         // 즐겨찾기를 눌렀을 때
         private void Favorites_Tap(object sender, System.Windows.Input.GestureEventArgs e)
@@ -149,7 +71,7 @@ namespace MyApps.DCView
             LoginInfo.Instance.PropertyChanged -= new PropertyChangedEventHandler(Login_PropertyChanged);
 
             // 세팅을 저장한다
-            SaveFavorite();
+            galleryList.SaveFavorite();            
             LoginInfo.Instance.Save();
             IsolatedStorageSettings.ApplicationSettings.Save();
         }
@@ -273,7 +195,7 @@ namespace MyApps.DCView
             List<Gallery> result = new List<Gallery>();
             string text = e.Argument as string;
 
-            foreach (Gallery gal in galleries.Values)
+            foreach (Gallery gal in galleryList.All)
             {
                 if (bw.CancellationPending)
                     break;
@@ -324,118 +246,12 @@ namespace MyApps.DCView
             RefreshGalleryListButton.Visibility = Visibility.Collapsed;
             RefreshPanel.Visibility = Visibility.Visible;
 
-            // 태스크 정의
-            // 1. 읽어오고..
-            BackgroundWorker bw = new BackgroundWorker();            
-            WebClientEx client = new WebClientEx();
+            galleryList.RefreshAll((o1, e1) =>
+            {
+                RefreshStatus.Text = string.Format("다운로드 중... {0}/{1} ", e1.BytesReceived, e1.TotalBytesToReceive);
+                RefreshProgress.Value = e1.ProgressPercentage * 0.8;
+            })
 
-            client.Encoding = Encoding.UTF8;
-            client.Headers["User-Agent"] = "Mozilla/5.0 (Linux; U; Android 2.1-update1; ko-kr; Nexus One Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17";
-            
-            client.DownloadProgressChanged += (o1, e1) =>
-                {
-                    RefreshStatus.Text = string.Format("{0}/{1} 다운로드 중입니다", e1.BytesReceived, e1.TotalBytesToReceive);
-                    RefreshProgress.Value = e1.ProgressPercentage * 0.8;
-                };
-
-            client.DownloadStringCompleted += (o1, e1) =>
-                {
-                    if( e1.Cancelled || e1.Error != null )
-                    {
-                        MessageBox.Show("갤러리 목록을 얻어내는데 실패했습니다. 잠시 후 다시 실행해보세요");
-                        return;
-                    }                    
-                    
-                    ThreadPool.QueueUserWorkItem( (state) =>
-                        {
-                            // 2. 파싱해서
-                            Dispatcher.BeginInvoke(() =>
-                            {
-                                RefreshStatus.Text = "결과 분석중입니다";
-                                RefreshProgress.Value = 80;
-                            });
-
-                            Regex regex = new Regex("<a href=\"http://m\\.dcinside\\.com/list\\.php\\?id=(\\w+)\">([^<]+)((</a>)|(<div class='icon_19'></div></a>))");
-
-                            var results = from match in regex.Matches(e1.Result).OfType<Match>()
-                                select new Gallery()
-                                {
-                                    ID = match.Groups[1].Value,
-                                    Name = match.Groups[2].Value,
-                                    Adult = (match.Groups[5].Value != String.Empty)
-                                };
-
-                            Dispatcher.BeginInvoke(() => 
-                            {
-                                RefreshStatus.Text = "설정 파일에 저장합니다";
-                                RefreshProgress.Value = 90;
-                            });
-
-                            // 3. 파일에 저장
-                            galleries.Clear();
-                            var storage = IsolatedStorageFile.GetUserStoreForApplication();
-                            using (var writer = new StreamWriter(storage.OpenFile("/DCView_list.txt", FileMode.Create)))
-                            {
-                                foreach (var entry in results)
-                                {                                    
-                                    Gallery gallery = entry;
-                                    if (gallery.Adult) continue;
-
-                                    writer.WriteLine(entry.ID);
-                                    writer.WriteLine(entry.Name);
-                                    writer.WriteLine(entry.Adult ? 1 : 0);
-                                    gallery.IsFavorite = false;
-
-                                    gallery.PropertyChanged += (o2, e2) =>
-                                    {
-                                        bModified = true;
-                                        if (gallery.IsFavorite)
-                                            Favorites.Items.Add(gallery);
-                                        else
-                                            Favorites.Items.Remove(gallery);
-                                    };
-
-                                    galleries[gallery.ID] = gallery;
-                                }
-                            }
-
-                            Dispatcher.BeginInvoke(() => { Favorites.Items.Clear(); });
-
-                            // 4. favorite 다시 읽어오기 ..
-                            using (var reader = new StreamReader(storage.OpenFile("/DCView_favorites.txt", FileMode.Open)))
-                            {
-                                string line = null;
-                                while ((line = reader.ReadLine()) != null)
-                                {
-                                    Gallery gal;
-                                    if (!galleries.TryGetValue(line, out gal)) continue;
-
-                                    Dispatcher.BeginInvoke( () =>
-                                        { gal.IsFavorite = true; }
-                                    );
-                                }
-                            }
-
-                            // 5. 
-                            Dispatcher.BeginInvoke(() =>
-                            {
-                                RefreshStatus.Text = "리스트 갱신";
-                                RefreshProgress.Value = 95;
-
-                                SearchResult.ItemsSource = new List<Gallery>(galleries.Values);
-
-                                SearchBox.Text = "";
-                                SearchBox.Visibility = Visibility.Visible;
-                                SearchResult.Visibility = Visibility.Visible;
-                                RefreshGalleryListButton.Visibility = Visibility.Visible;
-                                RefreshPanel.Visibility = Visibility.Collapsed;
-                            });
-
-
-                        });
-                };
-
-            client.DownloadStringAsync(new Uri("http://m.dcinside.com/category_gall_total.html", UriKind.Absolute));
 
         }
 

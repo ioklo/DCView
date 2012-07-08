@@ -78,6 +78,7 @@
     <Compile Include="Models\ArticleList.cs" />
     <Compile Include="Models\ArticleManager.cs" />
     <Compile Include="Models\ArticleWriter.cs" />
+    <Compile Include="Models\GalleryList.cs" />
     <Compile Include="ViewModels\ArticleListViewModel.cs" />
     <Compile Include="Views\BoolToColorConverter.cs" />
     <Compile Include="Models\Comment.cs" />
