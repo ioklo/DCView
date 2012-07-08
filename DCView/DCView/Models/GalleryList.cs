@@ -16,6 +16,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace MyApps.Models
 {
@@ -24,9 +25,15 @@ namespace MyApps.Models
         Dictionary<string, Gallery> galleries = new Dictionary<string, Gallery>();
         bool modified = false;
 
+        public IEnumerable<Gallery> All 
+        {
+            get
+            {
+                return galleries.Values;
+            }
+        }
 
-        public IList<Gallery> All { get; }
-        public IList<Gallery> Favorites { get; }
+        public IEnumerable<Gallery> Favorites;
 
         
         public void Load()
@@ -105,33 +112,38 @@ namespace MyApps.Models
             }
         }
 
-        public Task<bool> RefreshAll(DownloadProgressChangedEventHandler progressEventHandler)
+        enum RefreshStatus
+        {
+            Downloading,
+            Parsing,
+            Saving
+        }
+        
+        public delegate void RefreshStatusChangedEventHandler(RefreshStatus status, int data);
+
+        public Task<bool> RefreshAll(RefreshStatusChangedEventHandler eventHandler)
         {
             WebClientEx client = new WebClientEx();
 
             client.Encoding = Encoding.UTF8;
             client.Headers["User-Agent"] = "Mozilla/5.0 (Linux; U; Android 2.1-update1; ko-kr; Nexus One Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17";
 
-            client.DownloadProgressChanged += progressEventHandler;
-            client.DownloadStringAsyncTask(new Uri("http://m.dcinside.com/category_gall_total.html", UriKind.Absolute))
-                .ContinueWith<string>( prevTask =>
-                {
+            client.DownloadProgressChanged += (obj, args) =>
+            {
+                eventHandler(RefreshStatus.Downloading, args.BytesReceived * 100 / args.TotalBytesToReceive);                                        
+            };
 
-                    if (prevTask.IsCanceled || e1.Error != null)
+            client.DownloadStringAsyncTask(new Uri("http://m.dcinside.com/category_gall_total.html", UriKind.Absolute))
+                .ContinueWith<bool>( prevTask =>
+                {
+                    if (prevTask.IsCanceled || prevTask.Exception != null)
                     {
-                        MessageBox.Show("갤러리 목록을 얻어내는데 실패했습니다. 잠시 후 다시 실행해보세요");
-                        return;
+                        return false;
                     }
 
-                ThreadPool.QueueUserWorkItem((state) =>
-                {
-                    // 2. 파싱해서
-                    Dispatcher.BeginInvoke(() =>
-                    {
-                        RefreshStatus.Text = "결과 분석중입니다";
-                        RefreshProgress.Value = 80;
-                    });
-
+                    eventHandler(RefreshStatus.Parsing, 0);                
+                    
+                    
                     Regex regex = new Regex("<a href=\"http://m\\.dcinside\\.com/list\\.php\\?id=(\\w+)\">([^<]+)((</a>)|(<div class='icon_19'></div></a>))");
 
                     var results = from match in regex.Matches(e1.Result).OfType<Match>()
@@ -142,13 +154,9 @@ namespace MyApps.Models
                                       Adult = (match.Groups[5].Value != String.Empty)
                                   };
 
-                    Dispatcher.BeginInvoke(() =>
-                    {
-                        RefreshStatus.Text = "설정 파일에 저장합니다";
-                        RefreshProgress.Value = 90;
-                    });
-
-                    // 3. 파일에 저장
+                    eventHandler(RefreshStatus.Saving, 0);
+                    
+                    // 3. 변경된 내용을 파일에 저장
                     galleries.Clear();
                     var storage = IsolatedStorageFile.GetUserStoreForApplication();
                     using (var writer = new StreamWriter(storage.OpenFile("/DCView_list.txt", FileMode.Create)))
@@ -211,6 +219,7 @@ namespace MyApps.Models
 
                 });
             };
+
 
             
         }

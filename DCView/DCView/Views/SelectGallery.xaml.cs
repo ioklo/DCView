@@ -250,7 +250,37 @@ namespace MyApps.DCView
             {
                 RefreshStatus.Text = string.Format("다운로드 중... {0}/{1} ", e1.BytesReceived, e1.TotalBytesToReceive);
                 RefreshProgress.Value = e1.ProgressPercentage * 0.8;
-            })
+
+                // 2. 파싱해서
+                Dispatcher.BeginInvoke(() =>
+                {
+                    RefreshStatus.Text = "결과 분석중입니다";
+                    RefreshProgress.Value = 80;
+                });
+
+                Dispatcher.BeginInvoke(() =>
+                {
+                    RefreshStatus.Text = "설정 파일에 저장합니다";
+                    RefreshProgress.Value = 90;
+                });
+
+
+
+
+
+            }).ContinueWith(prevTask =>
+            {
+                if (prevTask.Result)
+                {
+                    MessageBox.Show("갤러리 목록을 얻어내는데 실패했습니다. 잠시 후 다시 실행해보세요");
+                    return;
+                }
+
+                
+
+                
+
+            }).Start();
 
 
         }
