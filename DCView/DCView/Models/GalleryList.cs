@@ -18,6 +18,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Threading;
 
 namespace MyApps.Models
 {
@@ -37,7 +38,13 @@ namespace MyApps.Models
             }
         }
 
-        public IEnumerable<Gallery> Favorites;
+        public IEnumerable<Gallery> Favorites
+        {
+            get
+            {
+                return favorites;
+            }
+        }
 
         public void Load()
         {
@@ -143,6 +150,25 @@ namespace MyApps.Models
                         writer.WriteLine(gal.ID);
                 }
             }
+        }        
+
+        public Task Search(string text, CancellationToken token, Action<Gallery> OnSearchGallery)
+        {            
+            return new Task( () => 
+            {
+                foreach (Gallery gal in galleries.Values)
+                {
+                    if (token.IsCancellationRequested)                        
+                        token.ThrowIfCancellationRequested();
+
+                    if (gal.ID.IndexOf(text, StringComparison.CurrentCultureIgnoreCase) >= 0 ||
+                        gal.Name.IndexOf(text, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                        OnSearchGallery(gal);
+                }
+
+                if (token.IsCancellationRequested)
+                    token.ThrowIfCancellationRequested();
+            });
         }
 
         public enum RefreshStatus

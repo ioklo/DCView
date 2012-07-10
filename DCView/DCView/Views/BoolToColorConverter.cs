@@ -14,15 +14,23 @@ namespace MyApps.DCView
 {
     public class BoolToColorConverter : IValueConverter
     {
+        object phoneAccentBrush;
+        object phoneDisabledBrush;
+
+        public BoolToColorConverter()
+        {
+            phoneAccentBrush = App.Current.Resources["PhoneAccentBrush"];
+            phoneDisabledBrush = App.Current.Resources["PhoneDisabledBrush"];
+        }
+
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             bool b = (bool)value;
 
             if (b)
-                return App.Current.Resources["PhoneAccentBrush"];
+                return phoneAccentBrush;
             else
-                return App.Current.Resources["PhoneDisabledBrush"];
-            
+                return phoneDisabledBrush;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

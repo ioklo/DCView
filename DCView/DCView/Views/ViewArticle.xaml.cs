@@ -238,6 +238,7 @@ namespace MyApps.DCView
                     () => { UpdateArticleText(article); },
                     () => { MessageBox.Show("글을 읽어들이는데 실패했습니다. 다시 시도해보세요"); });
         }
+
         private void UpdateArticleText(Article article)
         {
             // 일단 기존의 ArticleText를 없앤다

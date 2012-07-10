@@ -78,7 +78,11 @@
     <Compile Include="Models\ArticleList.cs" />
     <Compile Include="Models\ArticleManager.cs" />
     <Compile Include="Models\ArticleWriter.cs" />
+    <Compile Include="Models\Parser\DCInsideArticleParser.cs" />
+    <Compile Include="Models\Parser\DCInsideArticleListParser.cs" />
     <Compile Include="Models\GalleryList.cs" />
+    <Compile Include="Models\Parser\DCInsideGallery.cs" />
+    <Compile Include="Models\Parser\IParser.cs" />
     <Compile Include="ViewModels\ArticleListViewModel.cs" />
     <Compile Include="Views\BoolToColorConverter.cs" />
     <Compile Include="Models\Comment.cs" />

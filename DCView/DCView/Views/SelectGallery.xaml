@@ -38,10 +38,10 @@
             
             <!--Panorama 항목 1-->
             <controls:PanoramaItem Header="즐겨찾기" x:Name="PanoramaFavorite">
-                <ListBox x:Name="Favorites" Tap="Favorites_Tap">
+                <ListBox x:Name="Favorites">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}" Style="{StaticResource PhoneTextLargeStyle}" Margin="12" >
+                            <TextBlock Tap="Favorites_Tap" Tag="{Binding}" Text="{Binding Name}" Style="{StaticResource PhoneTextLargeStyle}" Margin="12" >
                                 <toolkit:ContextMenuService.ContextMenu>
                                     <toolkit:ContextMenu>
                                         <toolkit:MenuItem Header="제거" Tag="{Binding}" Click="RemoveFavorite"/>
@@ -68,13 +68,12 @@
                     
                     <TextBox x:Name="SearchBox" Grid.Row="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
                     
-                    <ListBox x:Name="SearchResult" Grid.Row="1" Tap="SearchResult_Tap">
+                    <ListBox x:Name="SearchResult" Grid.Row="1">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="{Binding Path=IsFavorite, Mode=TwoWay}" Tap="CheckBox_Tap" Margin="0" VerticalAlignment="Center"/>
+                                <StackPanel Orientation="Horizontal" Tap="SearchResult_Tap" Tag="{Binding}">
+                                    <CheckBox IsChecked="{Binding Path=IsFavorite, Mode=TwoWay}" Tag="{Binding}" Tap="CheckBox_Tap" Margin="0" VerticalAlignment="Center"/>
                                     <TextBlock Style="{StaticResource PhoneTextLargeStyle}" Margin="0" VerticalAlignment="Center" Text="{Binding Name}" />
-                                    
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>

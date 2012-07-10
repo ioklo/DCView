@@ -23,6 +23,7 @@ using System.Windows.Navigation;
 using System.Text;
 using System.Text.RegularExpressions;
 using MyApps.Models;
+using System.Threading.Tasks;
 
 namespace MyApps.DCView
 {
@@ -39,14 +40,16 @@ namespace MyApps.DCView
             InitializeComponent();
 
             // 갤러리 목록 읽어들이기
-            galleryList.Load();            
-            SearchResult.ItemsSource = new List<Gallery>(galleryList.All);
+            galleryList.Load();
+
+            SearchResult.ItemsSource = galleryList.All;
+            Favorites.ItemsSource = galleryList.Favorites;
         }        
         
         // 즐겨찾기를 눌렀을 때
         private void Favorites_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            Gallery gal = Favorites.SelectedItem as Gallery;
+            Gallery gal = ((FrameworkElement)sender).Tag as Gallery;
             if (gal == null) return;
 
             Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?site={0}&id={1}&name={2}&pcsite={3}", gal.Site ,gal.ID, gal.Name, gal.PCSite), UriKind.Relative);
@@ -55,8 +58,8 @@ namespace MyApps.DCView
 
         // 검색결과창에서 갤러리를 눌렀을 때
         private void SearchResult_Tap(object sender, System.Windows.Input.GestureEventArgs e)
-        {
-            Gallery gal = SearchResult.SelectedItem as Gallery;
+        {            
+            Gallery gal = ((FrameworkElement)sender).Tag as Gallery;
             if (gal == null) return;
 
             Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?site={0}&id={1}&name={2}&pcsite={3}", gal.Site, gal.ID, gal.Name, gal.PCSite), UriKind.Relative);
@@ -88,7 +91,6 @@ namespace MyApps.DCView
                 if (NavigationService.CanGoBack)
                     NavigationService.RemoveBackEntry();
             }
-
 
             // 세팅 페이지 
             LoginForm.DataContext = LoginInfo.Instance;
@@ -152,63 +154,52 @@ namespace MyApps.DCView
         }
         
         // 찾기         
-        DispatcherTimer dt;
-        BackgroundWorker searchWorker = null;
+        DispatcherTimer dt = null; // 1초 기다리는 타이머
+        CancellationTokenSource cancelTokenSource = null;
+        ObservableCollection<Gallery> searchResult = null;
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            // 1초 기다리는 타이머가 없다면 만든다.
             if (dt == null)
             {
                 dt = new DispatcherTimer();
                 dt.Interval = new TimeSpan(0, 0, 1);
 
-                // 1초 있다가 
+                // 1초 있다가 할일을 정의해주고
                 dt.Tick += (o, ea) =>
                 {
                     // 더이상 수행은 멈추고 
                     dt.Stop();
 
-                    searchWorker = new BackgroundWorker();
-                    searchWorker.WorkerSupportsCancellation = true;
-                    searchWorker.DoWork += new DoWorkEventHandler(searchWorker_DoWork);
-                    searchWorker.RunWorkerAsync(String.Copy(SearchBox.Text));                    
+                    if (SearchBox.Text.Length == 0)
+                    {
+                        SearchResult.ItemsSource = galleryList.All;
+                        return;
+                    }
+
+                    // 새로운 cancellation
+                    cancelTokenSource = new CancellationTokenSource();
+                    searchResult = new ObservableCollection<Gallery>();
+                    SearchResult.ItemsSource = searchResult;
+
+                    galleryList.Search(SearchBox.Text, cancelTokenSource.Token, gallery =>
+                    {
+                        Dispatcher.BeginInvoke(() => { searchResult.Add(gallery); });
+                    }).Start();
                 };
             }
 
-            // 현재 돌아가고 있는 searchWorker는 중지한다. 
-            if (searchWorker != null)
+            // 1초를 기다리는 중이었고
+            // 취소 토큰이 있다면
+            if (cancelTokenSource != null)
             {
-                searchWorker.CancelAsync();
-                searchWorker = null;                
+                cancelTokenSource.Cancel();
+                cancelTokenSource = null;
             }
 
+            // 다시 시작            
             dt.Stop();
-            dt.Start();
-        }
-
-        void searchWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            BackgroundWorker bw = sender as BackgroundWorker;
-
-            // 캔슬당했으면 그만 둬야함
-            if (bw.CancellationPending) return;
-
-            List<Gallery> result = new List<Gallery>();
-            string text = e.Argument as string;
-
-            foreach (Gallery gal in galleryList.All)
-            {
-                if (bw.CancellationPending)
-                    break;
-
-                if (gal.ID.IndexOf(text, StringComparison.CurrentCultureIgnoreCase) >= 0 || 
-                    gal.Name.IndexOf(text, StringComparison.CurrentCultureIgnoreCase) >= 0)
-                    result.Add(gal);
-            }
-
-            Dispatcher.BeginInvoke(() =>
-            {
-                SearchResult.ItemsSource = result;
-            });
+            dt.Start();            
         }
 
         // 전체리스트에서 체크박스를 눌렀을때는 
@@ -280,18 +271,14 @@ namespace MyApps.DCView
 
             refreshTask.ContinueWith(prevTask =>
             {
-                if (prevTask.Result)
+                if (!prevTask.Result)
                 {
                     MessageBox.Show("갤러리 목록을 얻어내는데 실패했습니다. 잠시 후 다시 실행해보세요");
-                    return;
                 }
 
                 // 5. 
                 Dispatcher.BeginInvoke(() =>
                 {
-                    RefreshStatus.Text = "리스트 갱신";
-                    RefreshProgress.Value = 95;
-
                     SearchResult.ItemsSource = galleryList.All;
 
                     SearchBox.Text = "";
@@ -301,7 +288,7 @@ namespace MyApps.DCView
                     RefreshPanel.Visibility = Visibility.Collapsed;
                 });
 
-            }).Start();
+            });
         }
 
         private void SearchBox_KeyUp(object sender, KeyEventArgs e)
