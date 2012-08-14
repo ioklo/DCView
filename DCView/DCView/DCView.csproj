@@ -9,7 +9,7 @@
     <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MyApps</RootNamespace>
+    <RootNamespace>DCView</RootNamespace>
     <AssemblyName>DCView</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
@@ -22,7 +22,7 @@
     <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
     <XapFilename>DCView.xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
-    <SilverlightAppEntry>MyApps.App</SilverlightAppEntry>
+    <SilverlightAppEntry>DCView.App</SilverlightAppEntry>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -74,25 +74,20 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\Article.cs" />
-    <Compile Include="Models\ArticleList.cs" />
-    <Compile Include="Models\ArticleManager.cs" />
-    <Compile Include="Models\ArticleWriter.cs" />
-    <Compile Include="Models\Parser\DCInsideArticleParser.cs" />
-    <Compile Include="Models\Parser\DCInsideArticleListParser.cs" />
-    <Compile Include="Models\GalleryList.cs" />
-    <Compile Include="Models\Parser\DCInsideGallery.cs" />
-    <Compile Include="Models\Parser\IParser.cs" />
-    <Compile Include="ViewModels\ArticleListViewModel.cs" />
+    <Compile Include="Model\Article.cs" />
+    <Compile Include="Model\ArticleWriter.cs" />
+    <Compile Include="Model\Board\DCInsideBoard.cs" />
+    <Compile Include="Model\Board\IBoard.cs" />
+    <Compile Include="Model\Picture.cs" />
+    <Compile Include="Model\GalleryList.cs" />
+    <Compile Include="Model\SandBox.cs" />
+    <Compile Include="Util\DCViewWebClient.cs" />
     <Compile Include="Views\BoolToColorConverter.cs" />
-    <Compile Include="Models\Comment.cs" />
-    <Compile Include="Models\Gallery.cs" />
-    <Compile Include="Views\StartupLogin.xaml.cs">
-      <DependentUpon>StartupLogin.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Models\LoginInfo.cs" />
-    <Compile Include="Views\SelectGallery.xaml.cs">
-      <DependentUpon>SelectGallery.xaml</DependentUpon>
+    <Compile Include="Model\Comment.cs" />
+    <Compile Include="Model\Gallery.cs" />
+    <Compile Include="Model\LoginInfo.cs" />
+    <Compile Include="Views\MainPanorama.xaml.cs">
+      <DependentUpon>MainPanorama.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ViewArticle.xaml.cs">
       <DependentUpon>ViewArticle.xaml</DependentUpon>
@@ -134,11 +129,7 @@
     <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\StartupLogin.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\SelectGallery.xaml">
+    <Page Include="Views\MainPanorama.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -1,5 +1,5 @@
 ﻿<phone:PhoneApplicationPage 
-    x:Class="MyApps.DCView.SelectGallery"
+    x:Class="DCView.MainPanorama"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
@@ -22,7 +22,7 @@
 
     <!--LayoutRoot에는 다른 모든 페이지 내용이 배치되는 루트 표가 포함됩니다.-->
     <Grid x:Name="LayoutRoot" Language="ko-kr">
-        <controls:Panorama x:Name="PanoramaMain">
+        <controls:Panorama x:Name="PanoramaMain" SelectionChanged="PanoramaMain_SelectionChanged">
             <controls:Panorama.Title>
                 <TextBlock Margin="-20,15,0,-15" FontFamily="Microsoft NeoGothic">
                     <TextBlock.Foreground>
@@ -63,17 +63,28 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     
                     <TextBox x:Name="SearchBox" Grid.Row="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
                     
-                    <ListBox x:Name="SearchResult" Grid.Row="1">
+                    <ListBox x:Name="SearchResult" Grid.Row="1" Margin="0,0,0,72">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Tap="SearchResult_Tap" Tag="{Binding}">
-                                    <CheckBox IsChecked="{Binding Path=IsFavorite, Mode=TwoWay}" Tag="{Binding}" Tap="CheckBox_Tap" Margin="0" VerticalAlignment="Center"/>
-                                    <TextBlock Style="{StaticResource PhoneTextLargeStyle}" Margin="0" VerticalAlignment="Center" Text="{Binding Name}" />
+                                <StackPanel Margin="12,12" >
+                                    <TextBlock Tag="{Binding}" Tap="SearchResult_Tap" 
+                                           Style="{StaticResource PhoneTextLargeStyle}" 
+                                           Margin="0"
+                                           VerticalAlignment="Center" 
+                                           Text="{Binding Name}" >
+                                        
+                                        <toolkit:ContextMenuService.ContextMenu>
+                                            <toolkit:ContextMenu>
+                                                <toolkit:MenuItem Header="즐겨찾기" Tag="{Binding}" Click="AddFavorite_Click"/>
+                                            </toolkit:ContextMenu>
+                                        </toolkit:ContextMenuService.ContextMenu>
+                                    </TextBlock>
+                                           
+                                           
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -85,42 +96,16 @@
                         <TextBlock x:Name="RefreshStatus" HorizontalAlignment="Center" Style="{StaticResource PhoneTextNormalStyle}"></TextBlock>
                         <ProgressBar x:Name="RefreshProgress" Minimum="0" Maximum="100"></ProgressBar>
                         
-                    </StackPanel>                        
+                    </StackPanel>                    
                     
-                    <Button x:Name="RefreshGalleryListButton" Grid.Row="2" Click="RefreshGalleryListButton_Click">목록 다시 얻어오기</Button>
                 </Grid>                
             </controls:PanoramaItem>
 
-            <controls:PanoramaItem x:Name="ParanomaSetting" Header="설정">
+            <controls:PanoramaItem x:Name="PanoramaSetting" Header="설정">
                 <ScrollViewer>
                     <StackPanel Margin="0, 0, 10, 0">
-                        
-                        <Border BorderBrush="{StaticResource PhoneSubtleBrush}" BorderThickness="0" Padding="3" Margin="0, 0, 0, 20">
-                            <StackPanel>
-                                <TextBlock Text="일반" Style="{StaticResource PhoneTextLargeStyle}" />
-                                <Rectangle Fill="{StaticResource PhoneSubtleBrush}" Height="1" Margin="3"/>
-                                <CheckBox x:Name="PassiveLoadImgCheckBox" Content="이미지 수동으로 불러오기" Tap="PassiveLoadImage" />
-                                <CheckBox x:Name="FontSizeCheckBox" Content="목록/내용 글씨 크게" Tap="FontSizeCheckBox_Tap"/>
-                            </StackPanel>
-                        </Border>
-                        
-                        <Border BorderBrush="{StaticResource PhoneSubtleBrush}" BorderThickness="0" Padding="3">
-                            <StackPanel x:Name="LoginForm" Visibility="Visible" >
-                                <TextBlock Text="로그인" Style="{StaticResource PhoneTextLargeStyle}" />
-                                <Rectangle Fill="{StaticResource PhoneSubtleBrush}" Height="1" Margin="3"/>
-                                <TextBlock Text="이름" Style="{StaticResource PhoneTextNormalStyle}" />
-                                <TextBox x:Name="LoginName" Text="{Binding ID, Mode=TwoWay}"/>
-
-                                <TextBlock Text="비밀번호" Style="{StaticResource PhoneTextNormalStyle}"/>
-                                <PasswordBox x:Name="LoginPassword" Password="{Binding Password, Mode=TwoWay}"/>
-
-                                <CheckBox Content="자동 로그인" IsChecked="{Binding AutoLogin, Mode=TwoWay}" Name="AutoLogin" />
-                                <Button x:Name="SubmitButton" Click="SubmitButton_Click" Content="지금 로그인" />
-                                <ProgressBar x:Name="ProgressBar" Value="0" Background="Transparent" IsIndeterminate="False" />
-                            </StackPanel>
-                        </Border>
-
-
+                        <CheckBox x:Name="PassiveLoadImgCheckBox" Content="이미지 수동으로 불러오기" Tap="PassiveLoadImage" />
+                        <CheckBox x:Name="FontSizeCheckBox" Content="목록/내용 글씨 크게" Tap="FontSizeCheckBox_Tap"/>
                     </StackPanel>
                 </ScrollViewer>
             </controls:PanoramaItem>
@@ -130,5 +115,6 @@
     </Grid>
 
     <!--Panorama 기반 응용 프로그램에서는 ApplicationBar를 표시하지 않아야 합니다.-->
+    
 
 </phone:PhoneApplicationPage>

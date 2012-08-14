@@ -21,71 +21,17 @@ using System.Windows.Media.Imaging;
 using MyApps.Common;
 using System.IO.IsolatedStorage;
 using System.Windows.Data;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
-namespace MyApps.DCView
+namespace DCView
 {
     // 글 목록을 보고 읽는 곳
-    public partial class ViewArticle : PhoneApplicationPage
-    {
-        // TEMP
-        //class ArticleTextAdapter
-        //{
-        //    public class ItemCollector
-        //    {
-        //        ViewArticle va = null;
-
-        //        public ItemCollector(ViewArticle article)
-        //        {
-        //            va = article;
-        //        }
-
-        //        public int Count { get { return va.ArticleTextPanel.Children.Count; } }
-
-        //        public void Clear()
-        //        {
-        //            va.ArticleTextPanel.Children.Clear();
-        //        }
-        //        public void Remove(UIElement obj)
-        //        {
-        //            va.ArticleTextPanel.Children.Remove(obj);
-        //        }
-        //        public void Add(UIElement obj)
-        //        {
-        //            va.ArticleTextPanel.Children.Add(obj);
-        //        }
-
-        //        public void Insert(int i, UIElement obj)
-        //        {
-        //            va.ArticleTextPanel.Children.Insert(i, obj);
-        //        }
-        //    }
-
-        //    public ItemCollector Items { get; private set; }
-
-        //    public void InvalidateArrange()
-        //    {
-        //        // va.ArticleTextPanel.InvalidateArrange();
-        //    }
-
-        //    public void ScrollIntoView(UIElement element)
-        //    {
-        //    }
-
-
-        //    public ArticleTextAdapter(ViewArticle article)
-        //    {
-        //        Items = new ItemCollector(article);
-        //    }
-        //}
-        //ArticleTextAdapter ArticleText = null;
-
-        // TEMP
-        
-
+    public partial class ViewArticle : PhoneApplicationPage, INotifyPropertyChanged
+    {       
         // 데이터.. articles
         // Tombstoning 당하면 사라져야 정상인걸까? => 그렇다.. 아무것도 없는 처음 상태로 되돌린다
-        ArticleManager archive = null;
-        LoginInfo loginInfo = LoginInfo.Instance;
+        IBoard board = null;
 
         // appBar        
         ApplicationBarIconButton appbarWrite;
@@ -171,13 +117,13 @@ namespace MyApps.DCView
             // 버튼 모두 삭제
             ApplicationBar.Buttons.Clear();
 
-            if (LoginInfo.Instance.LoginState == LoginInfo.State.LoggedIn)
+            if (App.Current.LoginInfo.LoginState == LoginInfo.State.LoggedIn)
                 ApplicationBar.Buttons.Add(appbarWrite);
 
             ApplicationBar.Buttons.Add(appbarRefresh);
 
             // 초기화 되면 archive가 없어진다
-            if (archive != null)
+            if (board != null)
             {
                 return;
             }
@@ -205,17 +151,42 @@ namespace MyApps.DCView
             NextPage.SetBinding(Button.IsEnabledProperty, new Binding("IsLoadingArticleList") { Converter = new NegateBoolConverter() });
             NextPage.Click += NextPage_Click;
             
-            archive = new ArticleManager(id, site, pcsite);
-            archive.ArticleAdded += (article) => { ArticleList.Items.Insert(ArticleList.Items.Count - 1, article); };
-            archive.ArticleCleared += () => 
-            {
-                ArticleList.Items.Clear();
-                ArticleList.Items.Add(NextPage);
-            };
-            
-            archive.Refresh();
+            board = new DCInsideBoard(site, id);
 
-            DataContext = archive;
+            ((INotifyCollectionChanged)board.Articles).CollectionChanged += (obj, args) =>
+                {
+                    switch (args.Action)
+                    {
+                        case NotifyCollectionChangedAction.Add:
+                            {
+                                Dispatcher.BeginInvoke(() =>
+                                    {
+
+                                        foreach (var item in args.NewItems)
+                                            ArticleList.Items.Insert(ArticleList.Items.Count - 1, item);
+                                    });
+                                break;
+                            }
+
+                        case NotifyCollectionChangedAction.Reset:
+                            {
+                                ArticleList.Items.Clear();
+                                if (args.NewItems != null)
+                                {
+                                    foreach (var item in args.NewItems)
+                                    {
+                                        ArticleList.Items.Add(item);
+                                    }
+                                }
+                                ArticleList.Items.Add(NextPage);
+                                break;
+                            }
+                        
+                    }
+                };
+
+            board.ResetArticleList(0);
+            // DataContext = archive;
 
             // 왼쪽 상단 갤러리
             PivotMain.Title = name + " 갤러리";
@@ -225,8 +196,8 @@ namespace MyApps.DCView
         private void Refresh()
         {
             // 글 목록을 지우고.. 
-            ArticleList.Items.Clear();
-            archive.Refresh();            
+            // ArticleList.Items.Clear();
+            board.ResetArticleList(0);            
         }
 
         private void RefreshArticleText(Article article)
@@ -234,9 +205,18 @@ namespace MyApps.DCView
             // 이전 글 안보이게 지우기
             ArticleText.Children.Clear();
 
-            archive.GetArticleText(article,
-                    () => { UpdateArticleText(article); },
-                    () => { MessageBox.Show("글을 읽어들이는데 실패했습니다. 다시 시도해보세요"); });
+            CancellationTokenSource cts = new CancellationTokenSource();
+            board.GetArticleText(article, cts.Token)
+            .ContinueWith( prevTask =>
+            {
+                if (prevTask.IsCanceled || prevTask.Exception != null)
+                {
+                    MessageBox.Show("글을 읽어들이는데 실패했습니다. 다시 시도해보세요");
+                    return;
+                }
+
+                UpdateArticleText(article);
+            });
         }
 
         private void UpdateArticleText(Article article)
@@ -254,7 +234,7 @@ namespace MyApps.DCView
             ArticleText.Children.Add(title);
 
 
-            if ((bool)IsolatedStorageSettings.ApplicationSettings["DCView.passive_loadimg"] && article.Images.Count != 0)
+            if ((bool)IsolatedStorageSettings.ApplicationSettings["DCView.passive_loadimg"] && article.Pictures.Count != 0)
             {
                 var button = new Button()
                 {
@@ -270,18 +250,18 @@ namespace MyApps.DCView
                 // 버튼을 눌렀을 때 
                 button.Click += (o, e) =>
                 {   
-                    button.Content = string.Format("로딩중 {0}/{1}", 0, article.Images.Count);
+                    button.Content = string.Format("로딩중 {0}/{1}", 0, article.Pictures.Count);
                     button.IsEnabled = false;
                     int failedCount = 0;
                     int count = 0;
                     
-                    foreach (Uri uri in article.Images)
+                    foreach (Picture pic in article.Pictures)
                     {
-                        Uri curUri = uri;
+                        Uri curUri = pic.Uri;
 
                         var image = new Image()
                         {
-                            Source = new BitmapImage(uri),
+                            Source = new BitmapImage(curUri),
                             Margin = new Thickness(3),
                         };
 
@@ -298,11 +278,11 @@ namespace MyApps.DCView
                             count++;
 
                             if( failedCount != 0 )
-                                button.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", count, article.Images.Count, failedCount);
+                                button.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", count, article.Pictures.Count, failedCount);
                             else
-                                button.Content = string.Format("불러오기 {0}/{1}", count, article.Images.Count, failedCount);
+                                button.Content = string.Format("불러오기 {0}/{1}", count, article.Pictures.Count, failedCount);
 
-                            if (failedCount == 0 && count == article.Images.Count)
+                            if (failedCount == 0 && count == article.Pictures.Count)
                             {
                                 // 버튼 제거하기
                                 ArticleText.Children.Remove(button);
@@ -316,7 +296,7 @@ namespace MyApps.DCView
                             failedCount++;
                             count++;
 
-                            button.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", 0, article.Images.Count, failedCount);
+                            button.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", 0, article.Pictures.Count, failedCount);
                         };
 
                         ArticleText.Children.Insert(imageEmbedIndex, image);
@@ -329,18 +309,18 @@ namespace MyApps.DCView
             }
             else 
             {
-                foreach (Uri uri in article.Images)
+                foreach (Picture pic in article.Pictures)
                 {
                     var image = new Image()
                     {
-                        Source = new BitmapImage(uri),
+                        Source = new BitmapImage(pic.Uri),
                         Margin = new Thickness(3),
                     };
 
                     image.Tap += (o1, e1) =>
                     {
                         WebBrowserTask task = new WebBrowserTask();
-                        task.Uri = uri;
+                        task.Uri = pic.Uri;
                         task.Show();                       
                     };
 
@@ -394,7 +374,7 @@ namespace MyApps.DCView
             // var cookies = WebClientEx.CookieContainer.GetCookies(new Uri("http://gall.dcinside.com"));
             // if (cookies["PHPSESSID"] != null)
             // 댓글 쓰기 버튼 누르기 -> 로그인 -> 로그인 성공 -> 댓글을 남기는 작업 -> 원래 페이지로 돌아와서 페이지 업데이트            
-            if (loginInfo.LoginState == LoginInfo.State.LoggedIn)
+            if (App.Current.LoginInfo.LoginState == LoginInfo.State.LoggedIn)
             {
                 var inputScope = new InputScope();
                 inputScope.Names.Add(new InputScopeName() { NameValue = InputScopeNameValue.Chat });
@@ -419,7 +399,7 @@ namespace MyApps.DCView
                     {
                         curReplyTextBox = replyText;
                         // 글쓰기 버튼 제거, 전송 버튼 추가
-                        if (LoginInfo.Instance.LoginState == LoginInfo.State.LoggedIn)
+                        if (App.Current.LoginInfo.LoginState == LoginInfo.State.LoggedIn)
                             ApplicationBar.Buttons.Remove(appbarWrite);
 
                         if( !ApplicationBar.Buttons.Contains(appbarCommentSubmit))
@@ -430,7 +410,7 @@ namespace MyApps.DCView
                     {
                         curReplyTextBox = null;
                         // 글쓰기 버튼 추가, 전송 버튼 제거
-                        if (LoginInfo.Instance.LoginState == LoginInfo.State.LoggedIn)
+                        if (App.Current.LoginInfo.LoginState == LoginInfo.State.LoggedIn)
                             if( !ApplicationBar.Buttons.Contains(appbarWrite))
                             ApplicationBar.Buttons.Insert(0, appbarWrite);
 
@@ -559,14 +539,14 @@ namespace MyApps.DCView
 
                     if (tag.Name == "p")
                     {
-                        if (tag.Kind == Common.Tag.TagKind.Open)
+                        if (tag.Kind == MyApps.Common.Tag.TagKind.Open)
                             pDepth++;
-                        else if (tag.Kind == Common.Tag.TagKind.Close)
+                        else if (tag.Kind == MyApps.Common.Tag.TagKind.Close)
                             pDepth--;
 
-                        if ((tag.Kind == Common.Tag.TagKind.Open && pDepth > 1) ||
-                                (tag.Kind == Common.Tag.TagKind.Close && pDepth == 0) ||
-                                (tag.Kind == Common.Tag.TagKind.OpenAndClose))
+                        if ((tag.Kind == MyApps.Common.Tag.TagKind.Open && pDepth > 1) ||
+                                (tag.Kind == MyApps.Common.Tag.TagKind.Close && pDepth == 0) ||
+                                (tag.Kind == MyApps.Common.Tag.TagKind.OpenAndClose))
                         {
                             foreach (var obj in MakeTextBlocks(curPlainString.ToString()))
                                 yield return obj;
@@ -634,7 +614,8 @@ namespace MyApps.DCView
 
         private void NextPage_Click(object sender, RoutedEventArgs e)
         {
-            archive.GetNextArticles();            
+            CancellationTokenSource cts = new CancellationTokenSource();
+            board.GetNextArticleList(cts.Token);
         }
 
         // 답장 버튼 클릭
@@ -646,10 +627,19 @@ namespace MyApps.DCView
             if (text.Trim() == string.Empty)
                 return false;
 
-            archive.Reply(article, text,
-                () => { RefreshArticleText(article); },
-                () => { MessageBox.Show("댓글달기에 실패했습니다 다시 시도해보세요"); });
+            CancellationTokenSource cts = new CancellationTokenSource();
 
+            board.WriteComment(article, text, cts.Token)
+            .ContinueWith( prevTask =>
+            {
+                if (prevTask.IsCanceled || prevTask.IsFaulted )
+                {
+                    MessageBox.Show("댓글달기에 실패했습니다 다시 시도해보세요");
+                    return;
+                }
+
+                RefreshArticleText(article);
+            });
             return true;
         }
 
@@ -671,13 +661,12 @@ namespace MyApps.DCView
             var wbTask = new WebBrowserTask();
 
             if (PivotMain.SelectedItem == PivotList)
-                wbTask.Uri = new Uri(string.Format("http://{0}/list.php?id={1}", archive.PCSite, archive.ID), UriKind.Absolute);
+                wbTask.Uri = board.GetBoardUri();
             else
             {
                 Article article = ArticleList.SelectedItem as Article;
                 if (article == null) return;
-
-                wbTask.Uri = new Uri(string.Format("http://{0}/list.php?id={1}&no={2}", archive.PCSite, archive.ID, article.ID), UriKind.Absolute);
+                wbTask.Uri = board.GetArticleUri(article);
             }
 
             wbTask.Show();
@@ -685,8 +674,9 @@ namespace MyApps.DCView
 
         private void appbarWrite_Click(object sender, EventArgs e)
         {
-            NavigationService.Navigate(new Uri(string.Format("/Views/WriteArticle.xaml?id={0}&name={1}&site={2}&pcsite={3}",
-                archive.ID, NavigationContext.QueryString["name"], archive.Site, archive.PCSite), UriKind.Relative));
+            // 여기가 에러 
+            // NavigationService.Navigate(new Uri(string.Format("/Views/WriteArticle.xaml?id={0}&name={1}&site={2}&pcsite={3}",
+            //     archive.ID, NavigationContext.QueryString["name"], archive.Site, archive.PCSite), UriKind.Relative));
         }
 
         void appbarCommentSubmit_Click(object sender, EventArgs e)
@@ -711,6 +701,50 @@ namespace MyApps.DCView
         private void ArticleList_ManipulationCompleted(object sender, ManipulationCompletedEventArgs e)
         {
             this.Focus();
+        }
+
+        // 
+
+        bool isLoadingArticleList;
+        bool isLoadingArticleText;
+        bool isReplying;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool IsLoadingArticleList
+        {
+            get { return isLoadingArticleList; }
+            private set
+            {
+                isLoadingArticleList = value;
+                RaisePropertyChanged("IsLoadingArticleList");
+            }
+        }
+
+        public bool IsLoadingArticleText
+        {
+            get { return isLoadingArticleText; }
+            private set
+            {
+                isLoadingArticleText = value;
+                RaisePropertyChanged("IsLoadingArticleText");
+            }
+        }
+
+        public bool IsReplying
+        {
+            get { return isReplying; }
+            private set
+            {
+                isReplying = value;
+                RaisePropertyChanged("IsReplying");
+            }
+        }
+
+        private void RaisePropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
         
     }

@@ -12,10 +12,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using MyApps.DCView;
 using System.IO.IsolatedStorage;
+using DCView;
 
-namespace MyApps
+namespace DCView
 {
     public partial class App : Application
     {
@@ -23,7 +23,9 @@ namespace MyApps
         /// 전화 응용 프로그램의 루트 프레임에 간단하게 액세스할 수 있습니다.
         /// </summary>
         /// <returns>전화 응용 프로그램의 루트 프레임입니다.</returns>
-        public PhoneApplicationFrame RootFrame { get; private set; }        
+        public PhoneApplicationFrame RootFrame { get; private set; }
+
+        public new static App Current { get { return (App)Application.Current; } }
 
         /// <summary>
         /// Application 개체의 생성자입니다.
@@ -41,19 +43,10 @@ namespace MyApps
 
             // 리소스 초기화
             // 폰트..
-            InitializeFontResource();            
+            InitializeFontResource();
 
-            // AutoLogin이면 Login페이지로 가고 아니라면 
-            var startupPageMapping = new UriMapping()
-            {
-                Uri = new Uri("/Startup.xaml", UriKind.Relative),
-                MappedUri = new Uri(LoginInfo.Instance.AutoLogin ?
-                    "/Views/StartupLogin.xaml" : "/Views/SelectGallery.xaml", UriKind.Relative),
-            };
-            var uriMapper = new UriMapper();
-            uriMapper.UriMappings.Add(startupPageMapping);
-            RootFrame.UriMapper = uriMapper;
-
+            Initialize();
+            
             // 디버깅하는 동안 그래픽 프로파일링 정보를 표시합니다.
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -226,5 +219,17 @@ namespace MyApps
         }
 
         #endregion
+
+        // 공용 리소스들
+        public GalleryList GalleryList { get; private set; }
+        public LoginInfo LoginInfo { get; private set; }
+
+        private void Initialize()
+        {
+            GalleryList = new GalleryList();
+            GalleryList.Load();
+
+            LoginInfo = new LoginInfo();
+        }
     }
 }

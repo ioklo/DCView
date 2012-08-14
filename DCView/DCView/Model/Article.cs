@@ -10,7 +10,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Collections.Generic;
 
-namespace MyApps.DCView
+namespace DCView
 {
     public class Article
     {
@@ -24,12 +24,12 @@ namespace MyApps.DCView
         public int CommentCount { get; set; }
         public int ViewCount { get; set; }
         public List<Comment> Comments { get; private set; }
-        public List<Uri> Images { get; private set; }
+        public List<Picture> Pictures { get; private set; }
 
         public Article()
         {
             Comments = new List<Comment>();
-            Images = new List<Uri>();
+            Pictures = new List<Picture>();
         }
 
         public string Status

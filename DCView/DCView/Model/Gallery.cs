@@ -10,7 +10,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 
-namespace MyApps.DCView
+namespace DCView
 {
     public class Gallery : INotifyPropertyChanged
     {
@@ -36,21 +36,6 @@ namespace MyApps.DCView
             get
             {
                 return "m.dcinside.com";
-            }
-        }
-
-        public bool IsFavorite
-        {
-            get
-            {
-                return isFavorite;
-            }
-            set
-            {
-                isFavorite = value;
-                
-                if( PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("IsFavorite"));
             }
         }
         

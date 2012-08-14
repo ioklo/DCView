@@ -12,8 +12,9 @@ using System.ComponentModel;
 using System.IO.IsolatedStorage;
 using MyApps.Common;
 using System.Text;
+using DCView.Util;
 
-namespace MyApps.DCView
+namespace DCView
 {
     public class LoginInfo : INotifyPropertyChanged
     {
@@ -22,12 +23,6 @@ namespace MyApps.DCView
             NotLogin,
             LoggingIn,
             LoggedIn,
-        }
-
-        private static LoginInfo instance = new LoginInfo();
-        public static LoginInfo Instance
-        {
-            get { return instance; }
         }
 
         public string ID
@@ -116,7 +111,7 @@ namespace MyApps.DCView
             isoSettings.Save();
         }
 
-        WebClientEx client = null;
+        DCViewWebClient client = null;
 
         // 로그인 중이라면 취소
         public void Cancel()
@@ -130,10 +125,9 @@ namespace MyApps.DCView
             if (client != null)
                 return;
 
-            client = new WebClientEx();
+            client = new DCViewWebClient();
 
             client.Headers["Content-Type"] = "application/x-www-form-urlencoded";
-            client.Headers["User-Agent"] = "Mozilla/5.0 (Linux; U; Android 2.1-update1; ko-kr; Nexus One Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17";
             client.Headers["Referer"] = "http://m.dcinside.com/login.php?r_url=%2F";
 
             string data = string.Format(
@@ -181,7 +175,7 @@ namespace MyApps.DCView
         {
             LastLogin = null;
             LoginState = State.NotLogin;
-            WebClientEx.ResetCookie(); // 쿠키값 리셋
+            DCViewWebClient.ResetCookie(); // 쿠키값 리셋
         }
 
         public void Delete()

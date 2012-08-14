@@ -12,8 +12,9 @@ using System.ComponentModel;
 using MyApps.Common;
 using System.Text;
 using System.Text.RegularExpressions;
+using DCView.Util;
 
-namespace MyApps.DCView
+namespace DCView
 {
     public class ArticleWriter : INotifyPropertyChanged
     {
@@ -24,7 +25,7 @@ namespace MyApps.DCView
             Sending,
             SendCompleted,
             Error, // 에러 
-        }
+        }        
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -80,9 +81,8 @@ namespace MyApps.DCView
 
         public void Refresh()
         {
-            WebClientEx client = new WebClientEx();
+            DCViewWebClient client = new DCViewWebClient();
             client.Encoding = Encoding.UTF8;            
-            client.Headers["User-Agent"] = "Mozilla/5.0 (Linux; U; Android 2.1-update1; ko-kr; Nexus One Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17";
             client.Headers["Referer"] = string.Format("http://m.dcinside.com/list.php?id={0}", ID);
 
             client.DownloadStringCompleted += (o, e) =>
@@ -124,22 +124,21 @@ namespace MyApps.DCView
 
         public void Send()
         {
-            if (LoginInfo.Instance.LoginState != LoginInfo.State.LoggedIn)
+            if (App.Current.LoginInfo.LoginState != LoginInfo.State.LoggedIn)
                 return;
 
             string data = string.Format(
                 "subject={0}&memo={1}&user_id={2}&mode=write&id={3}&code={4}&mobile_key={5}",
                 HttpUtility.UrlEncode(Title),
                 HttpUtility.UrlEncode(Text),
-                HttpUtility.UrlEncode(LoginInfo.Instance.ID),
+                HttpUtility.UrlEncode(App.Current.LoginInfo.ID),
                 HttpUtility.UrlEncode(ID),
                 code,
                 mobileKey);
 
-            WebClientEx client = new WebClientEx();
+            DCViewWebClient client = new DCViewWebClient();
             client.Encoding = Encoding.UTF8;
             client.Headers["Content-Type"] = "application/x-www-form-urlencoded";
-            client.Headers["User-Agent"] = "Mozilla/5.0 (Linux; U; Android 2.1-update1; ko-kr; Nexus One Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17";
             client.Headers["Referer"] = string.Format("http://m.dcinside.com/write.php?id={0}&mode=write", ID);
 
             client.UploadStringCompleted += (o, e) =>

@@ -9,8 +9,6 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Collections.Generic;
-using MyApps.DCView;
-using MyApps.Common;
 using System.IO.IsolatedStorage;
 using System.IO;
 using System.ComponentModel;
@@ -20,14 +18,18 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.Threading;
 
-namespace MyApps.Models
+using MyApps.Common;
+using DCView.Util;
+using System.Collections.ObjectModel;
+
+namespace DCView
 {
     public class GalleryList
     {
         // favorite과 gallery의 분리
         Dictionary<string, Gallery> galleries = new Dictionary<string, Gallery>();
-        
-        List<Gallery> favorites = new List<Gallery>();
+
+        ObservableCollection<Gallery> favorites = new ObservableCollection<Gallery>();
         bool modifiedFavorites = false;
 
         public IEnumerable<Gallery> All 
@@ -38,7 +40,7 @@ namespace MyApps.Models
             }
         }
 
-        public IEnumerable<Gallery> Favorites
+        public ObservableCollection<Gallery> Favorites
         {
             get
             {
@@ -49,7 +51,7 @@ namespace MyApps.Models
         public void Load()
         {
             // DCView_list.txt 생성 
-            Util.CopyResourceToStorage("Data/idlist.txt", "/DCView_list.txt");
+            MyApps.Common.Util.CopyResourceToStorage("Data/idlist.txt", "/DCView_list.txt");
 
             var storage = IsolatedStorageFile.GetUserStoreForApplication();
             using (var reader = new StreamReader(storage.OpenFile("/DCView_list.txt", FileMode.Open), Encoding.UTF8))
@@ -144,10 +146,9 @@ namespace MyApps.Models
             var storage = IsolatedStorageFile.GetUserStoreForApplication();
             using (var writer = new StreamWriter(storage.OpenFile("/DCView_favorites.txt", FileMode.Create)))
             {
-                foreach (var gal in galleries.Values)
+                foreach (var gal in favorites)
                 {
-                    if (gal.IsFavorite)
-                        writer.WriteLine(gal.ID);
+                    writer.WriteLine(gal.ID);
                 }
             }
         }        
@@ -181,17 +182,15 @@ namespace MyApps.Models
 
         public Task<bool> RefreshAll(RefreshStatusChangedEventHandler eventHandler)
         {
-            WebClientEx client = new WebClientEx();
-
-            client.Encoding = Encoding.UTF8;
-            client.Headers["User-Agent"] = "Mozilla/5.0 (Linux; U; Android 2.1-update1; ko-kr; Nexus One Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17";
+            DCViewWebClient client = new DCViewWebClient();
 
             client.DownloadProgressChanged += (obj, args) =>
             {
                 eventHandler(RefreshStatus.Downloading, args);
             };
 
-            Task<string> downloadTask = client.DownloadStringAsyncTask(new Uri("http://m.dcinside.com/category_gall_total.html", UriKind.Absolute));
+            CancellationTokenSource cts = new CancellationTokenSource();
+            Task<string> downloadTask = client.DownloadStringAsyncTask(new Uri("http://m.dcinside.com/category_gall_total.html", UriKind.Absolute), cts.Token);
 
             return downloadTask.ContinueWith<bool>( prevTask =>
             {

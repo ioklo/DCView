@@ -12,7 +12,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 
-namespace MyApps.DCView
+namespace DCView
 {
     public partial class WriteArticle : PhoneApplicationPage
     {

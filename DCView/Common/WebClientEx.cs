@@ -19,9 +19,14 @@ namespace MyApps.Common
             this.Encoding = System.Text.Encoding.UTF8;
         }
 
-        public Task<string> DownloadStringAsyncTask(Uri uri)
+        public Task<string> DownloadStringAsyncTask(Uri uri, CancellationToken cts)
         {
-            var tcs = new TaskCompletionSource<string>();
+            var tcs = new TaskCompletionSource<string>();            
+
+            var registration = cts.Register(() =>
+                {
+                    this.CancelAsync();
+                });
 
             this.DownloadStringCompleted += (o, e) =>
             {
@@ -35,11 +40,12 @@ namespace MyApps.Common
                 // 에러가 났거나
                 if (e.Error != null)
                 {
-                    tcs.TrySetException(e.Error);
+                    tcs.SetException(e.Error);
                     return;
                 }
                         
                 tcs.SetResult(e.Result);
+                registration.Dispose();
             };
 
             this.DownloadStringAsync(uri);

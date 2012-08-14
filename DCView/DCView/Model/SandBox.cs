@@ -9,10 +9,9 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 
-namespace MyApps.ViewModels
+namespace DCView
 {
-    
-    public class ArticleListViewModel
+    public class SandBox
     {
 
     }
