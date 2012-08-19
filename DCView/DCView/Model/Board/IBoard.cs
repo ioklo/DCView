@@ -11,7 +11,7 @@ namespace DCView
     {
         ReadOnlyObservableCollection<Article> Articles { get; }
 
-        // 
+        
         Uri GetBoardUri();
         Uri GetArticleUri(Article article);
 

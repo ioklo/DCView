@@ -67,7 +67,7 @@
                     
                     <TextBox x:Name="SearchBox" Grid.Row="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
                     
-                    <ListBox x:Name="SearchResult" Grid.Row="1" Margin="0,0,0,72">
+                    <ListBox x:Name="SearchResult" Grid.Row="1">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="12,12" >

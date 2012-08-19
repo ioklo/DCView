@@ -32,6 +32,14 @@ namespace DCView
         ObservableCollection<Gallery> favorites = new ObservableCollection<Gallery>();
         bool modifiedFavorites = false;
 
+        public Gallery this[string id]
+        {
+            get
+            {
+                return galleries[id];
+            }
+        }
+
         public IEnumerable<Gallery> All 
         {
             get
@@ -159,8 +167,8 @@ namespace DCView
             {
                 foreach (Gallery gal in galleries.Values)
                 {
-                    if (token.IsCancellationRequested)                        
-                        token.ThrowIfCancellationRequested();
+                    if (token.IsCancellationRequested)
+                        return;
 
                     if (gal.ID.IndexOf(text, StringComparison.CurrentCultureIgnoreCase) >= 0 ||
                         gal.Name.IndexOf(text, StringComparison.CurrentCultureIgnoreCase) >= 0)
@@ -168,7 +176,7 @@ namespace DCView
                 }
 
                 if (token.IsCancellationRequested)
-                    token.ThrowIfCancellationRequested();
+                    return;
             });
         }
 

@@ -19,8 +19,8 @@ namespace DCView
 
         public BoolToColorConverter()
         {
-            phoneAccentBrush = App.Current.Resources["PhoneAccentBrush"];
-            phoneDisabledBrush = App.Current.Resources["PhoneDisabledBrush"];
+            phoneAccentBrush = Application.Current.Resources["PhoneAccentBrush"];
+            phoneDisabledBrush = Application.Current.Resources["PhoneDisabledBrush"];
         }
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -68,23 +68,16 @@ namespace DCView
 
         void InitializeApplicationBar()
         {
-            favoriteApplicationBar = new ApplicationBar();
-            Color col = (Color)App.Current.Resources["PhoneAccentColor"];
-            Color bgcolor = Color.FromArgb(80, col.R, col.G, col.B );
-            favoriteApplicationBar.BackgroundColor = bgcolor;
-            ApplicationBarIconButton addFavoriteIconButton = new ApplicationBarIconButton();
+            favoriteApplicationBar = null;
 
             allApplicationBar = new ApplicationBar();
-            allApplicationBar.BackgroundColor = bgcolor;
-
             ApplicationBarIconButton refreshListIconButton = new ApplicationBarIconButton();
             refreshListIconButton.IconUri = new Uri("/appbar.refresh.rest.png", UriKind.Relative);
             refreshListIconButton.Click += RefreshGalleryListButton_Click;
             refreshListIconButton.Text = "새로고침";
             allApplicationBar.Buttons.Add(refreshListIconButton);
 
-            settingApplicationBar = new ApplicationBar();
-            settingApplicationBar.BackgroundColor = bgcolor;
+            settingApplicationBar = null;
         }
 
         private void PanoramaMain_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -113,7 +106,7 @@ namespace DCView
             Gallery gal = ((FrameworkElement)sender).Tag as Gallery;
             if (gal == null) return;
 
-            Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?site={0}&id={1}&name={2}&pcsite={3}", gal.Site ,gal.ID, gal.Name, gal.PCSite), UriKind.Relative);
+            Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?id={0}", gal.ID), UriKind.Relative);
             NavigationService.Navigate(uri);
         }
 
@@ -134,7 +127,7 @@ namespace DCView
             Gallery gal = ((FrameworkElement)sender).Tag as Gallery;
             if (gal == null) return;
 
-            Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?site={0}&id={1}&name={2}&pcsite={3}", gal.Site, gal.ID, gal.Name, gal.PCSite), UriKind.Relative);
+            Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?id={0}", gal.ID), UriKind.Relative);
             NavigationService.Navigate(uri);
         }
 

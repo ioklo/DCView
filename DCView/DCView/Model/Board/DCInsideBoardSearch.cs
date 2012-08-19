@@ -8,23 +8,33 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Collections.Generic;
-using MyApps.Common;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Threading;
-using System.Linq;
 using DCView.Util;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.IO;
+using MyApps.Common;
+using MyApps.Common.HtmlParser;
 
 namespace DCView
 {
-    public class DCInsideBoard : IBoard
+    public class DCInsideBoardSearch : IBoard    
     {
+        public enum SearchType
+        {
+            Subject,
+            Content,
+            Name,
+        }
+
         // 내부 변수
         string id;
+        string searchText;
+        SearchType searchType;
         int page;
+        int serpos = 0; // 현재 search pos
         ObservableCollection<Article> articleList;
         ReadOnlyObservableCollection<Article> readonlyArticleList;
 
@@ -33,9 +43,11 @@ namespace DCView
             get { return readonlyArticleList; }
         }
 
-        public DCInsideBoard(string id)
+        public DCInsideBoardSearch(string id, string searchText, SearchType searchType)
         {            
             this.id = id;
+            this.searchText = searchText;
+            this.searchType = searchType;
             this.articleList = new ObservableCollection<Article>();
             this.readonlyArticleList = new ReadOnlyObservableCollection<Article>(this.articleList);
         }
@@ -57,15 +69,30 @@ namespace DCView
             articleList.Clear();
         }
 
+        private string GetSearchTypeText(SearchType searchType)
+        {
+            switch (searchType)
+            {
+                case SearchType.Content: return "memo";
+                case SearchType.Subject: return "subject";
+                case SearchType.Name: return "name";
+            }
+
+            return string.Empty;
+        }
+
         public Task GetNextArticleList(CancellationToken cts)
         {
             // 현재 페이지에 대해서 
             DCViewWebClient webClient = new DCViewWebClient();
 
             // 접속할 사이트
-            string url = string.Format("http://m.dcinside.com/list.php?id={0}&page={1}&nocache={2}", 
+            string url = string.Format("http://m.dcinside.com/list.php?id={0}&page={1}&serVal={2}&s_type={3}&ser_pos={4}&nocache={5}", 
                 id, 
                 page + 1, 
+                searchText,
+                GetSearchTypeText(searchType),
+                serpos != 0 ? serpos.ToString() : string.Empty,
                 DateTime.Now.Ticks);
 
             // 페이지를 받고
@@ -88,9 +115,43 @@ namespace DCView
                 List<Article> newArticles = GetArticleListFromString(prevTask.Result);
                 AddArticles(newArticles);
 
-                // 페이지 하나 증가시키고
-                page++;
+                // 마지막 리스트였다면
+                int nextSearchPos;
+                if (IsLastSearch(prevTask.Result, out nextSearchPos))
+                {
+                    page = 0;
+                    serpos = nextSearchPos;
+                }
+                else
+                {
+                    // 페이지 하나 증가시키고
+                    page++;
+                }
             });
+        }
+
+        private bool IsLastSearch(string input, out int nextSearchPos)
+        {
+            nextSearchPos = 0;
+
+            Match match = Regex.Match(input, "<em(.*)class=\"pg_num_on21\">(\\d+)</em>/(\\d+)");
+            if (!match.Success)
+                return false;
+
+            if (match.Success && match.Groups[2].Value != match.Groups[3].Value)
+            {
+                return false;
+            }
+
+            // 없다면 
+            match = Regex.Match(input, "<button type='button' class='pg_btn21' ([^>]*)onclick=\"location.href='([^']*)ser_pos=-(\\d+)';\"\\s*>다음</button>");
+            if (match.Success)
+            {
+                nextSearchPos = - int.Parse(match.Groups[3].Value);
+                return true;
+            }
+
+            return false;
         }       
 
         public Task GetArticleText(Article article, CancellationToken cts)
@@ -150,7 +211,7 @@ namespace DCView
 
 
         private Regex getNumber = new Regex("no=(\\d+)[^>]*>");
-        private Regex getArticleData = new Regex("<span class=\"list_right\"><span class=\"((list_pic_n)|(list_pic_y))\"></span>([^>]*)<span class=\"list_pic_re\">(\\[(\\d+)\\])?</span><br /><span class=\"list_pic_galler\">([^<]*)(<img[^>]*>)?<span>([^>]*)</span></span></span></a></li>");
+        private Regex getArticleData = new Regex("<span class=\"list_right\"><span class=\"((list_pic_n)|(list_pic_y))\"></span>(.*?)<span class=\"list_pic_re\">(\\[(\\d+)\\])?</span><br /><span class=\"list_pic_galler\">(.*?)(<img[^>]*>)?<span>([^>]*)</span></span></span></a></li>");
         private List<Article> GetArticleListFromString(string input)
         {
             List<Article> result = new List<Article>();
@@ -176,9 +237,9 @@ namespace DCView
 
                 // HasImage
                 article.HasImage = matchArticleData.Groups[3].Length != 0;
-                article.Title = HttpUtility.HtmlDecode(matchArticleData.Groups[4].Value);
+                article.Title = HttpUtility.HtmlDecode(HtmlParser.StripTags(matchArticleData.Groups[4].Value)).Trim();
                 article.CommentCount = matchArticleData.Groups[5].Length == 0 ? 0 : int.Parse(matchArticleData.Groups[6].Value);
-                article.Name = HttpUtility.HtmlDecode(matchArticleData.Groups[7].Value).Trim();
+                article.Name = HttpUtility.HtmlDecode(HtmlParser.StripTags(matchArticleData.Groups[7].Value)).Trim();
                 article.Date = DateTime.Parse(matchArticleData.Groups[9].Value);
 
                 result.Add(article);

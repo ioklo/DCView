@@ -12,7 +12,7 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 
-namespace MyApps.Common
+namespace MyApps.Common.HtmlParser
 {
     public class StringHtmlEntityConverter
     {
@@ -308,7 +308,7 @@ namespace MyApps.Common
             if (Get<List<IHtmlEntity>>(reader, entities, GetPlainString))
                 return entities;
 
-            return null;
+            return new List<IHtmlEntity>();
         }
     }
 

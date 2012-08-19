@@ -8,38 +8,18 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.ComponentModel;
 
 namespace DCView
 {
-    public class Gallery : INotifyPropertyChanged
+    public class Gallery
     {
+        public string ID { get; private set; }
+        public string Name { get; private set; }
+
         public Gallery(string id, string name)
         {
             this.ID = id;
             this.Name = name;            
         }
-
-        public string ID { get; private set; }
-        public string Name { get; private set; }
-
-        public string PCSite
-        {
-            get
-            {
-                return "gall.dcinside.com";
-            }
-        }
-
-        public string Site
-        {
-            get
-            {
-                return "m.dcinside.com";
-            }
-        }
-        
-        public event PropertyChangedEventHandler PropertyChanged;
-        private bool isFavorite = false;
     }
 }

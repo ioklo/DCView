@@ -9,73 +9,171 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using Microsoft.Phone.Shell;
-using Microsoft.Phone.Controls;
+using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
-using Microsoft.Phone.Tasks;
-using System.Windows.Media.Imaging;
-using MyApps.Common;
 using System.IO.IsolatedStorage;
 using System.Windows.Data;
 using System.Collections.Specialized;
-using System.ComponentModel;
+using Microsoft.Phone.Shell;
+using Microsoft.Phone.Controls;
+using Microsoft.Phone.Tasks;
+using System.Windows.Media.Imaging;
+using MyApps.Common;
+using MyApps.Common.HtmlParser;
 
 namespace DCView
 {
     // 글 목록을 보고 읽는 곳
-    public partial class ViewArticle : PhoneApplicationPage, INotifyPropertyChanged
+    public partial class ViewArticle : PhoneApplicationPage
     {       
         // 데이터.. articles
         // Tombstoning 당하면 사라져야 정상인걸까? => 그렇다.. 아무것도 없는 처음 상태로 되돌린다
         IBoard board = null;
-
-        // appBar        
-        ApplicationBarIconButton appbarWrite;
-        ApplicationBarIconButton appbarRefresh;
-        ApplicationBarIconButton appbarCommentSubmit;
+        IBoard origBoard = null;
+        IBoard searchBoard = null;
+        
+        ApplicationBar listAppBar = null; // 목록에서의 앱바
+        ApplicationBar textAppBar = null; // 텍스트에서의 앱바
+        ApplicationBar replyAppBar = null; // 텍스트에서의 앱바
+        ApplicationBar searchAppBar = null;
 
         // 댓글쓰기 관련
         TextBox curReplyTextBox = null;
+        Button nextPageButton = null;
+        
+        Article curArticle = null;
+
+        Action<Uri> tapAction = (Action<Uri>)(uri =>
+        {
+            WebBrowserTask task = new WebBrowserTask();
+            task.Uri = uri;
+            task.Show();
+        });
 
         private void InitializeAppbar()
-        {
-            // AppBar
-            ApplicationBar appBar = new ApplicationBar();
-            appBar.IsMenuEnabled = true;
-            appBar.IsVisible = true;
-            
-            appbarWrite = new ApplicationBarIconButton()
-            {
-                IconUri = new Uri("/appbar.edit.rest.png", UriKind.Relative),
-                Text = "글쓰기"
-            };
-            appbarWrite.Click += appbarWrite_Click;
+        {   
+            // 앱바 처리 
 
-            appbarRefresh = new ApplicationBarIconButton()
+            // 1. 글 목록일때의 앱바
+            //   i 목록 다시 읽기
+            //   i 글쓰기
+            //   i 검색
+            //   - 웹브라우저에서 보기
+            listAppBar = new ApplicationBar();
+            listAppBar.IsMenuEnabled = true;
+            listAppBar.IsVisible = true;                        
+
+            var refreshListIconButton = new ApplicationBarIconButton()
             {
                 IconUri = new Uri("/appbar.refresh.rest.png", UriKind.Relative),
                 Text = "새로고침"
             };
-            appbarRefresh.Click += appbarRefresh_Click;
+            refreshListIconButton.Click += refreshListIconButton_Click;
+            listAppBar.Buttons.Add(refreshListIconButton);
 
-            appbarCommentSubmit = new ApplicationBarIconButton()
+            var writeIconButton = new ApplicationBarIconButton()
+            {
+                IconUri = new Uri("/appbar.edit.rest.png", UriKind.Relative),
+                Text = "글쓰기"
+            };
+            writeIconButton.Click += writeIconButton_Click;
+            listAppBar.Buttons.Add(writeIconButton);
+
+            var searchIconButton = new ApplicationBarIconButton()
+            {
+                IconUri = new Uri("/appbar.feature.search.rest.png", UriKind.Relative),
+                Text = "검색"
+            };
+            searchIconButton.Click += searchIconButton_Click;
+            listAppBar.Buttons.Add(searchIconButton);
+
+            var webViewList = new ApplicationBarMenuItem();
+            webViewList.Text = "웹브라우저로 보기";
+            webViewList.Click += webViewList_Click;
+            listAppBar.MenuItems.Add(webViewList);
+
+            // 2. 글 보기일때의 앱바
+            //   i 글 다시 읽기
+            //   - 웹브라우저에서 보기
+            textAppBar = new ApplicationBar();
+            textAppBar.IsMenuEnabled = true;
+            textAppBar.IsVisible = true;            
+
+            var refreshTextIconButton = new ApplicationBarIconButton()
+            {
+                IconUri = new Uri("/appbar.refresh.rest.png", UriKind.Relative),
+                Text = "새로고침"
+            };
+            refreshTextIconButton.Click += refreshTextIconButton_Click;
+            textAppBar.Buttons.Add(refreshTextIconButton);
+
+            var webViewText = new ApplicationBarMenuItem();
+            webViewText.Text = "웹브라우저로 보기";
+            webViewText.Click += webViewText_Click;
+            textAppBar.MenuItems.Add(webViewText);
+
+            // 리플 달기 상태에서의 앱바
+            // i 완료
+
+            replyAppBar = new ApplicationBar();
+            replyAppBar.IsMenuEnabled = true;
+            replyAppBar.IsVisible = true;            
+
+            var submitReplyIconButton = new ApplicationBarIconButton()
             {
                 IconUri = new Uri("/appbar.check.rest.png", UriKind.Relative),
-                Text = "전송"
-            };            
-            appbarCommentSubmit.Click += new EventHandler(appbarCommentSubmit_Click);
+                Text = "보내기"
+            };
+            submitReplyIconButton.Click += submitReplyIconButton_Click;
+            replyAppBar.Buttons.Add(submitReplyIconButton);
 
-            var menuItem1 = new ApplicationBarMenuItem();
-            menuItem1.Text = "웹브라우저로 보기";
-            menuItem1.Click += appbarWebbrowser_Click;
-            appBar.MenuItems.Add(menuItem1);
+            // 검색 상태에서의 앱바
+            searchAppBar = new ApplicationBar();
+            searchAppBar.IsMenuEnabled = true;
+            searchAppBar.IsVisible = true;
 
-            this.ApplicationBar = appBar;
+            var submitSearchIconButton = new ApplicationBarIconButton()
+            {
+                IconUri = new Uri("/appbar.check.rest.png", UriKind.Relative),
+                Text = "보내기"
+            };
+            submitSearchIconButton.Click += submitSearchIconButton_Click;
+            searchAppBar.Buttons.Add(submitSearchIconButton);
+
+
+            UpdateAppBar();
         }
+
+        private void UpdateAppBar()
+        {
+            if (PivotMain.SelectedItem == PivotList && FocusManager.GetFocusedElement() == SearchTextBox)
+                this.ApplicationBar = searchAppBar;
+            else if (PivotMain.SelectedItem == PivotList)
+                this.ApplicationBar = listAppBar;
+            else if (PivotMain.SelectedItem == PivotArticle && curReplyTextBox != null)
+                this.ApplicationBar = replyAppBar;
+            else if (PivotMain.SelectedItem == PivotArticle)
+                this.ApplicationBar = textAppBar;
+            else
+                this.ApplicationBar = null;
+        }
+
+        // 공통 함수
+        private void ShowErrorMessage(string msg)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(() => ShowErrorMessage(msg));
+                return;
+            }
+
+            MessageBox.Show(msg);
+        }                
 
         
         // 생성자
@@ -115,12 +213,7 @@ namespace DCView
             base.OnNavigatedTo(e);
 
             // 버튼 모두 삭제
-            ApplicationBar.Buttons.Clear();
-
-            if (App.Current.LoginInfo.LoginState == LoginInfo.State.LoggedIn)
-                ApplicationBar.Buttons.Add(appbarWrite);
-
-            ApplicationBar.Buttons.Add(appbarRefresh);
+            UpdateAppBar();
 
             // 초기화 되면 archive가 없어진다
             if (board != null)
@@ -129,104 +222,150 @@ namespace DCView
             }
        
             // archive 설정
-            string id, name, site, pcsite;
+            string id;
 
-            if (!NavigationContext.QueryString.TryGetValue("id", out id) ||
-                !NavigationContext.QueryString.TryGetValue("name", out name) ||
-                !NavigationContext.QueryString.TryGetValue("site", out site) ||
-                !NavigationContext.QueryString.TryGetValue("pcsite", out pcsite)
-                )
+            if (!NavigationContext.QueryString.TryGetValue("id", out id))
             {
                 NavigationService.GoBack();
                 return;
             }
 
             // 다음글 버튼
-            var NextPage = new Button()
+            nextPageButton = new Button()
             {
                 Content = "다음글",
                 HorizontalAlignment = HorizontalAlignment.Stretch
             };
 
-            NextPage.SetBinding(Button.IsEnabledProperty, new Binding("IsLoadingArticleList") { Converter = new NegateBoolConverter() });
-            NextPage.Click += NextPage_Click;
-            
-            board = new DCInsideBoard(site, id);
+            nextPageButton.Click += (o1, e1) =>
+            {
+                GetNextArticleList();
+            };
 
-            ((INotifyCollectionChanged)board.Articles).CollectionChanged += (obj, args) =>
-                {
-                    switch (args.Action)
-                    {
-                        case NotifyCollectionChangedAction.Add:
-                            {
-                                Dispatcher.BeginInvoke(() =>
-                                    {
-
-                                        foreach (var item in args.NewItems)
-                                            ArticleList.Items.Insert(ArticleList.Items.Count - 1, item);
-                                    });
-                                break;
-                            }
-
-                        case NotifyCollectionChangedAction.Reset:
-                            {
-                                ArticleList.Items.Clear();
-                                if (args.NewItems != null)
-                                {
-                                    foreach (var item in args.NewItems)
-                                    {
-                                        ArticleList.Items.Add(item);
-                                    }
-                                }
-                                ArticleList.Items.Add(NextPage);
-                                break;
-                            }
-                        
-                    }
-                };
-
-            board.ResetArticleList(0);
-            // DataContext = archive;
+            origBoard = new DCInsideBoard(id);
+            ConnectBoard(origBoard);
 
             // 왼쪽 상단 갤러리
-            PivotMain.Title = name + " 갤러리";
-        }
-        
-        // 하는 행동
-        private void Refresh()
-        {
-            // 글 목록을 지우고.. 
-            // ArticleList.Items.Clear();
-            board.ResetArticleList(0);            
+            PivotMain.Title = App.Current.GalleryList[id].Name + " 갤러리";
+
+            RefreshArticleList();
         }
 
+        void OnBoardCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    {
+                        Dispatcher.BeginInvoke(() =>
+                        {
+
+                            foreach (var item in args.NewItems)
+                                ArticleList.Items.Insert(ArticleList.Items.Count - 1, item);
+                        });
+                        break;
+                    }
+
+                case NotifyCollectionChangedAction.Reset:
+                    {
+                        ArticleList.Items.Clear();
+                        if (args.NewItems != null)
+                        {
+                            foreach (var item in args.NewItems)
+                            {
+                                ArticleList.Items.Add(item);
+                            }
+                        }
+                        ArticleList.Items.Add(nextPageButton);
+                        break;
+                    }
+
+            }
+        }
+
+        private void ConnectBoard(IBoard board)
+        {
+            if (this.board != null)
+            {
+                ((INotifyCollectionChanged)board.Articles).CollectionChanged -= OnBoardCollectionChanged;
+            }
+
+            this.board = board;
+
+            ArticleList.Items.Clear();
+            foreach (var article in board.Articles)
+                ArticleList.Items.Add(article);
+
+            ((INotifyCollectionChanged)board.Articles).CollectionChanged += OnBoardCollectionChanged;
+        }
+        
+        // 하는 행동        
+
+        // 글 목록 리스트 초기화
+        private void RefreshArticleList()
+        {
+            board.ResetArticleList(0);
+            GetNextArticleList();
+        }
+
+        // 다음 글 목록 얻어오기
+        private void GetNextArticleList()
+        {
+            nextPageButton.IsEnabled = false;
+            LoadingArticleListProgressBar.IsIndeterminate = true;
+
+            CancellationTokenSource cts = new CancellationTokenSource();
+            board.GetNextArticleList(cts.Token).ContinueWith(prevTask =>
+            {
+                Dispatcher.BeginInvoke(() =>
+                {
+                    nextPageButton.IsEnabled = true;
+                    LoadingArticleListProgressBar.IsIndeterminate = false;
+                });                
+            });
+        }
+
+        // 지금 읽고 있는 글 다시 불러와서 article.Text에 넣기
         private void RefreshArticleText(Article article)
         {
             // 이전 글 안보이게 지우기
             ArticleText.Children.Clear();
+            if (article == null) return;
+
+            // 프로그레스 바 켬
+            LoadingArticleTextProgressBar.IsIndeterminate = true;
 
             CancellationTokenSource cts = new CancellationTokenSource();
             board.GetArticleText(article, cts.Token)
-            .ContinueWith( prevTask =>
+            .ContinueWith(prevTask =>
             {
                 if (prevTask.IsCanceled || prevTask.Exception != null)
                 {
-                    MessageBox.Show("글을 읽어들이는데 실패했습니다. 다시 시도해보세요");
+                    ShowErrorMessage("글을 읽어들이는데 실패했습니다. 다시 시도해보세요");
                     return;
                 }
 
-                UpdateArticleText(article);
+                // UI를 건드리기 때문에 Dispatcher로 해야한다.
+                ShowArticleText(article);
+                Dispatcher.BeginInvoke(() => { LoadingArticleTextProgressBar.IsIndeterminate = false; });
             });
         }
 
-        private void UpdateArticleText(Article article)
+        // 화면에 article의 내용을 보여주기
+        private void ShowArticleText(Article article)
         {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(() => ShowArticleText(article));
+                return;
+            }
+
             // 일단 기존의 ArticleText를 없앤다
             ArticleText.Children.Clear();
 
             // 제목
             var title = new TextBlock();
-            title.TextWrapping = TextWrapping.Wrap;            
+            title.TextWrapping = TextWrapping.Wrap;
             title.Style = Application.Current.Resources["DCViewTextMediumStyle"] as Style;
             title.Text = article.Title;
             title.FontWeight = FontWeights.Bold;
@@ -249,12 +388,12 @@ namespace DCView
 
                 // 버튼을 눌렀을 때 
                 button.Click += (o, e) =>
-                {   
+                {
                     button.Content = string.Format("로딩중 {0}/{1}", 0, article.Pictures.Count);
                     button.IsEnabled = false;
                     int failedCount = 0;
                     int count = 0;
-                    
+
                     foreach (Picture pic in article.Pictures)
                     {
                         Uri curUri = pic.Uri;
@@ -277,7 +416,7 @@ namespace DCView
                         {
                             count++;
 
-                            if( failedCount != 0 )
+                            if (failedCount != 0)
                                 button.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", count, article.Pictures.Count, failedCount);
                             else
                                 button.Content = string.Format("불러오기 {0}/{1}", count, article.Pictures.Count, failedCount);
@@ -307,7 +446,7 @@ namespace DCView
 
                 ArticleText.Children.Add(button);
             }
-            else 
+            else
             {
                 foreach (Picture pic in article.Pictures)
                 {
@@ -321,7 +460,7 @@ namespace DCView
                     {
                         WebBrowserTask task = new WebBrowserTask();
                         task.Uri = pic.Uri;
-                        task.Show();                       
+                        task.Show();
                     };
 
                     image.ImageOpened += delegate(object o1, RoutedEventArgs rea)
@@ -337,7 +476,7 @@ namespace DCView
             margin.Margin = new Thickness(0, 0, 0, 12);
             ArticleText.Children.Add(margin);
 
-            foreach (var textBlock in GetTextBlocksFromString(article.Text))
+            foreach (var textBlock in HtmlParser.GetTextBlocksFromString(article.Text, tapAction))
                 ArticleText.Children.Add(textBlock);
 
             // 기타 정보
@@ -354,21 +493,16 @@ namespace DCView
             {
                 var cmtName = new TextBlock();
                 cmtName.Text = cmt.Name;
-                cmtName.Style = Application.Current.Resources["DCViewTextNormalStyle"] as Style;
-                cmtName.FontWeight = FontWeights.Bold;
+                cmtName.Style = Application.Current.Resources["DCViewTextSmallStyle"] as Style;
                 cmtName.Margin = new Thickness(0, 12, 0, 3);
+                //cmtName.Foreground = App.Current.Resources["PhoneAccentBrush"] as Brush;
                 ArticleText.Children.Add(cmtName);
 
-                /*
-                var cmtText = new TextBlock();
-                cmtText.Text = cmt.Text;
-                cmtText.TextWrapping = TextWrapping.Wrap;
-                cmtText.Style = Application.Current.Resources["DCViewTextNormalStyle"] as Style;
-                cmtText.Margin = new Thickness(0, 3, 0, 24);
-                */
-
-                foreach(var blocks in MakeTextBlocks(cmt.Text))
+                foreach (var blocks in HtmlParser.GetTextBlocksFromString(cmt.Text, tapAction))
                     ArticleText.Children.Add(blocks);
+
+                // 댓글마다 충전물좀 넣기
+                ArticleText.Children.Add(new Rectangle() { Height = 20 });
             }
 
             // var cookies = WebClientEx.CookieContainer.GetCookies(new Uri("http://gall.dcinside.com"));
@@ -380,45 +514,36 @@ namespace DCView
                 inputScope.Names.Add(new InputScopeName() { NameValue = InputScopeNameValue.Chat });
 
                 var replyText = new TextBox()
-                {                    
-                    AcceptsReturn = true,                    
+                {
+                    AcceptsReturn = true,
                     TextWrapping = TextWrapping.Wrap,
                     VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
                     InputScope = inputScope,
                     IsTabStop = false,
                 };
 
-
                 replyText.SizeChanged += (o1, e1) =>
-                    {
-                        if (curReplyTextBox != null)
-                            ArticleTextScroll.ScrollToVerticalOffset(ArticleText.ActualHeight);
-                    };
-                
-                replyText.GotFocus += (o1, e1) =>
-                    {
-                        curReplyTextBox = replyText;
-                        // 글쓰기 버튼 제거, 전송 버튼 추가
-                        if (App.Current.LoginInfo.LoginState == LoginInfo.State.LoggedIn)
-                            ApplicationBar.Buttons.Remove(appbarWrite);
+                {
+                    if (curReplyTextBox != null)
+                        ArticleTextScroll.ScrollToVerticalOffset(ArticleText.ActualHeight);
+                };
 
-                        if( !ApplicationBar.Buttons.Contains(appbarCommentSubmit))
-                            ApplicationBar.Buttons.Add(appbarCommentSubmit);
-                    };
+                replyText.GotFocus += (o1, e1) =>
+                {
+                    curReplyTextBox = replyText;
+
+                    // 글쓰기 버튼 제거, 전송 버튼 추가
+                    UpdateAppBar();
+                };
 
                 replyText.LostFocus += (o1, e1) =>
-                    {
-                        curReplyTextBox = null;
-                        // 글쓰기 버튼 추가, 전송 버튼 제거
-                        if (App.Current.LoginInfo.LoginState == LoginInfo.State.LoggedIn)
-                            if( !ApplicationBar.Buttons.Contains(appbarWrite))
-                            ApplicationBar.Buttons.Insert(0, appbarWrite);
-
-                        ApplicationBar.Buttons.Remove(appbarCommentSubmit);
-                    };
+                {       
+                    curReplyTextBox = null;
+                    UpdateAppBar();
+                };
 
                 ArticleText.Children.Add(replyText);
-               
+
                 // 자동으로 늘어나는 replyTex
 
                 // reply_Click                
@@ -427,259 +552,123 @@ namespace DCView
             ArticleTextScroll.ScrollToVerticalOffset(0);
         }
 
-        private static StringHtmlEntityConverter stringHtmlConverter = new StringHtmlEntityConverter();
-        private static Regex urlRegex = new Regex(@"((https?|ftp|gopher|telnet|file|notes|ms-help):((//)|(\\\\))+[\w\d:#@%/;$()~_?\+-=\\\.&]*)");
-
-        class Splitted
-        {
-            public string Content {get; set;}
-            public bool IsUrl {get; set;}
-        }
-
-        private IEnumerable<Splitted> SplitUrl(string input)
-        {
-            int cur = 0;
-
-            Match match = urlRegex.Match(input);
-
-            while (match.Success)
-            {
-                yield return new Splitted() { Content = input.Substring(cur, match.Index - cur), IsUrl = false };
-
-                yield return new Splitted() { Content = match.Value, IsUrl = true };
-
-                cur = match.Index + match.Length;
-                match = urlRegex.Match(input, cur);
-            }
-
-            if (cur < input.Length)
-                yield return new Splitted() { Content = input.Substring(cur), IsUrl = false };
-        }
-
-        private IEnumerable<FrameworkElement> MakeTextBlocks(string input)
-        {
-            input = HttpUtility.HtmlDecode(input);
-
-            foreach (var s in SplitUrl(input))
-            {
-                var splitted = s;
-
-                // url임 
-                if (splitted.IsUrl)
-                {
-                    var textBlock = new TextBlock()
-                    {
-                        TextWrapping = TextWrapping.Wrap,
-                        LineHeight = 1.2,
-                        Style = Application.Current.Resources["DCViewTextNormalStyle"] as Style,
-                        Margin = new Thickness(0, 3, 0, 3),                        
-                        Foreground = new SolidColorBrush(Colors.Blue),                        
-                    };
-
-                    var underline = new Underline();
-                    underline.Inlines.Add(new Run() { Text = splitted.Content });
-                    textBlock.Inlines.Add(underline);
-
-                    textBlock.Tap += (o1, e1) =>
-                        {
-                            WebBrowserTask task = new WebBrowserTask()
-                            {
-                                Uri = new Uri(splitted.Content, UriKind.Absolute)
-                            };
-
-                            task.Show();
-                        };
-
-                    yield return textBlock;                    
-                }
-                else
-                {
-                    // 지금까지 내용을 전부 flush 
-                    var textBlock = new TextBlock()
-                    {
-                        TextWrapping = TextWrapping.Wrap,
-                        LineHeight = 1.2,
-                        Style = Application.Current.Resources["DCViewTextNormalStyle"] as Style,
-                        Margin = new Thickness(0, 3, 0, 3),
-                        Text = splitted.Content,
-                    };
-
-                    yield return textBlock;
-                }
-            }
-        }
-        
-        private IEnumerable<UIElement> GetTextBlocksFromString(string input)
-        {
-            StringBuilder curPlainString = new StringBuilder();
-
-            int pDepth = 0;            
-
-            foreach (IHtmlEntity entity in stringHtmlConverter.Convert(input))
-            {
-                if (entity is PlainString)
-                {
-                    // 바로 출력하지는 않고 
-                    PlainString plainString = (PlainString)entity;
-                    curPlainString.Append(plainString.Content);
-                }
-
-                if (entity is Tag)
-                {
-                    Tag tag = (Tag)entity;
-
-                    if (tag.Name.Equals("br"))
-                    {
-                        curPlainString.AppendLine();
-                        continue;
-                    }
-
-                    // p는 0에서 1일때는 반응 안함
-                    // 1에서 0으로 내려올때 
-
-                    if (tag.Name == "p")
-                    {
-                        if (tag.Kind == MyApps.Common.Tag.TagKind.Open)
-                            pDepth++;
-                        else if (tag.Kind == MyApps.Common.Tag.TagKind.Close)
-                            pDepth--;
-
-                        if ((tag.Kind == MyApps.Common.Tag.TagKind.Open && pDepth > 1) ||
-                                (tag.Kind == MyApps.Common.Tag.TagKind.Close && pDepth == 0) ||
-                                (tag.Kind == MyApps.Common.Tag.TagKind.OpenAndClose))
-                        {
-                            foreach (var obj in MakeTextBlocks(curPlainString.ToString()))
-                                yield return obj;
-                            curPlainString.Clear();
-                            continue;
-                        }                                
-                    }
-                    
-                    if (tag.Name == "div")
-                    {
-                        if (curPlainString.Length != 0)
-                        {
-                            foreach (var obj in MakeTextBlocks(curPlainString.ToString()))
-                                yield return obj;
-                            curPlainString.Clear();                            
-                        }
-                        continue;
-                    }
-                    
-                    // 이미지 처리.. 몰라 ㅋ
-                    if (tag.Name.Equals("img", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                    }
-                }                
-            }
-
-            if( curPlainString.Length != 0)
-                foreach (var obj in MakeTextBlocks(curPlainString.ToString()))
-                    yield return obj;            
-
-            // 1. <br> <br />은 \n으로 바꿈
-            // 2. <p> </p>는 하나의 paragraph로 처리
-            // 3. <div>도 마찬가지..
-            // 4. <img src=는 image로 바꿈;
-            // 5. <a>
-
-            //string text = Regex.Replace(input, "\\s+", " ");
-            //text = Regex.Replace(text, "(<br[^>]*>)|(<br[^/]*/>)", "\n", RegexOptions.IgnoreCase);
-
-            //// p를 만나면 거기서 끊는다
-            //foreach (var par in Regex.Split(text, "(<p[^>]*>)|(<div[^>]*>)", RegexOptions.IgnoreCase))
-            //{               
-
-            //    yield return textBlock;
-            //}                    
-        }
-
-        // 이벤트 핸들러        
-        private void ArticleList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Article article = ArticleList.SelectedItem as Article;
-            if (article == null) return;
-
-            if (!PivotMain.Items.Contains(PivotArticle))
-                PivotMain.Items.Add(PivotArticle);
-
-            // 글이 없다면
-            if (article.Text == null)
-                RefreshArticleText(article);
-            else
-                UpdateArticleText(article);            
-                
-            PivotMain.SelectedItem = PivotArticle;
-        }
-
-        private void NextPage_Click(object sender, RoutedEventArgs e)
-        {
-            CancellationTokenSource cts = new CancellationTokenSource();
-            board.GetNextArticleList(cts.Token);
-        }
-
-        // 답장 버튼 클릭
+        // 리플 달기
         private bool CommentSubmit(string text)
         {
-            Article article = ArticleList.SelectedItem as Article;
-            if (article == null) return false;
+            if (curArticle == null) return false;            
 
             if (text.Trim() == string.Empty)
                 return false;
 
             CancellationTokenSource cts = new CancellationTokenSource();
 
-            board.WriteComment(article, text, cts.Token)
-            .ContinueWith( prevTask =>
+            board.WriteComment(curArticle, text, cts.Token)
+            .ContinueWith(prevTask =>
             {
-                if (prevTask.IsCanceled || prevTask.IsFaulted )
+                if (prevTask.IsCanceled || prevTask.IsFaulted)
                 {
-                    MessageBox.Show("댓글달기에 실패했습니다 다시 시도해보세요");
+                    ShowErrorMessage("댓글달기에 실패했습니다 다시 시도해보세요");
                     return;
                 }
 
-                RefreshArticleText(article);
+                // 글 다시 불러오기
+                RefreshArticleText(curArticle);
             });
             return true;
         }
 
-        private void appbarRefresh_Click(object sender, EventArgs e)
+        
+        // 이벤트 핸들러
+        // 목록 다시 읽기버튼 처리
+        private void refreshListIconButton_Click(object sender, EventArgs e)
         {
-            if (PivotMain.SelectedItem == PivotList)
-                Refresh();
-            else
-            {
-                Article article = ArticleList.SelectedItem as Article;
-                if (article == null) return;
-
-                RefreshArticleText(article);
-            }
-
-        }
-        private void appbarWebbrowser_Click(object sender, EventArgs e)
-        {
-            var wbTask = new WebBrowserTask();
-
-            if (PivotMain.SelectedItem == PivotList)
-                wbTask.Uri = board.GetBoardUri();
-            else
-            {
-                Article article = ArticleList.SelectedItem as Article;
-                if (article == null) return;
-                wbTask.Uri = board.GetArticleUri(article);
-            }
-
-            wbTask.Show();
+            RefreshArticleList();
         }
 
-        private void appbarWrite_Click(object sender, EventArgs e)
+        // 글쓰기 처리
+        private void writeIconButton_Click(object sender, EventArgs e)
         {
             // 여기가 에러 
             // NavigationService.Navigate(new Uri(string.Format("/Views/WriteArticle.xaml?id={0}&name={1}&site={2}&pcsite={3}",
             //     archive.ID, NavigationContext.QueryString["name"], archive.Site, archive.PCSite), UriKind.Relative));
         }
 
-        void appbarCommentSubmit_Click(object sender, EventArgs e)
+        // 검색
+        private void searchIconButton_Click(object sender, EventArgs e)
+        {
+            if (SearchPanel.Visibility == Visibility.Visible)
+            {
+                SearchPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            SearchPanel.Visibility = Visibility.Visible;
+            SearchTextBox.Focus();            
+        }
+
+        private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UpdateAppBar();
+        }
+
+        private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {            
+            UpdateAppBar();
+        }
+
+        private void submitSearchIconButton_Click(object sender, EventArgs e)
+        {
+            // 내용을 바탕으로 searchBoard 를 만든다
+            string id;
+            if (!NavigationContext.QueryString.TryGetValue("id", out id))
+                return;
+
+            PivotList.Header = "검색";
+
+            DCInsideBoardSearch.SearchType searchType = DCInsideBoardSearch.SearchType.Subject;
+            if (SearchTypeSubject.IsChecked ?? false)
+                searchType = DCInsideBoardSearch.SearchType.Subject;
+            else if (SearchTypeContent.IsChecked ?? false)
+                searchType = DCInsideBoardSearch.SearchType.Content;
+            else if (SearchTypeName.IsChecked ?? false)
+                searchType = DCInsideBoardSearch.SearchType.Name;
+
+            searchBoard = new DCInsideBoardSearch(id, SearchTextBox.Text, searchType);
+            ConnectBoard(searchBoard);
+
+            // 검색창 닫기
+            SearchPanel.Visibility = Visibility.Collapsed;
+            RefreshArticleList();
+            this.Focus();
+        }
+
+        // 글 목록 웹브라우저에서 보기 메뉴 처리
+        private void webViewList_Click(object sender, EventArgs e)
+        {
+            var wbTask = new WebBrowserTask();
+            wbTask.Uri = board.GetBoardUri();
+            wbTask.Show();
+        }
+
+        // 글 다시 읽기 처리
+        private void refreshTextIconButton_Click(object sender, EventArgs e)
+        {
+            if (curArticle == null) return;
+            RefreshArticleText(curArticle);
+        }
+
+        // 글을 웹브라우저에서 읽기         
+        private void webViewText_Click(object sender, EventArgs e)
+        {
+            if (curArticle == null) return;
+
+            var wbTask = new WebBrowserTask();
+            wbTask.Uri = board.GetArticleUri(curArticle);
+            wbTask.Show();
+        }
+
+        // 
+        void submitReplyIconButton_Click(object sender, EventArgs e)
         {
             if (curReplyTextBox == null)
                 return;
@@ -687,65 +676,57 @@ namespace DCView
             if (CommentSubmit(curReplyTextBox.Text))
             {
                 // 일단 제출했으면 
-                appbarCommentSubmit.IsEnabled = false;
+                (sender as ApplicationBarIconButton).IsEnabled = false;
             }
         }
 
-        private void PivotMain_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        // 글 목록에서 글을 클릭했을 때
+        private void ArticleListItem_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            if (PivotMain.SelectedItem == PivotList)
-                ArticleList.SelectedItem = null;
+            Article article = (sender as FrameworkElement).Tag as Article;
+            if (article == null)
+                return;
+
+            curArticle = article;
+
+            // '내용' 탭이 없다면 이제 추가해 준다            
+            if (!PivotMain.Items.Contains(PivotArticle))
+                PivotMain.Items.Add(PivotArticle);
+
+            // '내용' 탭으로 화면 전환
+            PivotMain.SelectedItem = PivotArticle;
+
+            // 글이 없다면
+            if (article.Text == null)
+                RefreshArticleText(article);
+            else
+                ShowArticleText(article);
         }
 
-        
         private void ArticleList_ManipulationCompleted(object sender, ManipulationCompletedEventArgs e)
         {
             this.Focus();
         }
 
-        // 
-
-        bool isLoadingArticleList;
-        bool isLoadingArticleText;
-        bool isReplying;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public bool IsLoadingArticleList
+        private void PivotMain_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            get { return isLoadingArticleList; }
-            private set
-            {
-                isLoadingArticleList = value;
-                RaisePropertyChanged("IsLoadingArticleList");
-            }
+            UpdateAppBar();
         }
 
-        public bool IsLoadingArticleText
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            get { return isLoadingArticleText; }
-            private set
-            {
-                isLoadingArticleText = value;
-                RaisePropertyChanged("IsLoadingArticleText");
-            }
+            searchBoard = null;
+            SearchPanel.Visibility = Visibility.Collapsed;
+            PivotList.Header = "목록";
+
+            ConnectBoard(origBoard);
+            UpdateAppBar();
         }
 
-        public bool IsReplying
+        private void SearchType_Click(object sender, RoutedEventArgs e)
         {
-            get { return isReplying; }
-            private set
-            {
-                isReplying = value;
-                RaisePropertyChanged("IsReplying");
-            }
-        }
-
-        private void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
+            SearchTextBox.Focus();
+        }      
         
     }
 }
