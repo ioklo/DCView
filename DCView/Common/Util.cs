@@ -10,10 +10,12 @@ using System.Windows.Media.Animation;
 using System.Windows.Resources;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MyApps.Common
 {
-    public class Util
+    public static class Util
     {
         static IsolatedStorageFile isoStorage = IsolatedStorageFile.GetUserStoreForApplication();
 
@@ -35,7 +37,7 @@ namespace MyApps.Common
             isoStorage.CreateDirectory(dir);
             return true;
         }
-        
+       
 
         // appPath의 리소스를 storagePath에 넣습니다.
         static public bool CopyResourceToStorage(string appPath, string storagePath)
@@ -62,6 +64,12 @@ namespace MyApps.Common
             }
 
             return true;
+        }
+
+        static public T GetResult<T>(this Task<T> task)
+        {
+            task.Wait();
+            return task.Result;
         }
 
     }

@@ -11,9 +11,9 @@ using System.Windows.Shapes;
 
 namespace DCView
 {
-    public class Comment
+    public interface IComment
     {
-        public string Name { get; set; }
-        public string Text { get; set; }
+        string Name { get; }
+        string Text { get; }
     }
 }

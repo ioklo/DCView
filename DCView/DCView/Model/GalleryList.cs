@@ -138,6 +138,7 @@ namespace DCView
                 if (entry.ID == id)
                     return;
 
+            modifiedFavorites = true;
             favorites.Add(new Gallery(id, name));
         }
 
@@ -152,10 +153,11 @@ namespace DCView
 
             // favorite 저장
             var storage = IsolatedStorageFile.GetUserStoreForApplication();
-            using (var writer = new StreamWriter(storage.OpenFile("/DCView_favorites.txt", FileMode.Create)))
+            using (var writer = new StreamWriter(storage.OpenFile("/DCView_favorites2.txt", FileMode.Create)))
             {
                 foreach (var gal in favorites)
                 {
+                    writer.WriteLine(gal.Name);
                     writer.WriteLine(gal.ID);
                 }
             }

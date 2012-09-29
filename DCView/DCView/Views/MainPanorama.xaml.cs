@@ -68,7 +68,7 @@ namespace DCView
 
         void InitializeApplicationBar()
         {
-            favoriteApplicationBar = null;
+            favoriteApplicationBar = new ApplicationBar();
 
             allApplicationBar = new ApplicationBar();
             ApplicationBarIconButton refreshListIconButton = new ApplicationBarIconButton();
@@ -77,7 +77,7 @@ namespace DCView
             refreshListIconButton.Text = "새로고침";
             allApplicationBar.Buttons.Add(refreshListIconButton);
 
-            settingApplicationBar = null;
+            settingApplicationBar = new ApplicationBar();
         }
 
         private void PanoramaMain_SelectionChanged(object sender, SelectionChangedEventArgs e)

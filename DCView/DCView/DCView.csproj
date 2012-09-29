@@ -74,28 +74,44 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\Article.cs" />
+    <Compile Include="Interface\IArticle.cs" />
+    <Compile Include="Interface\ILister.cs" />
+    <Compile Include="Interface\INotifyActivated.cs" />
     <Compile Include="Model\ArticleWriter.cs" />
+    <Compile Include="Model\Board\DCInsideArticle.cs" />
+    <Compile Include="Model\Board\DCInsideAuth.cs" />
     <Compile Include="Model\Board\DCInsideBoard.cs" />
     <Compile Include="Model\Board\DCInsideBoardSearch.cs" />
-    <Compile Include="Model\Board\IBoard.cs" />
+    <Compile Include="Interface\IBoard.cs" />
+    <Compile Include="Model\Board\DCInsideComment.cs" />
     <Compile Include="Model\Picture.cs" />
     <Compile Include="Model\GalleryList.cs" />
     <Compile Include="Model\SandBox.cs" />
     <Compile Include="Util\DCViewWebClient.cs" />
+    <Compile Include="Util\HtmlElementConverter.cs" />
     <Compile Include="Views\BoolToColorConverter.cs" />
-    <Compile Include="Model\Comment.cs" />
+    <Compile Include="Interface\IComment.cs" />
     <Compile Include="Model\Gallery.cs" />
     <Compile Include="Model\LoginInfo.cs" />
     <Compile Include="Views\MainPanorama.xaml.cs">
       <DependentUpon>MainPanorama.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Util\MRUCache.cs" />
     <Compile Include="Views\ViewArticle.xaml.cs">
       <DependentUpon>ViewArticle.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Views\WriteArticle.xaml.cs">
-      <DependentUpon>WriteArticle.xaml</DependentUpon>
+    <Compile Include="Views\ViewArticleListPivotItem.xaml.cs">
+      <DependentUpon>ViewArticleListPivotItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ViewArticleTextPivotItem.xaml.cs">
+      <DependentUpon>ViewArticleTextPivotItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ViewSearchArticleListPivotItem.xaml.cs">
+      <DependentUpon>ViewSearchArticleListPivotItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WriteArticlePivotItem.xaml.cs">
+      <DependentUpon>WriteArticlePivotItem.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -118,7 +134,13 @@
     <Content Include="appbar.feature.search.rest.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="appbar.gotoslide.rest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="appbar.refresh.rest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appbar.stop.rest.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ApplicationIcon.png">
@@ -141,7 +163,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\WriteArticle.xaml">
+    <Page Include="Views\ViewArticleListPivotItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ViewArticleTextPivotItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ViewSearchArticleListPivotItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WriteArticlePivotItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

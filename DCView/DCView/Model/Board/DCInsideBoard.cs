@@ -1,63 +1,117 @@
 ﻿using System;
 using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Collections.Generic;
-using MyApps.Common;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Linq;
+using MyApps.Common;
+using System.Collections.Specialized;
+
+using System.Text;
 using DCView.Util;
 
 namespace DCView
 {
+    public class DCInsideLister : ILister<IArticle>
+    {
+        DCInsideBoard board;
+        int page;
+        int lastArticleID = int.MaxValue;
+
+        public DCInsideLister(DCInsideBoard board, int page)
+        {
+            this.board = board;
+            this.page = page;
+        }
+
+        public bool Next(CancellationToken ct, out IEnumerable<IArticle> result)
+        {
+            result = null;
+            IEnumerable<DCInsideArticle> articles;
+            if (!board.GetArticleList(page, ct, out articles))
+                throw new Exception();
+
+            // 성공했으면 다음에 읽을 page를 하나 올려준다
+            page++;
+
+            var resultList = new List<IArticle>();
+            int minID = int.MaxValue;
+            foreach(var article in articles)
+            {
+                int id = int.Parse(article.ID);
+                if (id < minID) minID = id;
+
+                if (id < lastArticleID)
+                    resultList.Add(article);                                    
+            }
+
+            lastArticleID = minID;
+            result = resultList;
+            return true;            
+        }        
+    }
+
+
     public class DCInsideBoard : IBoard
     {
         // 내부 변수
-        string id;
-        int page;
-        ObservableCollection<Article> articleList;
-        ReadOnlyObservableCollection<Article> readonlyArticleList;
-
-        public ReadOnlyObservableCollection<Article> Articles
-        {
-            get { return readonlyArticleList; }
-        }
-
+        string id;        
+        
         public DCInsideBoard(string id)
         {            
             this.id = id;
-            this.articleList = new ObservableCollection<Article>();
-            this.readonlyArticleList = new ReadOnlyObservableCollection<Article>(this.articleList);
         }
 
-        public Uri GetBoardUri()
+        public string ID { get { return id; } }
+
+        // 인터페이스 
+        public Uri Uri
         {
-            return new Uri(string.Format("http://gall.dcinside.com/list.php?id={0}", id), UriKind.Absolute);
+            get
+            {
+                return new Uri(string.Format("http://gall.dcinside.com/list.php?id={0}", id), UriKind.Absolute);
+            }
         }
 
-        public Uri GetArticleUri(Article article)
+        public ILister<IArticle> GetArticleLister(int page)
+        {
+            return new DCInsideLister(this, page);
+        }
+
+        public ILister<IArticle> GetSearchLister(string text, SearchType type)
+        {
+            return new DCInsideBoardSearchLister(this, text, type);
+        }
+
+        // 동기 함수, 비동기 처리는 밖에서 해주는 것
+        public bool WriteArticle(string title, string text, List<AttachmentStream> attachmentStreams, CancellationToken ct)
+        {
+            string code, mobileKey;
+            if (!GetCodeAndMobileKey(ct, out code, out mobileKey))
+                return false;
+
+            string flData = null, oflData = null;
+            if (attachmentStreams != null && attachmentStreams.Count > 0)
+                if (!UploadPictures(attachmentStreams, out flData, out oflData))
+                    return false; // 업로드 실패
+
+            if (!UploadArticle(title, text, code, mobileKey, flData, oflData))
+                return false;
+
+            return true;
+        }
+
+
+        // 인터페이스 끝
+        public Uri GetArticleUri(DCInsideArticle article)
         {
             return new Uri(string.Format("http://gall.dcinside.com/list.php?id={0}&no={1}", id, article.ID), UriKind.Absolute);
         }
 
-        // 
-        public void ResetArticleList(int page)
-        {
-            this.page = page;
-            articleList.Clear();
-        }
-
-        public Task GetNextArticleList(CancellationToken cts)
+        public bool GetArticleList(int page, CancellationToken ct, out IEnumerable<DCInsideArticle> articles)
         {
             // 현재 페이지에 대해서 
             DCViewWebClient webClient = new DCViewWebClient();
@@ -69,69 +123,74 @@ namespace DCView
                 DateTime.Now.Ticks);
 
             // 페이지를 받고
-            Task<string> result = webClient.DownloadStringAsyncTask(new Uri(url, UriKind.Absolute), cts);
-
-            return result.ContinueWith( prevTask =>
-            {
-                if (prevTask.IsCanceled)
-                {
-                    if (cts.IsCancellationRequested)
-                        cts.ThrowIfCancellationRequested();                    
-                }
-
-                if (prevTask.Exception != null)
-                {
-                    throw prevTask.Exception;
-                }
+            string result = webClient.DownloadStringAsyncTask(new Uri(url, UriKind.Absolute), ct).GetResult();
                 
-                // 결과스트링에서 게시물 목록을 뽑아낸다.                
-                List<Article> newArticles = GetArticleListFromString(prevTask.Result);
-                AddArticles(newArticles);
+            // 결과스트링에서 게시물 목록을 뽑아낸다.                
+            articles = GetArticleListFromString(result);
 
-                // 페이지 하나 증가시키고
-                page++;
-            });
+            return true;
         }       
 
-        public Task GetArticleText(Article article, CancellationToken cts)
+        public bool GetArticleText(DCInsideArticle article, CancellationToken ct, out string text)
         {
-            article.Text = string.Empty;
-            article.Comments.Clear();
-
             DCViewWebClient webClient = new DCViewWebClient();            
             string url = string.Format("http://m.dcinside.com/view.php?id={0}&no={1}&nocache={2}", id, article.ID, DateTime.Now.Ticks);
 
-            return webClient.DownloadStringAsyncTask(new Uri(url, UriKind.Absolute), cts)
-            .ContinueWith( prevTask =>
-            {
-                if (prevTask.IsCanceled)
-                {
-                    throw new OperationCanceledException(cts);
-                }
+            string result = webClient.DownloadStringAsyncTask(new Uri(url, UriKind.Absolute), ct).GetResult();
 
-                if (prevTask.Exception != null) 
-                {
-                    throw prevTask.Exception;
-                }
+            List<Picture> pictures;
+            List<DCInsideComment> comments;
+            string commentUserID;
+            if (!UpdateArticleTextAndComments(result, out pictures, out comments, out commentUserID, out text))
+                return false; // 파싱 에러
 
-                if (!UpdateArticleTextAndComments(article, prevTask.Result))
-                {
-                    throw new Exception("파싱 에러");
-                }
-            });
+            article.Pictures = pictures;
+            article.CachedComments = comments;
+            article.CommentUserID = commentUserID;            
+            
+            return true;
         }
 
-        public Task GetNextCommentList(Article article, CancellationToken cts)
+        public Task GetNextCommentList(IArticle article, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
-
-        public Task WriteArticle(string title, string text, List<Picture> pics, CancellationToken cts)
+        
+        
+        
+        private bool GetCodeAndMobileKey(CancellationToken ct, out string code, out string mobileKey)
         {
-            throw new NotImplementedException();
+            code = null;
+            mobileKey = null;
+
+            // 일단 code와 mobile_key를 얻는다
+            DCViewWebClient client = new DCViewWebClient();
+            client.Headers["Referer"] = string.Format("http://m.dcinside.com/list.php?id={0}", id);
+
+            string response = client.DownloadStringAsyncTask(
+                new Uri("http://m.dcinside.com/write.php?id=windowsphone&mode=write", UriKind.Absolute),
+                ct).GetResult();
+
+            Regex codeRegex = new Regex("<input type=\"hidden\" name=\"code\" value=\"([^\"]*)\"");
+
+            StringEngine se = new StringEngine(response);
+            Match match;
+
+            if (!se.Next(codeRegex, out match))
+                return false;
+
+            code = match.Groups[1].Value;
+
+            Regex mobileKeyRegex = new Regex("<input type=\"hidden\" name=\"mobile_key\" id=\"mobile_key\" value=\"([^\"]*)\"");
+            if (!se.Next(mobileKeyRegex, out match))
+                return false;
+
+
+            mobileKey = match.Groups[1].Value;
+            return true;
         }
 
-        public Task WriteComment(Article article, string text, CancellationToken cts)
+        public bool WriteComment(DCInsideArticle article, string text, CancellationToken ct)
         {
             DCViewWebClient webClient = new DCViewWebClient();
         
@@ -145,15 +204,15 @@ namespace DCView
                 article.CommentUserID
                 );
 
-            return webClient.UploadStringAsyncTask(new Uri("http://m.dcinside.com/_option_write.php", UriKind.Absolute), "POST", data);
-        }       
-
+            webClient.UploadStringAsyncTask(new Uri("http://m.dcinside.com/_option_write.php", UriKind.Absolute), "POST", data).GetResult();
+            return true;
+        }
 
         private Regex getNumber = new Regex("no=(\\d+)[^>]*>");
         private Regex getArticleData = new Regex("<span class=\"list_right\"><span class=\"((list_pic_n)|(list_pic_y))\"></span>([^>]*)<span class=\"list_pic_re\">(\\[(\\d+)\\])?</span><br /><span class=\"list_pic_galler\">([^<]*)(<img[^>]*>)?<span>([^>]*)</span></span></span></a></li>");
-        private List<Article> GetArticleListFromString(string input)
+        private List<DCInsideArticle> GetArticleListFromString(string input)
         {
-            List<Article> result = new List<Article>();
+            List<DCInsideArticle> result = new List<DCInsideArticle>();
             var sr = new StringReader(input);
 
             string line = null;
@@ -164,7 +223,7 @@ namespace DCView
 
                 string line2 = sr.ReadLine();
 
-                Article article = new Article();
+                DCInsideArticle article = new DCInsideArticle(this);
 
                 // Number
                 Match matchGetNumber = getNumber.Match(line);
@@ -187,50 +246,26 @@ namespace DCView
             return result;
         }
 
-        private void AddArticles(List<Article> newArticles)
-        {
-            // 저번 아티클에서 가장 작았던 항목의 인덱스를 알아낸다.
-            int lastItemIndex = int.MaxValue;
-            if (articleList.Count > 0)
-            {
-                Article article = articleList[articleList.Count - 1];
-
-                int articleIndex;
-                if (int.TryParse(article.ID, out articleIndex))
-                    lastItemIndex = articleIndex;
-            }
-
-            // 항목을 추가한다. 저번보다 큰 번호는 추가하지 않는다
-            foreach (var newArticle in newArticles)
-            {
-                int curItemIndex;
-                if (!int.TryParse(newArticle.ID, out curItemIndex))
-                    continue;
-
-                if (lastItemIndex <= curItemIndex)
-                    continue;
-
-                articleList.Add(newArticle);
-            }
-        }
-
         // 글의 텍스트와 코멘트를 읽어서 채워넣는다
-        private bool UpdateArticleTextAndComments(Article article, string input)
+        private bool UpdateArticleTextAndComments(string input, out List<Picture> pictures, out List<DCInsideComment> comments, out string commentUserID, out string text)
         {
+            text = string.Empty;
+            pictures = new List<Picture>();
+            comments = new List<DCInsideComment>();
+            commentUserID = string.Empty;
+
             // 1. 이미지들을 찾는다
             // <img id='dc_image_elm_*.. src="()"/> 이미지
             // <img  id=dc_image_elm0 src='http://dcimg1.dcinside.com/viewimage.php?id=windowsphone&no=29bcc427b78a77a16fb3dab004c86b6fc3a0be4a5f9fd1a8cc77865e83c2029da6f5d553d560d273a5d0802458ed844942b60ffcef4cc95a9e820f3d0eb76388a4ded971bc29b6cc1fd6a780e7e52f627fdf1b9b6a40491c7fa25f4acaa4663f080794f8abd4e01cc6&f_no=7bee837eb38760f73f8081e240847d6ecaa51e16c7795ecc2584471ef43a7f730867c7d42ef66cf9f0827af5263d'width=550  /></a><br/> <br/>        </p>
 
             StringEngine se = new StringEngine(input);
 
-            article.Pictures.Clear();
-
             Regex imageRegex = new Regex("<img\\s+id=dc_image_elm[^>]*src='(http://dcimg[^']*)'", RegexOptions.IgnoreCase);
             Match match;
 
             while (se.Next(imageRegex, out match))
             {
-                article.Pictures.Add(
+                pictures.Add(
                     new Picture(
                         new Uri(match.Groups[1].Value, UriKind.Absolute)));
             }
@@ -264,19 +299,19 @@ namespace DCView
 
             if (count != 0)
             {
-                article.Text = input.Substring(start).Trim();
+                text = input.Substring(start).Trim();
                 return true;
             }
             else
             {
-                article.Text = input.Substring(start, match.Index - start).Trim();
+                text = input.Substring(start, match.Index - start).Trim();
             }
 
             Regex commentStart = new Regex("<div class=\"m_reply_list m_list\">");
             Regex getCommentName = new Regex("<p>(<a[^>]*>)?\\[([^<]*)(<img[^>]*>)?\\](</a>)?</p>");
             Regex getCommentText = new Regex("<div class=\"m_list_text\">([^<]*)</div>");
 
-            article.Comments.Clear();
+            comments.Clear();
 
             // 댓글 가져오기
             while (se.Next(commentStart, out match))
@@ -287,24 +322,179 @@ namespace DCView
                 match = getCommentName.Match(line);
                 if (!match.Success) continue;
 
-                var cmt = new Comment();
+                var cmt = new DCInsideComment();
                 cmt.Name = HttpUtility.HtmlDecode(match.Groups[2].Value.Trim());
 
                 // 내용
                 if (!se.Next(getCommentText, out match)) continue;
                 cmt.Text = HttpUtility.HtmlDecode(match.Groups[1].Value.Trim());
 
-                article.Comments.Add(cmt);
+                comments.Add(cmt);
             }
 
             // CommentUserID 얻기
             Regex userRegex = new Regex("<input[^>]*id=\"user_no\"[^>]*value=\"(\\d+)\"/>");
             if (se.Next(userRegex, out match))
             {
-                article.CommentUserID = match.Groups[1].Value;
+                commentUserID = match.Groups[1].Value;
             }
 
             return true;
-        }      
+        }
+
+        private bool UploadPictures(List<AttachmentStream> attachmentStreams, out string flData, out string oflData)
+        {
+            // 그림 업로드
+            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(@"http://upload.dcinside.com/upload_imgfree_mobile.php");
+
+            string boundary = DateTime.Now.Ticks.ToString("x");
+            httpRequest.ContentType = "multipart/form-data; boundary=" + boundary;
+            httpRequest.CookieContainer = WebClientEx.CookieContainer;
+            httpRequest.Method = "POST";
+
+            Task<Stream> requestStreamTask = Task.Factory.FromAsync<Stream>(
+                httpRequest.BeginGetRequestStream, httpRequest.EndGetRequestStream, null);
+            requestStreamTask.Wait();
+            Stream stream = requestStreamTask.Result;
+
+            var writer = new StreamWriter(stream);
+            writer.AutoFlush = true;
+
+            // upload[0]의 이름을 업로드
+            int count = 0;
+            foreach (var attachmentStream in attachmentStreams)
+            {
+                // 헤더
+                writer.WriteLine("--" + boundary);
+                writer.WriteLine("Content-Disposition: form-data; name=\"upload[{0}]\"; filename=\"{1}\"",
+                        count,
+                        attachmentStream.Filename
+                    );
+                writer.WriteLine("Content-Type: {0}", attachmentStream.ContentType);
+                writer.WriteLine(); // 헤더가 끝났을 때 새 줄
+
+                attachmentStream.Stream.CopyTo(stream);
+
+                writer.WriteLine(); // 내용이 끝났을 때 새 줄을 넣어준다
+
+                count++;
+            }
+
+            // 그 다음에 붙여야 할 것들..
+            // upload의 끝을 알려야 하나..
+            writer.WriteLine("--" + boundary);
+            writer.WriteLine("Content-Disposition: form-data; name=\"upload[{0}]\"; filename=\"\"", count);
+            writer.WriteLine("Content-Type: application/octet-stream");
+            writer.WriteLine(); // 헤더가 끝났을 때 새 줄
+
+            // 아무 내용 없고,
+            writer.WriteLine(); // 내용이 끝났을 때 새 줄을 넣어준다
+
+            var dict = new Dictionary<string, string>();
+            dict.Add("imgId", id);
+            dict.Add("mode", "write");
+            dict.Add("mobile_key", "1");
+
+            foreach (var kv in dict)
+            {
+                // 여기에 필요한 변수들을 넣는다
+                writer.WriteLine("--" + boundary);
+                writer.WriteLine("Content-Disposition: form-data; name=\"{0}\"", kv.Key);
+                writer.WriteLine();
+                writer.WriteLine(kv.Value);
+            }
+            // 스트림의 끝을 알림
+            writer.WriteLine("--" + boundary + "--");
+            stream.Close();
+
+            HttpWebResponse response = (HttpWebResponse)Task<WebResponse>.Factory.FromAsync(
+                httpRequest.BeginGetResponse, 
+                httpRequest.EndGetResponse, 
+                null).GetResult();
+            Stream responseStream = response.GetResponseStream();
+
+            // 여기서 FL_DATA와 OFL_DATA를 뽑아낸다
+            Regex fl_dataRegex = new Regex(@"\('FL_DATA'\).value\s+=\s+'([^']*?)'");
+            Regex ofl_dataRegex = new Regex(@"\('OFL_DATA'\)\.value\s*=\s*'([^']*?)'");
+
+            flData = null;
+            oflData = null;
+            using (var reader = new StreamReader(responseStream))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (flData == null)
+                    {
+                        var flDataRegexMatch = fl_dataRegex.Match(line);
+                        if (flDataRegexMatch.Success)
+                            flData = flDataRegexMatch.Groups[1].Value;
+                        continue;
+                    }
+
+                    if (oflData == null)
+                    {
+                        var oflDataRegexMatch = ofl_dataRegex.Match(line);
+                        if (oflDataRegexMatch.Success)
+                            oflData = oflDataRegexMatch.Groups[1].Value;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private bool UploadArticle(string title, string text, string code, string mobileKey, string flData, string oflData)
+        {
+            // 이제 
+            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(@"http://upload.dcinside.com/g_write.php");
+
+            string boundary = DateTime.Now.Ticks.ToString("x");
+            httpRequest.ContentType = "multipart/form-data; boundary=" + boundary;
+            httpRequest.CookieContainer = WebClientEx.CookieContainer;
+            httpRequest.Method = "POST";
+
+            httpRequest.Headers["Referer"] = string.Format("http://m.dcinside.com/write.php?id={0}&mode=write", id);
+            // httpRequest.Referer = string.Format("http://m.dcinside.com/write.php?id={0}&mode=write", id);
+
+            Stream stream = Task<Stream>.Factory.FromAsync(
+                httpRequest.BeginGetRequestStream, httpRequest.EndGetRequestStream, null).GetResult();            
+            StreamWriter writer = new StreamWriter(stream);
+            writer.AutoFlush = true;
+
+            var nvc = new Dictionary<string, string>();
+
+            nvc.Add("subject", HttpUtility.UrlEncode(title));
+            nvc.Add("memo", HttpUtility.UrlEncode(text));
+            // nvc.Add("user_id", HttpUtility.UrlEncode("dcviewtest"));
+            nvc.Add("mode", "write");
+            nvc.Add("id", HttpUtility.UrlEncode(id));
+            nvc.Add("code", code);
+            nvc.Add("mobile_key", mobileKey);
+            if (flData != null)
+                nvc.Add("FL_DATA", flData );
+
+            if (oflData != null)
+                nvc.Add("OFL_DATA", oflData );
+
+            foreach (var kv in nvc)
+            {
+                // 여기에 필요한 변수들을 넣는다
+                writer.WriteLine("--" + boundary);
+                writer.WriteLine("Content-Disposition: form-data; name=\"{0}\"", kv.Key);
+                writer.WriteLine();
+                writer.WriteLine(kv.Value);
+            }
+
+            // 다 됐으면 
+            writer.WriteLine("--" + boundary + "--");
+            stream.Close();
+
+            Task<WebResponse>.Factory.FromAsync(httpRequest.BeginGetResponse, httpRequest.EndGetResponse, null).GetResult();
+            return true;
+        }
+
+
+
     }
 }

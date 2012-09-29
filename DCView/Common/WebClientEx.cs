@@ -4,6 +4,10 @@ using System.Windows;
 using System.Security;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections.Specialized;
+using System.IO;
+using System.Collections.Generic;
+using System.Text;
 
 namespace MyApps.Common
 {
@@ -19,7 +23,7 @@ namespace MyApps.Common
             this.Encoding = System.Text.Encoding.UTF8;
         }
 
-        public Task<string> DownloadStringAsyncTask(Uri uri, CancellationToken cts)
+        public Task<string> DownloadStringAsyncTask(Uri uri, CancellationToken ct)
         {
             var tcs = new TaskCompletionSource<string>();            
 
@@ -80,7 +84,6 @@ namespace MyApps.Common
 
             return tcs.Task;
         }
-
 
         protected override WebResponse GetWebResponse(WebRequest request, IAsyncResult result)
         {

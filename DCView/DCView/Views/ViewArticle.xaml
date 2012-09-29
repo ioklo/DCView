@@ -9,23 +9,24 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:my="clr-namespace:DCView"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
-    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
-    shell:SystemTray.IsVisible="False"
+    shell:SystemTray.IsVisible="True"
+    shell:SystemTray.Opacity="0.0"
     toolkit:TiltEffect.IsTiltEnabled="True">
     
     <phone:PhoneApplicationPage.Resources>
-        <my:BoolToColorConverter x:Key="BoolToColorConverter" />        
+        <!--my:BoolToColorConverter x:Key="BoolToColorConverter" /-->        
     </phone:PhoneApplicationPage.Resources>
     
     <!--LayoutRoot에는 다른 모든 페이지 내용이 배치되는 루트 표가 포함됩니다.-->
     <Grid x:Name="LayoutRoot" Language="ko-kr">
         
         <controls:Pivot Title="내 응용 프로그램" 
-                        Name="PivotMain" 
+                        Name="MainPivot" 
                         SelectionChanged="PivotMain_SelectionChanged">   
             
             <controls:Pivot.TitleTemplate>
@@ -34,99 +35,7 @@
                 </DataTemplate>
             </controls:Pivot.TitleTemplate>
             
-            <!--Panorama 항목 1-->
-            <controls:PivotItem x:Name="PivotList" Header="목록" Margin="6,14,6,0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    
-                    <StackPanel x:Name="SearchPanel" Grid.Row="0" Visibility="Collapsed">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <RadioButton GroupName="SearchType" x:Name="SearchTypeSubject" Content="제목" IsChecked="True" Click="SearchType_Click"/>
-                            <RadioButton GroupName="SearchType" x:Name="SearchTypeContent" Content="내용" Click="SearchType_Click"/>
-                            <RadioButton GroupName="SearchType" x:Name="SearchTypeName" Content="이름" Click="SearchType_Click"/>
-                            <Button Content="전체 목록" Click="Button_Click"/>
-                        </StackPanel>
-                        
-                        <TextBox x:Name="SearchTextBox" Grid.Row="0" 
-                                 GotFocus="SearchTextBox_GotFocus"
-                                 LostFocus="SearchTextBox_LostFocus" />
-                    </StackPanel>
-
-                    <ListBox x:Name="ArticleList" Grid.Row="1"
-                             ManipulationCompleted="ArticleList_ManipulationCompleted">
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            </Style>
-                            
-                        </ListBox.ItemContainerStyle>
-
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="12, 12" Tap="ArticleListItem_Tap" Tag="{Binding}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Rectangle Grid.Column="0" Width="5" Height="Auto" Fill="{Binding Path=HasImage, Converter={StaticResource BoolToColorConverter}}" />  
-                                    <StackPanel Grid.Column="1" Margin="0, 0, 0, 3">
-                                        <TextBlock Text="{Binding Title}" 
-                                                   Style="{StaticResource DCViewTextMediumStyle}"
-                                                   TextWrapping="Wrap" />
-                                    
-                                        <TextBlock Text="{Binding Status}" Style="{StaticResource DCViewTextSmallStyle}" />
-                                    </StackPanel>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>                        
-                    </ListBox>
-                    
-                    <toolkit:PerformanceProgressBar Grid.Row="2" 
-                                                    x:Name="LoadingArticleListProgressBar"
-                                                    Background="Transparent"/>
-
-                </Grid>
-
-            </controls:PivotItem>
-
-            <!--Pivot 항목 2-->
-            <controls:PivotItem x:Name="PivotArticle" Header="내용" Margin="6,14,6,0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <!--ListBox toolkit:TiltEffect.SuppressTilt="True" Grid.Row="0" x:Name="ArticleText" Margin="12, 12" ManipulationCompleted="ArticleText_ManipulationCompleted">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Loaded="VirtualizingStackPanel_Loaded"/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem" >
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            </Style>
-
-                        </ListBox.ItemContainerStyle>
-                    </ListBox-->
-                    
-                    <ScrollViewer Grid.Row="0" x:Name="ArticleTextScroll">
-                        <StackPanel x:Name="ArticleText" Margin="12,0,12,0">
-                        </StackPanel>
-                    </ScrollViewer>
-                    
-                    <toolkit:PerformanceProgressBar Grid.Row="1" 
-                                                    x:Name="LoadingArticleTextProgressBar"
-                                                    Background="Transparent" />
-
-                </Grid>
-            </controls:PivotItem>
-
+            
         </controls:Pivot>
     </Grid>
 
