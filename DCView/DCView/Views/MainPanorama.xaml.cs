@@ -72,7 +72,7 @@ namespace DCView
 
             allApplicationBar = new ApplicationBar();
             ApplicationBarIconButton refreshListIconButton = new ApplicationBarIconButton();
-            refreshListIconButton.IconUri = new Uri("/appbar.refresh.rest.png", UriKind.Relative);
+            refreshListIconButton.IconUri = new Uri("/Data/appbar.refresh.rest.png", UriKind.Relative);
             refreshListIconButton.Click += RefreshGalleryListButton_Click;
             refreshListIconButton.Text = "새로고침";
             allApplicationBar.Buttons.Add(refreshListIconButton);

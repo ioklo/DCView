@@ -38,10 +38,14 @@ namespace DCView
 
         ApplicationBar textAppBar = null;  // 텍스트에서의 앱바
         ApplicationBar replyAppBar = null; // 리플 달때의 앱바
-
-        TextBox curReplyTextBox = null;
+        
         IArticle article = null;
         ViewArticle viewArticlePage;
+
+        Grid loadImageGrid = null;
+        Button loadImageButton = null;
+        TextBox replyTextBox = null;
+        bool bReplyModified = false;
 
         Action<Uri> tapAction = (Action<Uri>)(uri =>
         {
@@ -54,6 +58,8 @@ namespace DCView
         {
             InitializeComponent();
             InitializeAppBar();
+            InitializeReplyTextBox();
+            InitializeLoadImageButton();
 
             this.Header = "내용";
             this.viewArticlePage = viewArticlePage;            
@@ -67,7 +73,7 @@ namespace DCView
 
             var refreshTextIconButton = new ApplicationBarIconButton()
             {
-                IconUri = new Uri("/appbar.refresh.rest.png", UriKind.Relative),
+                IconUri = new Uri("/Data/appbar.refresh.rest.png", UriKind.Relative),
                 Text = "새로고침"
             };
             refreshTextIconButton.Click += refreshTextIconButton_Click;
@@ -87,12 +93,74 @@ namespace DCView
 
             var submitReplyIconButton = new ApplicationBarIconButton()
             {
-                IconUri = new Uri("/appbar.check.rest.png", UriKind.Relative),
+                IconUri = new Uri("/Data/appbar.check.rest.png", UriKind.Relative),
                 Text = "보내기"
             };
             submitReplyIconButton.Click += submitReplyIconButton_Click;
             replyAppBar.Buttons.Add(submitReplyIconButton);
+        }
 
+        private void InitializeReplyTextBox()
+        {
+            var inputScope = new InputScope();
+            inputScope.Names.Add(new InputScopeName() { NameValue = InputScopeNameValue.Chat });
+
+            replyTextBox = new TextBox()
+            {
+                AcceptsReturn = true,
+                TextWrapping = TextWrapping.Wrap,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+                InputScope = inputScope,
+                Text = "댓글",
+                Margin = new Thickness(-15, 0, -15, 0),                
+            };
+
+            replyTextBox.SizeChanged += (o1, e1) =>
+            {
+                if (FocusManager.GetFocusedElement() == replyTextBox)
+                    ArticleTextScroll.ScrollToVerticalOffset(ArticleText.ActualHeight);
+            };
+
+            replyTextBox.GotFocus += (o1, e1) => 
+            { 
+                UpdateAppBar();
+
+                if (bReplyModified) return;
+                replyTextBox.Text = "";
+                bReplyModified = true;
+            };
+
+            replyTextBox.LostFocus += (o1, e1) => 
+            {
+                UpdateAppBar();
+
+                if (replyTextBox.Text.Length == 0)
+                {
+                    bReplyModified = false;
+                    replyTextBox.Text = "댓글";
+                }
+            };
+        }
+
+        void InitializeLoadImageButton()
+        {
+            loadImageGrid = new Grid();
+            loadImageButton = new Button();
+            loadImageButton.Content = "그림 불러오기";
+            loadImageButton.FontSize = 14;
+            loadImageButton.BorderThickness = new Thickness(1);
+            loadImageButton.HorizontalAlignment = HorizontalAlignment.Center;
+            loadImageButton.Click += new RoutedEventHandler(loadImageButton_Click);
+            loadImageGrid.Children.Add(loadImageButton);
+        }
+
+
+        private void UpdateAppBar()
+        {
+            if (FocusManager.GetFocusedElement() == replyTextBox)
+                viewArticlePage.ApplicationBar = replyAppBar;
+            else
+                viewArticlePage.ApplicationBar = textAppBar;
         }
 
         // 글 다시 읽기 처리
@@ -106,14 +174,9 @@ namespace DCView
         // 
         void submitReplyIconButton_Click(object sender, EventArgs e)
         {
-            if (curReplyTextBox == null)
-                return;
-
-            if (CommentSubmit(curReplyTextBox.Text))
-            {
+            if (CommentSubmit(replyTextBox.Text))
                 // 일단 제출했으면 
                 (sender as ApplicationBarIconButton).IsEnabled = false;
-            }
         }
 
         // 리플 달기
@@ -138,7 +201,7 @@ namespace DCView
                 GetAndShowArticleText();
             });
             return true;
-        }       
+        }
 
         private void ShowArticleText(ArticleData data)
         {
@@ -163,76 +226,10 @@ namespace DCView
 
             if ((bool)IsolatedStorageSettings.ApplicationSettings["DCView.passive_loadimg"] && article.Pictures.Count != 0)
             {
-                var button = new Button()
-                {
-                    Content = "그림 불러오기",
-                    FontSize = 14,
-                    BorderThickness = new Thickness(1),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                };
+                loadImageButton.Content = "그림 불러오기";
+                loadImageButton.IsEnabled = true;                
 
-                int index = ArticleText.Children.Count;
-                int imageEmbedIndex = index + 1;
-
-                // 버튼을 눌렀을 때 
-                button.Click += (o, e) =>
-                {
-                    button.Content = string.Format("로딩중 {0}/{1}", 0, article.Pictures.Count);
-                    button.IsEnabled = false;
-                    int failedCount = 0;
-                    int count = 0;
-
-                    foreach (Picture pic in article.Pictures)
-                    {
-                        Uri curUri = pic.Uri;
-
-                        var image = new Image()
-                        {
-                            Source = new BitmapImage(curUri),
-                            Margin = new Thickness(3),
-                        };
-
-                        image.Tap += (o1, e1) =>
-                        {
-                            WebBrowserTask task = new WebBrowserTask();
-                            task.Uri = curUri;
-                            task.Show();
-                        };
-
-                        // 이미지가 열렸을 때.. 
-                        image.ImageOpened += delegate(object o1, RoutedEventArgs rea)
-                        {
-                            count++;
-
-                            if (failedCount != 0)
-                                button.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", count, article.Pictures.Count, failedCount);
-                            else
-                                button.Content = string.Format("불러오기 {0}/{1}", count, article.Pictures.Count, failedCount);
-
-                            if (failedCount == 0 && count == article.Pictures.Count)
-                            {
-                                // 버튼 제거하기
-                                ArticleText.Children.Remove(button);
-                                ArticleText.InvalidateArrange();
-                            }
-                        };
-
-                        // 이미지 로딩에 실패했을 때..
-                        image.ImageFailed += (o1, e1) =>
-                        {
-                            failedCount++;
-                            count++;
-
-                            button.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", 0, article.Pictures.Count, failedCount);
-                        };
-
-                        ArticleText.Children.Insert(imageEmbedIndex, image);
-
-                        imageEmbedIndex++;
-                    }
-                };
-
-                ArticleText.Children.Add(button);
+                ArticleText.Children.Add(loadImageGrid);                
             }
             else
             {
@@ -292,36 +289,8 @@ namespace DCView
                 // 댓글마다 충전물좀 넣기
                 ArticleText.Children.Add(new Rectangle() { Height = 20 });
             }
-
-            var inputScope = new InputScope();
-            inputScope.Names.Add(new InputScopeName() { NameValue = InputScopeNameValue.Chat });
-
-            var replyText = new TextBox()
-            {
-                AcceptsReturn = true,
-                TextWrapping = TextWrapping.Wrap,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
-                InputScope = inputScope,
-                IsTabStop = false,
-            };
-
-            replyText.SizeChanged += (o1, e1) =>
-            {
-                if (curReplyTextBox != null)
-                    ArticleTextScroll.ScrollToVerticalOffset(ArticleText.ActualHeight);
-            };
-
-            replyText.GotFocus += (o1, e1) =>
-            {
-                curReplyTextBox = replyText;                    
-            };
-
-            replyText.LostFocus += (o1, e1) =>
-            {
-                curReplyTextBox = null;
-            };
-
-            ArticleText.Children.Add(replyText);
+            
+            ArticleText.Children.Add(replyTextBox);
 
             // 자동으로 늘어나는 replyText 구현
             // reply_Click
@@ -398,14 +367,77 @@ namespace DCView
             }          
             else
                 ShowArticleText(data);
+
+            // 리플란 깨끗이 청소
+            bReplyModified = false;
+            replyTextBox.Text = "댓글";
+        }
+
+        // 버튼을 눌렀을 때 
+        private void loadImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            loadImageButton.Content = string.Format("로딩중 {0}/{1}", 0, article.Pictures.Count);
+            loadImageButton.IsEnabled = false;
+
+            int insertIndex = ArticleText.Children.IndexOf(loadImageGrid) + 1;
+
+            List<Image> failedImage = new List<Image>();
+            int openedImageCount = 0;
+
+            foreach (Picture pic in article.Pictures)
+            {
+                Uri curUri = pic.Uri;
+
+                var image = new Image()
+                {
+                    Source = new BitmapImage(curUri),
+                    Margin = new Thickness(3),
+                };
+
+                image.Tap += (o1, e1) =>
+                {
+                    WebBrowserTask task = new WebBrowserTask();
+                    task.Uri = curUri;
+                    task.Show();
+                };
+
+                // 이미지가 열렸을 때.. 
+                image.ImageOpened += delegate(object o1, RoutedEventArgs rea)
+                {
+                    openedImageCount++;
+
+                    if (failedImage.Count != 0)
+                        loadImageButton.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", openedImageCount, article.Pictures.Count, failedImage.Count);
+                    else
+                        loadImageButton.Content = string.Format("불러오기 {0}/{1}", openedImageCount, article.Pictures.Count);
+
+                    if (failedImage.Count == 0 && openedImageCount == article.Pictures.Count)
+                    {
+                        // 버튼 제거하기
+                        ArticleText.Children.Remove(loadImageGrid);
+                        ArticleText.InvalidateArrange();
+                    }
+                };
+
+                // 이미지 로딩에 실패했을 때..
+                image.ImageFailed += (o1, e1) =>
+                {
+                    if (failedImage.IndexOf(image) == -1)
+                        failedImage.Add(image);
+                    
+                    loadImageButton.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", openedImageCount, article.Pictures.Count, failedImage.Count);
+                };
+
+                ArticleText.Children.Insert(insertIndex, image);
+                insertIndex++;
+            }            
         }
 
         void INotifyActivated.OnActivated()
         {
-            if (FocusManager.GetFocusedElement() == curReplyTextBox)
-                viewArticlePage.ApplicationBar = replyAppBar;
-            else
-                viewArticlePage.ApplicationBar = textAppBar;
+            UpdateAppBar();
         }
+
+        
     }
 }

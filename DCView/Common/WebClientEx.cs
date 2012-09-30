@@ -27,7 +27,7 @@ namespace MyApps.Common
         {
             var tcs = new TaskCompletionSource<string>();            
 
-            var registration = cts.Register(() =>
+            var registration = ct.Register(() =>
                 {
                     this.CancelAsync();
                 });

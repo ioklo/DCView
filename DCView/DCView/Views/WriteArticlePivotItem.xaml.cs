@@ -40,12 +40,12 @@ namespace DCView
         {
             var submitButton = new ApplicationBarIconButton();
             submitButton.Text = "올리기";
-            submitButton.IconUri = new Uri("/appbar.check.rest.png", UriKind.Relative);
+            submitButton.IconUri = new Uri("/Data/appbar.check.rest.png", UriKind.Relative);
             submitButton.Click += new EventHandler(submitButton_Click);
 
             var cancelButton = new ApplicationBarIconButton();
             cancelButton.Text = "취소";
-            cancelButton.IconUri = new Uri("/appbar.stop.rest.png", UriKind.Relative);
+            cancelButton.IconUri = new Uri("/Data/appbar.stop.rest.png", UriKind.Relative);
             cancelButton.Click += new EventHandler(cancelButton_Click);
 
             appBar = new ApplicationBar();

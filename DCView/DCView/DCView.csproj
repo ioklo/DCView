@@ -78,12 +78,12 @@
     <Compile Include="Interface\ILister.cs" />
     <Compile Include="Interface\INotifyActivated.cs" />
     <Compile Include="Model\ArticleWriter.cs" />
-    <Compile Include="Model\Board\DCInsideArticle.cs" />
-    <Compile Include="Model\Board\DCInsideAuth.cs" />
-    <Compile Include="Model\Board\DCInsideBoard.cs" />
-    <Compile Include="Model\Board\DCInsideBoardSearch.cs" />
+    <Compile Include="DCInside\DCInsideArticle.cs" />
+    <Compile Include="DCInside\DCInsideAuth.cs" />
+    <Compile Include="DCInside\DCInsideBoard.cs" />
+    <Compile Include="DCInside\DCInsideBoardSearch.cs" />
     <Compile Include="Interface\IBoard.cs" />
-    <Compile Include="Model\Board\DCInsideComment.cs" />
+    <Compile Include="DCInside\DCInsideComment.cs" />
     <Compile Include="Model\Picture.cs" />
     <Compile Include="Model\GalleryList.cs" />
     <Compile Include="Model\SandBox.cs" />
@@ -128,19 +128,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appbar.back.rest.png" />
-    <Content Include="appbar.check.rest.png" />
-    <Content Include="appbar.edit.rest.png" />
-    <Content Include="appbar.feature.search.rest.png">
+    <Content Include="Data\appbar.back.rest.png" />
+    <Content Include="Data\appbar.check.rest.png" />
+    <Content Include="Data\appbar.edit.rest.png" />
+    <Content Include="Data\appbar.feature.search.rest.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="appbar.gotoslide.rest.png">
+    <Content Include="Data\appbar.gotoslide.rest.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="appbar.refresh.rest.png">
+    <Content Include="Data\appbar.refresh.rest.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="appbar.stop.rest.png">
+    <Content Include="Data\appbar.stop.rest.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ApplicationIcon.png">

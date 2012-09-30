@@ -47,7 +47,7 @@ namespace DCView
 
             var refreshListIconButton = new ApplicationBarIconButton()
             {
-                IconUri = new Uri("/appbar.refresh.rest.png", UriKind.Relative),
+                IconUri = new Uri("/Data/appbar.refresh.rest.png", UriKind.Relative),
                 Text = "새로고침"
             };
             refreshListIconButton.Click += refreshListIconButton_Click;
@@ -55,7 +55,7 @@ namespace DCView
 
             var writeIconButton = new ApplicationBarIconButton()
             {
-                IconUri = new Uri("/appbar.edit.rest.png", UriKind.Relative),
+                IconUri = new Uri("/Data/appbar.edit.rest.png", UriKind.Relative),
                 Text = "글쓰기"
             };
             writeIconButton.Click += writeIconButton_Click;
@@ -63,7 +63,7 @@ namespace DCView
 
             var searchIconButton = new ApplicationBarIconButton()
             {
-                IconUri = new Uri("/appbar.feature.search.rest.png", UriKind.Relative),
+                IconUri = new Uri("/Data/appbar.feature.search.rest.png", UriKind.Relative),
                 Text = "검색"
             };
             searchIconButton.Click += searchIconButton_Click;
@@ -129,6 +129,7 @@ namespace DCView
                 catch
                 {
                     viewArticlePage.ShowErrorMessage("목록을 가져오는데 실패했습니다.");
+                    Dispatcher.BeginInvoke(() => LoadingArticleListProgressBar.IsIndeterminate = true);
                 }
             });            
         }

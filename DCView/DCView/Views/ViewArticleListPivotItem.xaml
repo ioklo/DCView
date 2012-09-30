@@ -17,7 +17,7 @@
     </controls:PivotItem.Resources>
   
 
-    <Grid>
+    <Grid Margin="-5, 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
@@ -69,9 +69,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <toolkit:PerformanceProgressBar Grid.Row="2" 
-                                                    x:Name="LoadingArticleListProgressBar"
-                                                    Background="Transparent"/>
+        <toolkit:PerformanceProgressBar Grid.Row="2" x:Name="LoadingArticleListProgressBar" Background="Transparent"/>
 
     </Grid>
 </controls:PivotItem>
