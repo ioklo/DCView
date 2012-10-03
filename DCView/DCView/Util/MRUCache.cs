@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DCView
+namespace DCView.Util
 {
     // 데이터의 값을 n개까지 유지하는 캐시
     public class MRUCache<Key, Value>

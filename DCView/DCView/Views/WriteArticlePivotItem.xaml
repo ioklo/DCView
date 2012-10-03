@@ -4,40 +4,47 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     d:DesignHeight="696" d:DesignWidth="480" Header="글쓰기">
     
-    <Grid x:Name="ContentPanel" Margin="12,0,12,0">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" x:Name="FormTitle" Text="제목" GotFocus="FormTitle_GotFocus" LostFocus="FormTitle_LostFocus"/>
-        
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" x:Name="ImagesPanel">
-                <Button Width="100" Height="100" Padding="0" Margin="0" Click="AddImage">
-                    <!--Image Source="/appbar.edit.rest.png"></Image-->
-                    짤 추가
-                </Button>
-                <Button Width="100" Height="100" Padding="0" Margin="0" Click="AddImage" />
-                <Button Width="100" Height="100" Padding="0" Margin="0" Click="AddImage" />
-                <Button Width="100" Height="100" Padding="0" Margin="0" Click="AddImage" />
-                <Button Width="100" Height="100" Padding="0" Margin="0" Click="AddImage" />                       
-                        
-            </StackPanel>
-        </ScrollViewer>        
+        <toolkit:PerformanceProgressBar x:Name="WriteProgressBar" Grid.Row="0"/>
 
-        <TextBox Grid.Row="2" 
-                 x:Name="FormText" 
-                 AcceptsReturn="True" 
-                 Text="내용" 
-                 TextWrapping="Wrap" VerticalScrollBarVisibility="Visible"
-                 GotFocus="FormText_GotFocus" LostFocus="FormText_LostFocus"/>
-    </Grid>    
+        <ScrollViewer Grid.Row="1">
+            <StackPanel x:Name="ContentPanel" Margin="12,0,12,0">
+                
+                <TextBox x:Name="FormTitle" Text="제목" GotFocus="FormTitle_GotFocus" LostFocus="FormTitle_LostFocus"/>
+
+                <TextBox x:Name="FormText" 
+                     AcceptsReturn="True" 
+                     Height="340"
+                     Text="내용" 
+                     TextWrapping="Wrap" VerticalScrollBarVisibility="Visible"
+                     GotFocus="FormText_GotFocus" LostFocus="FormText_LostFocus"/>
+
+                <TextBlock Text="이미지 첨부" Style="{StaticResource PhoneTextNormalStyle}"/>
+
+                <toolkit:WrapPanel x:Name="ImagesPanel">
+                    <Button x:Name="AddImageButton" Width="128" Height="128" Click="AddImage" BorderThickness="1">
+                        <!--Image Source="/appbar.edit.rest.png"></Image--> 추가
+                    </Button>
+                </toolkit:WrapPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+
+
+    </Grid>
+    
+    
+    
 </controls:PivotItem>

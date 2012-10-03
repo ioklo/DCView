@@ -89,10 +89,12 @@
     <Compile Include="Model\SandBox.cs" />
     <Compile Include="Util\DCViewWebClient.cs" />
     <Compile Include="Util\HtmlElementConverter.cs" />
+    <Compile Include="Util\SilverlightUtil.cs" />
     <Compile Include="Views\BoolToColorConverter.cs" />
     <Compile Include="Interface\IComment.cs" />
     <Compile Include="Model\Gallery.cs" />
     <Compile Include="Model\LoginInfo.cs" />
+    <Compile Include="Util\CommentedTextBox.cs" />
     <Compile Include="Views\MainPanorama.xaml.cs">
       <DependentUpon>MainPanorama.xaml</DependentUpon>
     </Compile>

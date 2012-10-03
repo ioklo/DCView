@@ -70,8 +70,9 @@ namespace DCView
             List<AttachmentStream> attachStream = new List<AttachmentStream>();
 
             // 짤 추가된것들 목록을 얻어온다
-            foreach (Button button in ImagesPanel.Children)
+            foreach (var child in ImagesPanel.Children)
             {
+                Button button = child as Button;
                 if (button == null) continue;
 
                 Image image = button.Content as Image;
@@ -80,14 +81,21 @@ namespace DCView
                 PhotoResult result = image.Tag as PhotoResult;
                 if (result == null) continue;
 
-                attachStream.Add(new AttachmentStream() { Stream = result.ChosenPhoto, Filename = new FileInfo(result.OriginalFileName).Name });
+                string name = result.OriginalFileName;
+                int last = result.OriginalFileName.LastIndexOf('\\');
+                if (last != -1)
+                    name = result.OriginalFileName.Substring(last + 1);
+
+                attachStream.Add(new AttachmentStream() { Stream = result.ChosenPhoto, Filename = name });
             }
 
             CancellationTokenSource cts = new CancellationTokenSource();
 
             string title = Title;
             string text = Text;
+
             submitButton.IsEnabled = false;
+            WriteProgressBar.IsIndeterminate = true;
 
             Task.Factory.StartNew(() =>
             {
@@ -114,8 +122,11 @@ namespace DCView
                 }
 
                 viewArticlePage.ShowErrorMessage("글쓰기에 실패했습니다. 다시 시도해 보세요");
-                Dispatcher.BeginInvoke(() => { submitButton.IsEnabled = true; });
-                
+                Dispatcher.BeginInvoke(() => 
+                { 
+                    submitButton.IsEnabled = true;
+                    WriteProgressBar.IsIndeterminate = false;
+                });                
 
             }, cts.Token);            
         }        
@@ -150,14 +161,19 @@ namespace DCView
                     return;
 
                 Button button = new Button();
-                button.Height = 100;
-                button.Width = 100;
+                button.Height = 128;
+                button.Width = 128;
                 button.Padding = new Thickness(0);
-                button.Margin = new Thickness(10);
                 button.Click += ModifyImage;
+                button.BorderThickness = new Thickness(1);
 
                 ContextMenu menu = new ContextMenu();
-                menu.Items.Add(new MenuItem() { Header = "제거" });
+                MenuItem removeMenuItem = new MenuItem();
+                removeMenuItem.Header = "제거";
+                removeMenuItem.Click += new RoutedEventHandler(removeMenuItem_Click);
+                removeMenuItem.Tag = button;
+
+                menu.Items.Add(removeMenuItem);
 
                 ContextMenuService.SetContextMenu(button, menu);
 
@@ -168,9 +184,25 @@ namespace DCView
                 button.Content = image;
 
                 ImagesPanel.Children.Insert(ImagesPanel.Children.Count - 1, button);
+
+                if (ImagesPanel.Children.Count >= 6)
+                    AddImageButton.IsEnabled = false;
             };
 
             photoChooser.Show();
+        }
+
+        void removeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var elem = sender as FrameworkElement;
+            if (elem == null) return;
+
+            var uiElem = elem.Tag as UIElement;
+            if (uiElem == null) return;
+
+            ImagesPanel.Children.Remove(uiElem);
+            if (ImagesPanel.Children.Count < 6)
+                AddImageButton.IsEnabled = true;
         }
 
         void INotifyActivated.OnActivated()

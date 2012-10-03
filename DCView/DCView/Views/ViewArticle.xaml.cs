@@ -85,10 +85,11 @@ namespace DCView
         void EnableLoginForm(bool bEnabled)
         {
             StackPanel panel = LoginForm;
-            foreach(Control child in panel.Children)
+            foreach(var child in panel.Children)
             {
-                if (child == null) continue;
-                child.IsEnabled = bEnabled;   
+                Control ctrl = child as Control;
+                if (ctrl == null) continue;
+                ctrl.IsEnabled = bEnabled;   
             }
         }
 
@@ -204,11 +205,11 @@ namespace DCView
         public void ShowWriteForm(IBoard board)
         {
             // 글쓰기 폼 보이기
-            if (writeArticlePivotItem == null)
-                writeArticlePivotItem = new WriteArticlePivotItem(this, board);
-
             if (!MainPivot.Items.Contains(writeArticlePivotItem))
+            {
+                writeArticlePivotItem = new WriteArticlePivotItem(this, board);
                 MainPivot.Items.Add(writeArticlePivotItem);
+            }
 
             MainPivot.SelectedItem = writeArticlePivotItem;
         }
@@ -220,6 +221,8 @@ namespace DCView
 
             MainPivot.Items.Remove(writeArticlePivotItem);
             MainPivot.SelectedIndex = 0;
+
+            writeArticlePivotItem = null;
         }
 
         public void ShowArticleList()

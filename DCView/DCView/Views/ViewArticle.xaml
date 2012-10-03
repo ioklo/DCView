@@ -41,7 +41,9 @@
                     <TextBlock Text="로그인" Style="{StaticResource PhoneTextExtraLargeStyle}" />
                 
                     <StackPanel x:Name="LoginForm">
+                        <TextBlock Text="아이디" Style="{StaticResource PhoneTextNormalStyle}"/>
                         <TextBox x:Name="LoginIDTextBox" Text="{Binding Path=ID, Mode=TwoWay}"/>
+                        <TextBlock Text="비밀번호" Style="{StaticResource PhoneTextNormalStyle}"/>
                         <PasswordBox x:Name="LoginPWTextBox" Password="{Binding Path=Password, Mode=TwoWay}"/>
                         <CheckBox x:Name="SaveLoginInfoCheckBox" IsChecked="{Binding Path=SaveLoginInfo, Mode=TwoWay}" Content="아이디/비밀번호 저장"/>
                         <CheckBox x:Name="AutoLoginCheckBox" IsChecked="{Binding Path=AutoLogin, Mode=TwoWay}" Content="시작할 때 자동으로 로그인 하기" />

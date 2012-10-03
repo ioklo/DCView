@@ -367,6 +367,7 @@ namespace DCView
             Task<Stream> requestStreamTask = Task.Factory.FromAsync<Stream>(
                 httpRequest.BeginGetRequestStream, httpRequest.EndGetRequestStream, null);
             requestStreamTask.Wait();
+
             Stream stream = requestStreamTask.Result;
 
             var writer = new StreamWriter(stream);
@@ -461,7 +462,7 @@ namespace DCView
             // 이제 
             HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(@"http://upload.dcinside.com/g_write.php");
 
-            string boundary = DateTime.Now.Ticks.ToString("x");
+            string boundary = "---------" + DateTime.Now.Ticks.ToString("x");
             httpRequest.ContentType = "multipart/form-data; boundary=" + boundary;
             httpRequest.CookieContainer = WebClientEx.CookieContainer;
             httpRequest.Method = "POST";
@@ -471,39 +472,48 @@ namespace DCView
 
             Stream stream = Task<Stream>.Factory.FromAsync(
                 httpRequest.BeginGetRequestStream, httpRequest.EndGetRequestStream, null).GetResult();            
-            StreamWriter writer = new StreamWriter(stream, Encoding.UTF8);
+            StreamWriter writer = new StreamWriter(stream);
             writer.AutoFlush = true;
 
-            var nvc = new Dictionary<string, string>();
+            
+            var nvc = new List<Tuple<string, string>>();
 
-            nvc.Add("subject", title);
-            nvc.Add("memo", text);
+            nvc.Add(Tuple.Create("subject", title));
+            nvc.Add(Tuple.Create("memo", text));
             // nvc.Add("user_id", HttpUtility.UrlEncode("dcviewtest"));
-            nvc.Add("mode", "write");
-            nvc.Add("id", id);
-            nvc.Add("code", code);
-            nvc.Add("mobile_key", mobileKey);
+            nvc.Add(Tuple.Create("mode", "write"));
+            nvc.Add(Tuple.Create("id", id));
+            nvc.Add(Tuple.Create("code", code));
+            nvc.Add(Tuple.Create("mobile_key", mobileKey));
             if (flData != null)
-                nvc.Add("FL_DATA", flData );
+                nvc.Add(Tuple.Create("FL_DATA", flData));
 
             if (oflData != null)
-                nvc.Add("OFL_DATA", oflData );
+                nvc.Add(Tuple.Create("OFL_DATA", oflData));
 
             foreach (var kv in nvc)
             {
                 // 여기에 필요한 변수들을 넣는다
                 writer.WriteLine("--" + boundary);
-                writer.WriteLine("Content-Disposition: form-data; name=\"{0}\"", kv.Key);
+                writer.WriteLine("Content-Disposition: form-data; name=\"{0}\"", kv.Item1);
                 writer.WriteLine("Content-Type: text/plain; charset=utf-8");
                 writer.WriteLine();
-                writer.WriteLine(kv.Value);
+                writer.WriteLine(kv.Item2);
             }
 
             // 다 됐으면 
             writer.WriteLine("--" + boundary + "--");
             stream.Close();
 
-            Task<WebResponse>.Factory.FromAsync(httpRequest.BeginGetResponse, httpRequest.EndGetResponse, null).GetResult();
+            WebResponse response = Task<WebResponse>.Factory.FromAsync(httpRequest.BeginGetResponse, httpRequest.EndGetResponse, null).GetResult();
+
+            var mem = new MemoryStream();
+            response.GetResponseStream().CopyTo(mem);
+
+            string s = Encoding.UTF8.GetString(mem.ToArray(), 0, (int)mem.Length);
+
+            int a = s.Length;
+
             return true;
         }
 
