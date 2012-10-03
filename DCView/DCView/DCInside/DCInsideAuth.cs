@@ -11,6 +11,8 @@ using System.Windows.Shapes;
 using System.Threading.Tasks;
 
 using DCView.Util;
+using MyApps.Common;
+using System.Threading;
 
 namespace DCView
 {
@@ -38,36 +40,34 @@ namespace DCView
         }
 
 
-        public Task Login(string id, string passwd)
+        public bool Login(string id, string passwd, CancellationToken ct)
         {
-            return Task.Factory.StartNew(() =>
+            DCViewWebClient client = new DCViewWebClient();
+
+            client.Headers["Content-Type"] = "application/x-www-form-urlencoded";
+            client.Headers["Referer"] = "http://m.dcinside.com/login.php?r_url=%2F";
+
+            string data = string.Format(
+                "user_id={0}&user_pw={1}&r_url=%2F",
+                HttpUtility.UrlEncode(id),
+                HttpUtility.UrlEncode(passwd));
+
+            try
             {
-                DCViewWebClient client = new DCViewWebClient();
-
-                client.Headers["Content-Type"] = "application/x-www-form-urlencoded";
-                client.Headers["Referer"] = "http://m.dcinside.com/login.php?r_url=%2F";
-
-                string data = string.Format(
-                    "user_id={0}&user_pw={1}&r_url=%2F",
-                    HttpUtility.UrlEncode(id),
-                    HttpUtility.UrlEncode(passwd));
-                
-                Task<string> task = client.UploadStringAsyncTask(new Uri("http://dcid.dcinside.com/join/mobile_login_ok.php", UriKind.Absolute), "POST", data);
-                task.Wait();
-
+                string result = client.UploadStringAsyncTask(new Uri("http://dcid.dcinside.com/join/mobile_login_ok.php", UriKind.Absolute), "POST", data, ct).GetResult();
                 var cookies = DCViewWebClient.CookieContainer.GetCookies(new Uri("http://gall.dcinside.com"));
 
-                // 로긴 성공
-                if (cookies["dc_m_login"] != null)
-                {
-                    LoggedIn = true;
-                }
-                else
-                {
+                if (result.IndexOf("parent.location.href='http://m.dcinside.com/'") == -1)
                     LoggedIn = false;
-                }
-                
-            });
+                else LoggedIn = true;
+
+                return LoggedIn;
+            }
+            catch
+            {
+                LoggedIn = false;
+                return false;                
+            }
         }
     }
 }

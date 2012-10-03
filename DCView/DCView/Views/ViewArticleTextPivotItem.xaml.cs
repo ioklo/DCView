@@ -174,32 +174,53 @@ namespace DCView
         // 
         void submitReplyIconButton_Click(object sender, EventArgs e)
         {
-            if (CommentSubmit(replyTextBox.Text))
-                // 일단 제출했으면 
-                (sender as ApplicationBarIconButton).IsEnabled = false;
+            // 제출하기 전에 로그인 확인 부터
+            if (App.Current.LoginInfo.LoginState != LoginInfo.State.LoggedIn)
+            {
+                viewArticlePage.ShowLoginDialog();
+                return;
+            }
+
+            CommentSubmit(replyTextBox.Text, sender as ApplicationBarIconButton);
         }
 
         // 리플 달기
-        private bool CommentSubmit(string text)
+        private bool CommentSubmit(string text, ApplicationBarIconButton submitButton)
         {
             if (article == null) return false;
 
             if (text.Trim() == string.Empty)
+            {
+                MessageBox.Show("댓글 내용을 입력해주세요");
                 return false;
+            }
+
+            submitButton.IsEnabled = true; 
 
             CancellationTokenSource cts = new CancellationTokenSource();
 
             Task.Factory.StartNew( () =>
             {
-                if (!article.WriteComment(text, cts.Token))
+                try
+                {
+                    if (!article.WriteComment(text, cts.Token))
+                    {
+                        viewArticlePage.ShowErrorMessage("댓글달기에 실패했습니다 다시 시도해보세요");
+                        Dispatcher.BeginInvoke(() => { submitButton.IsEnabled = true; });
+                        return;
+                    }
+
+                    // 글 다시 읽기
+                    Dispatcher.BeginInvoke(() => { GetAndShowArticleText(); submitButton.IsEnabled = true; });
+                }
+                catch
                 {
                     viewArticlePage.ShowErrorMessage("댓글달기에 실패했습니다 다시 시도해보세요");
-                    return;
+                    Dispatcher.BeginInvoke(() => { submitButton.IsEnabled = true; });
+                    return;                    
                 }
-
-                // 글 다시 읽기
-                GetAndShowArticleText();
             });
+
             return true;
         }
 

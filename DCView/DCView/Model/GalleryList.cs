@@ -144,6 +144,7 @@ namespace DCView
 
         public void RemoveFavorite(Gallery gallery)
         {
+            modifiedFavorites = true;
             favorites.Remove(gallery);
         }
 

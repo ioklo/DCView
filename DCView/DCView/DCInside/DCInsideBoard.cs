@@ -192,6 +192,18 @@ namespace DCView
 
         public bool WriteComment(DCInsideArticle article, string text, CancellationToken ct)
         {
+            if (article.CommentUserID.Length == 0)
+            {
+                // 한번만 더 시도하고, (이전에 로그인을 안했을 수도 있으므로)
+                string dummyText;
+                if (!GetArticleText(article, ct, out dummyText))
+                    return false;
+
+                // 그래도 commentUserID를 얻지 못했다면
+                if (article.CommentUserID.Length == 0)
+                    return false;
+            }
+
             DCViewWebClient webClient = new DCViewWebClient();
         
             webClient.Headers["Content-Type"] = "application/x-www-form-urlencoded";
@@ -204,7 +216,7 @@ namespace DCView
                 article.CommentUserID
                 );
 
-            webClient.UploadStringAsyncTask(new Uri("http://m.dcinside.com/_option_write.php", UriKind.Absolute), "POST", data).GetResult();
+            webClient.UploadStringAsyncTask(new Uri("http://m.dcinside.com/_option_write.php", UriKind.Absolute), "POST", data, ct).GetResult();
             return true;
         }
 
@@ -459,16 +471,16 @@ namespace DCView
 
             Stream stream = Task<Stream>.Factory.FromAsync(
                 httpRequest.BeginGetRequestStream, httpRequest.EndGetRequestStream, null).GetResult();            
-            StreamWriter writer = new StreamWriter(stream);
+            StreamWriter writer = new StreamWriter(stream, Encoding.UTF8);
             writer.AutoFlush = true;
 
             var nvc = new Dictionary<string, string>();
 
-            nvc.Add("subject", HttpUtility.UrlEncode(title));
-            nvc.Add("memo", HttpUtility.UrlEncode(text));
+            nvc.Add("subject", title);
+            nvc.Add("memo", text);
             // nvc.Add("user_id", HttpUtility.UrlEncode("dcviewtest"));
             nvc.Add("mode", "write");
-            nvc.Add("id", HttpUtility.UrlEncode(id));
+            nvc.Add("id", id);
             nvc.Add("code", code);
             nvc.Add("mobile_key", mobileKey);
             if (flData != null)
@@ -482,6 +494,7 @@ namespace DCView
                 // 여기에 필요한 변수들을 넣는다
                 writer.WriteLine("--" + boundary);
                 writer.WriteLine("Content-Disposition: form-data; name=\"{0}\"", kv.Key);
+                writer.WriteLine("Content-Type: text/plain; charset=utf-8");
                 writer.WriteLine();
                 writer.WriteLine(kv.Value);
             }

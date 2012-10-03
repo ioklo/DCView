@@ -57,7 +57,7 @@ namespace DCView
         // 생성자
         public ViewArticle()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         // 오버라이드 함수들
@@ -77,6 +77,53 @@ namespace DCView
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
+
+            // LoginInfo 바인딩 제거
+            App.Current.LoginInfo.PropertyChanged -= LoginInfo_PropertyChanged;
+        }
+
+        void EnableLoginForm(bool bEnabled)
+        {
+            StackPanel panel = LoginForm;
+            foreach(Control child in panel.Children)
+            {
+                if (child == null) continue;
+                child.IsEnabled = bEnabled;   
+            }
+        }
+
+        void LoginInfo_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            LoginInfo info = sender as LoginInfo;
+            if (info == null) return;
+
+            switch(e.PropertyName)
+            {
+                case "LoginState":
+
+                    switch(info.LoginState)
+                    {
+                        case LoginInfo.State.LoggedIn:
+                            LoginStatus.Text = info.ID + " 로그인";
+                            EnableLoginForm(false);
+                            LoginSubmitButton.Content = "로그아웃";
+                            HideLoginDialog();
+                            break;
+
+                        case LoginInfo.State.LoggingIn:
+                            LoginStatus.Text = "로그인 중...";
+                            EnableLoginForm(false);
+                            LoginSubmitButton.Content = "로그인 취소";
+                            break;
+
+                        case LoginInfo.State.NotLoggedIn:
+                            LoginStatus.Text = "비회원";
+                            EnableLoginForm(true);
+                            LoginSubmitButton.Content = "로그인";
+                            break;
+                    }
+                    break;
+            }
         }
 
         // 이 페이지로 들어오려고 할 때
@@ -85,6 +132,10 @@ namespace DCView
             base.OnNavigatedTo(e);
 
             Initialize();
+            LoginForm.DataContext = App.Current.LoginInfo;
+            LoginInfo_PropertyChanged(App.Current.LoginInfo, new PropertyChangedEventArgs("LoginState"));
+
+            App.Current.LoginInfo.PropertyChanged += LoginInfo_PropertyChanged;
         }
 
         private void Initialize()
@@ -95,7 +146,7 @@ namespace DCView
 
             viewArticleListPivotItem = new ViewArticleListPivotItem(this, new DCInsideBoard(id));
             
-            MainPivot.Title = App.Current.GalleryList[id].Name + " 갤러리"; // 왼쪽 상단 갤러리 이름 적기
+            GalleryTitle.Text = App.Current.GalleryList[id].Name + " 갤러리"; // 왼쪽 상단 갤러리 이름 적기
             MainPivot.Items.Clear();
             MainPivot.Items.Add(viewArticleListPivotItem);
 
@@ -150,11 +201,11 @@ namespace DCView
             viewArticleTextPivotItem.SetArticle(article);
         }
 
-        public void ShowWriteForm()
+        public void ShowWriteForm(IBoard board)
         {
             // 글쓰기 폼 보이기
             if (writeArticlePivotItem == null)
-                writeArticlePivotItem = new WriteArticlePivotItem(this);
+                writeArticlePivotItem = new WriteArticlePivotItem(this, board);
 
             if (!MainPivot.Items.Contains(writeArticlePivotItem))
                 MainPivot.Items.Add(writeArticlePivotItem);
@@ -178,5 +229,70 @@ namespace DCView
 
             UpdatePivotItem(viewArticleListPivotItem);            
         }
+
+        public void RefreshArticleList()
+        {
+            viewArticleListPivotItem.RefreshArticleList(); // 리스트 갱신
+        }
+
+        public void ShowLoginDialog()
+        {
+            MainPivot.IsEnabled = false;
+            ApplicationBar.IsMenuEnabled = false;
+
+            LoginPanel.Visibility = Visibility.Visible;
+        }
+
+        public void HideLoginDialog()
+        {
+            MainPivot.IsEnabled = true;
+            ApplicationBar.IsMenuEnabled = true;
+
+            LoginPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void LoginStatus_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            ShowLoginDialog();            
+        }
+
+        private void LoginCloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            HideLoginDialog();
+        }
+
+        CancellationTokenSource loginCancelTokenSource;
+
+        private void LoginSubmitButton_Click(object sender, RoutedEventArgs e)
+        {
+            var loginInfo = App.Current.LoginInfo;
+
+            switch (loginInfo.LoginState)
+            {
+                // 로그인 중이라면 취소,
+                case LoginInfo.State.LoggingIn:
+                    if (loginCancelTokenSource != null)
+                    {
+                        loginCancelTokenSource.Cancel();
+                        loginCancelTokenSource = null;
+                    }
+                    break;
+
+                case LoginInfo.State.NotLoggedIn:
+                    {
+                        loginCancelTokenSource = new CancellationTokenSource();
+                        loginInfo.Login(loginCancelTokenSource.Token);
+                        break;
+                    }
+
+                case LoginInfo.State.LoggedIn:
+                    {
+                        loginInfo.Logout();
+                    }
+                    break;
+            }
+        }
+
+
     }
 }

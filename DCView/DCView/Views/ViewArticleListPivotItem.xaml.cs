@@ -208,7 +208,7 @@ namespace DCView
         // 글쓰기 아이콘 클릭
         private void writeIconButton_Click(object sender, EventArgs e)
         {
-            viewArticlePage.ShowWriteForm();
+            viewArticlePage.ShowWriteForm(board);
         }
 
         // 검색 아이콘 클릭

@@ -34,6 +34,8 @@ namespace MyApps.Common
 
             this.DownloadStringCompleted += (o, e) =>
             {
+                registration.Dispose();
+
                 // 취소되었거나
                 if (e.Cancelled)
                 {
@@ -49,7 +51,6 @@ namespace MyApps.Common
                 }
                         
                 tcs.SetResult(e.Result);
-                registration.Dispose();
             };
 
             this.DownloadStringAsync(uri);
@@ -57,12 +58,19 @@ namespace MyApps.Common
             return tcs.Task;
         }
 
-        public Task<string> UploadStringAsyncTask(Uri uri, string method, string data)
+        public Task<string> UploadStringAsyncTask(Uri uri, string method, string data, CancellationToken ct)
         {
             var tcs = new TaskCompletionSource<string>();
 
+            var registration = ct.Register(() =>
+            {
+                this.CancelAsync();
+            });
+
             this.UploadStringCompleted += (o, e) =>
             {
+                registration.Dispose();
+
                 // 취소되었거나
                 if (e.Cancelled)
                 {
