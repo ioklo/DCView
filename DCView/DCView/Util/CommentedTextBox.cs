@@ -26,6 +26,9 @@ namespace DCView.Util
             }
             set
             {
+                if (!bModified)
+                    base.Text = value;
+
                 SetValue(CommentProperty, value);
             }
         }
@@ -42,6 +45,15 @@ namespace DCView.Util
 
             set
             {
+                if (value == null) return;
+
+                // 비 편집 상태이고, 주석을 보여주는 상태였는데 text가 바뀐거라면
+                if (!bModified && value.Length != 0)
+                {
+                    // 주석 보여주기 끄기
+                    bModified = true;
+                }
+
                 base.Text = value;
             }
         }
@@ -53,22 +65,8 @@ namespace DCView.Util
 
         public CommentedTextBox()
         {
-            this.RegisterForNotification("Text", this, TextPropertyChangedCallback);
         }
-
-        void TextPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            string text = e.NewValue as string;
-            if (text == null) return;
-
-            // 비 편집 상태이고, 주석을 보여주는 상태였는데 text가 바뀐거라면
-            if (!bModified && text.Length != 0)
-            {
-                // 주석 보여주기 끄기
-                bModified = true;
-            }
-        }
-
+        
         // 편집 상태에서는 bModified가 항상 true이다
         protected override void OnGotFocus(RoutedEventArgs e)
         {

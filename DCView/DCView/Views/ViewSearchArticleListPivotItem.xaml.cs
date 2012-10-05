@@ -17,7 +17,7 @@ namespace DCView
     {
         private IBoard board;
         private string searchText;
-        private SearchType searchType;
+        private SearchType searchType;       
 
         public ViewSearchArticleListPivotItem(ViewArticle page, IBoard board, string text, SearchType searchType)
             : base(page, board)

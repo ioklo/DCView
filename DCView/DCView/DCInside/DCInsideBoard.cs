@@ -319,7 +319,7 @@ namespace DCView
                 text = input.Substring(start, match.Index - start).Trim();
             }
 
-            Regex commentStart = new Regex("<div class=\"m_reply_list m_list\">");
+            Regex commentStart = new Regex("<div\\s+class=\"m_reply_list m_list\">");
             Regex getCommentName = new Regex("<p>(<a[^>]*>)?\\[([^<]*)(<img[^>]*>)?\\](</a>)?</p>");
             Regex getCommentText = new Regex("<div class=\"m_list_text\">([^<]*)</div>");
 

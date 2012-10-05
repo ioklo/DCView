@@ -44,8 +44,8 @@ namespace DCView
 
         Grid loadImageGrid = null;
         Button loadImageButton = null;
-        TextBox replyTextBox = null;
-        bool bReplyModified = false;
+
+        CommentedTextBox replyTextBox = null;
 
         Action<Uri> tapAction = (Action<Uri>)(uri =>
         {
@@ -58,7 +58,6 @@ namespace DCView
         {
             InitializeComponent();
             InitializeAppBar();
-            InitializeReplyTextBox();
             InitializeLoadImageButton();
 
             this.Header = "내용";
@@ -100,46 +99,30 @@ namespace DCView
             replyAppBar.Buttons.Add(submitReplyIconButton);
         }
 
-        private void InitializeReplyTextBox()
+        private CommentedTextBox CreateReplyTextBox()
         {
             var inputScope = new InputScope();
             inputScope.Names.Add(new InputScopeName() { NameValue = InputScopeNameValue.Chat });
 
-            replyTextBox = new TextBox()
-            {
-                AcceptsReturn = true,
-                TextWrapping = TextWrapping.Wrap,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
-                InputScope = inputScope,
-                Text = "댓글",
-                Margin = new Thickness(-15, 0, -15, 0),                
-            };
+            var textBox = new CommentedTextBox();
 
-            replyTextBox.SizeChanged += (o1, e1) =>
+            textBox.AcceptsReturn = true;
+            textBox.TextWrapping = TextWrapping.Wrap;
+            textBox.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+            textBox.InputScope = inputScope;
+            textBox.Comment = "댓글";
+            textBox.Margin = new Thickness(-15, 0, -15, 0);
+
+            textBox.SizeChanged += (o1, e1) =>
             {
-                if (FocusManager.GetFocusedElement() == replyTextBox)
+                if (FocusManager.GetFocusedElement() == textBox)
                     ArticleTextScroll.ScrollToVerticalOffset(ArticleText.ActualHeight);
             };
 
-            replyTextBox.GotFocus += (o1, e1) => 
-            { 
-                UpdateAppBar();
+            textBox.GotFocus += (o1, e1) => { UpdateAppBar(); };
+            textBox.LostFocus += (o1, e1) => { UpdateAppBar(); };
 
-                if (bReplyModified) return;
-                replyTextBox.Text = "";
-                bReplyModified = true;
-            };
-
-            replyTextBox.LostFocus += (o1, e1) => 
-            {
-                UpdateAppBar();
-
-                if (replyTextBox.Text.Length == 0)
-                {
-                    bReplyModified = false;
-                    replyTextBox.Text = "댓글";
-                }
-            };
+            return textBox;
         }
 
         void InitializeLoadImageButton()
@@ -210,8 +193,12 @@ namespace DCView
                         return;
                     }
 
-                    // 글 다시 읽기
-                    Dispatcher.BeginInvoke(() => { GetAndShowArticleText(); submitButton.IsEnabled = true; });
+                    // 성공 했으면
+                    Dispatcher.BeginInvoke(() => 
+                    {
+                        GetAndShowArticleText(); 
+                        submitButton.IsEnabled = true;                         
+                    });
                 }
                 catch
                 {
@@ -310,11 +297,10 @@ namespace DCView
                 // 댓글마다 충전물좀 넣기
                 ArticleText.Children.Add(new Rectangle() { Height = 20 });
             }
-            
-            ArticleText.Children.Add(replyTextBox);
 
-            // 자동으로 늘어나는 replyText 구현
-            // reply_Click
+            // ReplyTextBox를 새로 만듦
+            replyTextBox = CreateReplyTextBox();
+            ArticleText.Children.Add(replyTextBox);
 
             ArticleTextScroll.ScrollToVerticalOffset(0);
         }
@@ -388,10 +374,6 @@ namespace DCView
             }          
             else
                 ShowArticleText(data);
-
-            // 리플란 깨끗이 청소
-            bReplyModified = false;
-            replyTextBox.Text = "댓글";
         }
 
         // 버튼을 눌렀을 때 

@@ -28,8 +28,6 @@ namespace DCView
         public string Title { get { return FormTitle.Text; } }
         public string Text { get { return FormText.Text; } }
 
-        bool bTitleModified = false;
-        bool bTextModified = false;
         IBoard board = null;
 
         public WriteArticlePivotItem(ViewArticle page, IBoard board)
@@ -61,7 +59,7 @@ namespace DCView
 
         private void Submit()
         {
-            if (!bTitleModified || !bTextModified || FormTitle.Text.Trim().Length == 0 || FormText.Text.Trim().Length == 0)
+            if (FormTitle.Text.Trim().Length == 0 || FormText.Text.Trim().Length == 0)
             {
                 MessageBox.Show("제목/내용이 없습니다");
                 return;
@@ -107,7 +105,7 @@ namespace DCView
                         Dispatcher.BeginInvoke(() =>
                         {
                             // 글쓰기 창을 닫고..
-                            viewArticlePage.RemoveWriteForm();
+                            viewArticlePage.RemoveWriteForm();                            
 
                             // 글 목록을 reload
                             viewArticlePage.RefreshArticleList();
@@ -208,39 +206,6 @@ namespace DCView
         void INotifyActivated.OnActivated()
         {
             viewArticlePage.ApplicationBar = appBar;
-        }
-
-        private void FormTitle_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (bTitleModified) return;
-            FormTitle.Text = "";
-            bTitleModified = true;
-        }
-
-        private void FormTitle_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (FormTitle.Text.Length == 0)
-            {
-                bTitleModified = false;
-                FormTitle.Text = "제목";
-            }
-        }
-
-        private void FormText_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (FormText.Text.Length == 0)
-            {
-                bTextModified = false;
-                FormText.Text = "내용";
-            }
-        }       
-
-        
-        private void FormText_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (bTextModified) return;
-            FormText.Text = "";
-            bTextModified = true;
         }
 
         void submitButton_Click(object sender, EventArgs e)

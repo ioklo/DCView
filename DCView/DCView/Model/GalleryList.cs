@@ -30,7 +30,7 @@ namespace DCView
         Dictionary<string, Gallery> galleries = new Dictionary<string, Gallery>();
 
         ObservableCollection<Gallery> favorites = new ObservableCollection<Gallery>();
-        bool modifiedFavorites = false;
+        bool bFavoriteModified = false;
 
         public Gallery this[string id]
         {
@@ -138,19 +138,19 @@ namespace DCView
                 if (entry.ID == id)
                     return;
 
-            modifiedFavorites = true;
+            bFavoriteModified = true;
             favorites.Add(new Gallery(id, name));
         }
 
         public void RemoveFavorite(Gallery gallery)
         {
-            modifiedFavorites = true;
+            bFavoriteModified = true;
             favorites.Remove(gallery);
         }
 
         public void SaveFavorite()
         {
-            if (!modifiedFavorites) return;
+            if (!bFavoriteModified) return;
 
             // favorite 저장
             var storage = IsolatedStorageFile.GetUserStoreForApplication();
