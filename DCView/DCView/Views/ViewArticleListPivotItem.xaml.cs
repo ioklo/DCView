@@ -129,7 +129,11 @@ namespace DCView
                 catch
                 {
                     viewArticlePage.ShowErrorMessage("목록을 가져오는데 실패했습니다.");
-                    Dispatcher.BeginInvoke(() => LoadingArticleListProgressBar.IsIndeterminate = true);
+                    Dispatcher.BeginInvoke(() => 
+                    {
+                        nextPageButton.IsEnabled = true;
+                        LoadingArticleListProgressBar.IsIndeterminate = false;
+                    });
                 }
             });            
         }

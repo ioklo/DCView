@@ -77,7 +77,6 @@
     <Compile Include="Interface\IArticle.cs" />
     <Compile Include="Interface\ILister.cs" />
     <Compile Include="Interface\INotifyActivated.cs" />
-    <Compile Include="Model\ArticleWriter.cs" />
     <Compile Include="DCInside\DCInsideArticle.cs" />
     <Compile Include="DCInside\DCInsideAuth.cs" />
     <Compile Include="DCInside\DCInsideBoard.cs" />
@@ -86,7 +85,6 @@
     <Compile Include="DCInside\DCInsideComment.cs" />
     <Compile Include="Model\Picture.cs" />
     <Compile Include="Model\GalleryList.cs" />
-    <Compile Include="Model\SandBox.cs" />
     <Compile Include="Util\DCViewWebClient.cs" />
     <Compile Include="Util\HtmlElementConverter.cs" />
     <Compile Include="Util\SilverlightUtil.cs" />
