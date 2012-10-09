@@ -24,6 +24,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Phone.Shell;
+using Microsoft.Phone.Tasks;
 
 namespace DCView
 {
@@ -269,6 +270,13 @@ namespace DCView
         private void PassiveLoadImage(object sender, RoutedEventArgs e)
         {
             IsolatedStorageSettings.ApplicationSettings["DCView.passive_loadimg"] = PassiveLoadImgCheckBox.IsChecked;
+        }
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            WebBrowserTask task = new WebBrowserTask();
+            task.Uri = new Uri("http://dcview.codeplex.com/", UriKind.Absolute);
+            task.Show();
         }
 
         

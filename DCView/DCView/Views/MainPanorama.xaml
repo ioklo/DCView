@@ -104,12 +104,27 @@
             </controls:PanoramaItem>
 
             <controls:PanoramaItem x:Name="PanoramaSetting" Header="설정">
-                <ScrollViewer>
-                    <StackPanel Margin="0, 0, 10, 0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0, 0, 10, 0">
                         <CheckBox x:Name="PassiveLoadImgCheckBox" Content="이미지 수동으로 불러오기" Tap="PassiveLoadImage" />
                         <CheckBox x:Name="FontSizeCheckBox" Content="목록/내용 글씨 크게" Tap="FontSizeCheckBox_Tap"/>
                     </StackPanel>
-                </ScrollViewer>
+
+                    <RichTextBox Grid.Row="1" VerticalAlignment="Top" Margin="0, 0, 0, 20" >
+                        <RichTextBox.Blocks>
+                            <Paragraph>DCView 1.3.0, Copyright © &lt;IOKLO 2012
+                                <LineBreak />
+                                <Hyperlink Click="Hyperlink_Click">http://dcview.codeplex.com/</Hyperlink>
+                            </Paragraph>
+                        </RichTextBox.Blocks>
+                    </RichTextBox>
+
+                </Grid>                
             </controls:PanoramaItem>
 
         </controls:Panorama>        

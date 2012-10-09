@@ -178,7 +178,7 @@ namespace DCView
                 return false;
             }
 
-            submitButton.IsEnabled = true; 
+            submitButton.IsEnabled = false; 
 
             CancellationTokenSource cts = new CancellationTokenSource();
 
