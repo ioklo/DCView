@@ -216,6 +216,7 @@ namespace DCView
                 return;
             }
 
+            this.Focus();
             Submit();
         }
 

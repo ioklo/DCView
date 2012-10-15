@@ -164,7 +164,9 @@ namespace DCView
                 return;
             }
 
-            CommentSubmit(replyTextBox.Text, sender as ApplicationBarIconButton);
+            string text = replyTextBox.Text;
+            CommentSubmit(text, sender as ApplicationBarIconButton);
+            this.Focus();
         }
 
         // 리플 달기
