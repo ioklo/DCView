@@ -27,29 +27,35 @@ namespace DCView.Util
 
         public void Add(Key key, Value value)
         {
-            keyQueue.Enqueue(new TimeWith<Key>() { value = key, time = curTime });
-            dict[key] = new TimeWith<Value>() { value = value, time = curTime };
-            curTime++;
-
-            if (keyQueue.Count > maxLength)
+            lock (this)
             {
-                var timeWithKey = keyQueue.Dequeue();
-                if (dict[timeWithKey.value].time == timeWithKey.time) // 업데이트 되었는지 확인하고 안되었다면
-                    dict.Remove(timeWithKey.value); // 제거
+                keyQueue.Enqueue(new TimeWith<Key>() { value = key, time = curTime });
+                dict[key] = new TimeWith<Value>() { value = value, time = curTime };
+                curTime++;
+
+                if (keyQueue.Count > maxLength)
+                {
+                    var timeWithKey = keyQueue.Dequeue();
+                    if (dict[timeWithKey.value].time == timeWithKey.time) // 업데이트 되었는지 확인하고 안되었다면
+                        dict.Remove(timeWithKey.value); // 제거
+                }
             }
         }
         
         public bool TryGetValue(Key key, out Value value)
         {
-            TimeWith<Value> timeWithValue;
-            if (!dict.TryGetValue(key, out timeWithValue))
+            lock (this)
             {
-                value = default(Value);
-                return false;
-            }
+                TimeWith<Value> timeWithValue;
+                if (!dict.TryGetValue(key, out timeWithValue))
+                {
+                    value = default(Value);
+                    return false;
+                }
 
-            value = timeWithValue.value;
-            return true;
+                value = timeWithValue.value;
+                return true;
+            }
         }
     }
 }
