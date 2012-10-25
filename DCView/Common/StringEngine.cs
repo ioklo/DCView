@@ -41,13 +41,14 @@ namespace MyApps.Common
         public bool GetNextLine(out string line)
         {
             Match match = lineRegex.Match(data, cur);
+            
             if (!match.Success)
             {
                 line = string.Empty;
                 return false;
             }
 
-            cur = match.Index + match.Length;
+            cur = match.Index + match.Length + 1;
             line = match.Groups[1].Value;
             return true;
         }

@@ -285,7 +285,7 @@ namespace DCView
             {
                 pictures.Add(
                     new Picture(
-                        new Uri(match.Groups[1].Value, UriKind.Absolute)));
+                        new Uri(match.Groups[1].Value, UriKind.Absolute), "http://gall.dcinside.com"));
             }
 
             // div를 개수를 세서 안에 있는 div 

@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 using System.IO.IsolatedStorage;
 using System.Windows.Media.Imaging;
 using DCView.Util;
+using MyApps.Common;
+using System.IO;
 
 namespace DCView
 {
@@ -213,6 +215,36 @@ namespace DCView
             return true;
         }
 
+        void LoadImageAsync(Image image, Picture pic)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    HttpWebRequest request = WebRequest.CreateHttp(pic.Uri);
+                    request.UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
+                    request.Headers["Referer"] = pic.Referer;
+                    request.CookieContainer = WebClientEx.CookieContainer;
+                    HttpWebResponse response = (HttpWebResponse)Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null).GetResult();
+
+
+                    MemoryStream stream = new MemoryStream();
+                    response.GetResponseStream().CopyTo(stream);                    
+                    
+                    Dispatcher.BeginInvoke(() => 
+                    {
+                        BitmapSource source = new BitmapImage();
+                        source.SetSource(stream);
+                        image.Source = source; 
+                    });
+                }
+                catch
+                {
+
+                }
+            });
+        }
+
         private void ShowArticleText(ArticleData data)
         {
             if (!Dispatcher.CheckAccess())
@@ -244,12 +276,14 @@ namespace DCView
             else
             {
                 foreach (Picture pic in article.Pictures)
-                {
+                {   
                     var image = new Image()
                     {
-                        Source = new BitmapImage(pic.Uri),
+                        // Source = new BitmapImage(pic.Uri),
                         Margin = new Thickness(3),
                     };
+
+                    LoadImageAsync(image, pic);
 
                     image.Tap += (o1, e1) =>
                     {
@@ -395,9 +429,10 @@ namespace DCView
 
                 var image = new Image()
                 {
-                    Source = new BitmapImage(curUri),
                     Margin = new Thickness(3),
                 };
+
+                LoadImageAsync(image, pic);
 
                 image.Tap += (o1, e1) =>
                 {

@@ -37,6 +37,7 @@ namespace DCView
         public SiteManager()
         {
             sites.Add(new DCInsideSite());
+            sites.Add(new Clien());
 
             // 만들어 지자 마자, loading을 시작한다            
             Task.Factory.StartNew(() =>

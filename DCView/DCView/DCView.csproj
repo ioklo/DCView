@@ -74,6 +74,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Clien\Clien.cs" />
+    <Compile Include="Clien\ClienArticle.cs" />
+    <Compile Include="Clien\ClienBoard.cs" />
+    <Compile Include="Clien\ClienComment.cs" />
     <Compile Include="DCInside\DCInsideSite.cs" />
     <Compile Include="Interface\IArticle.cs" />
     <Compile Include="Interface\ILister.cs" />
