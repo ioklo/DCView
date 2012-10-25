@@ -41,7 +41,7 @@
                 <ListBox x:Name="Favorites">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Tap="Favorites_Tap" Tag="{Binding}" Text="{Binding Name}" Style="{StaticResource PhoneTextLargeStyle}" Margin="12" 
+                            <TextBlock Tap="Favorites_Tap" Tag="{Binding}" Text="{Binding DisplayName}" Style="{StaticResource PhoneTextLargeStyle}" Margin="12" 
                                        HorizontalAlignment="Stretch"
                                        toolkit:TiltEffect.IsTiltEnabled="True">
                                 <toolkit:ContextMenuService.ContextMenu>

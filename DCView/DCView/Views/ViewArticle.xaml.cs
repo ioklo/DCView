@@ -143,11 +143,15 @@ namespace DCView
         {            
             if (bInitialized) return;
             
-            string id = NavigationContext.QueryString["id"];
+            string siteID = NavigationContext.QueryString["siteID"];
+            string boardID = NavigationContext.QueryString["boardID"];
+            string boardName = NavigationContext.QueryString["boardName"];
 
-            viewArticleListPivotItem = new ViewArticleListPivotItem(this, new DCInsideBoard(id));
+            IBoard board = App.Current.SiteManager.GetBoard(siteID, boardID, boardName);
+
+            viewArticleListPivotItem = new ViewArticleListPivotItem(this, board);
             
-            GalleryTitle.Text = App.Current.GalleryList[id].Name + " 갤러리"; // 왼쪽 상단 갤러리 이름 적기
+            GalleryTitle.Text = boardName + " 갤러리"; // 왼쪽 상단 갤러리 이름 적기
             MainPivot.Items.Clear();
             MainPivot.Items.Add(viewArticleListPivotItem);
 

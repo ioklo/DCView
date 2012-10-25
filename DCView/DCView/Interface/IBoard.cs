@@ -30,6 +30,10 @@ namespace DCView
     // 게시판이 할 수 있는 일들 모음
     public interface IBoard
     {
+        ISite Site { get; }
+        string ID { get; }   // 게시판 접근용 아이디
+        string Name { get; } // 게시판의 이름
+
         Uri Uri { get; }
         ILister<IArticle> GetArticleLister(int page);
         ILister<IArticle> GetSearchLister(string text, SearchType searchType);

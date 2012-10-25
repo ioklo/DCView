@@ -227,15 +227,15 @@ namespace DCView
         #endregion
 
         // 공용 리소스들
-        public GalleryList GalleryList { get; private set; }
+        public SiteManager SiteManager { get; private set; }
+        public Favorites Favorites { get; private set; }
         public LoginInfo LoginInfo { get; private set; }
 
         private void Initialize()
         {
-            GalleryList = new GalleryList();
-            GalleryList.Load();
-
+            SiteManager = new SiteManager();
             LoginInfo = new LoginInfo();
+            Favorites = new Favorites();
         }
     }
 }

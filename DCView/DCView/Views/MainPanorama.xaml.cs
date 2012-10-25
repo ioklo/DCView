@@ -1,31 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using Microsoft.Phone.Controls;
-using System.IO;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
-using System.IO.IsolatedStorage;
-using System.Threading;
-using System.ComponentModel;
-using MyApps.Common;
-using System.Windows.Data;
-using System.Windows.Threading;
-using System.Windows.Navigation;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Microsoft.Phone.Shell;
-using Microsoft.Phone.Tasks;
+﻿
 
+using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
+using System.Windows.Controls;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Threading;
+using System.Threading;
+using System.Collections.ObjectModel;
+using System.Net;
+using System;
+using System.IO.IsolatedStorage;
+using System.Threading.Tasks;
+using Microsoft.Phone.Tasks;
 namespace DCView
 {
     public partial class MainPanorama : PhoneApplicationPage
@@ -36,9 +23,12 @@ namespace DCView
             InitializeApplicationBar();
 
             ApplicationBar = favoriteApplicationBar;
-            
-            SearchResult.ItemsSource = App.Current.GalleryList.All;
-            Favorites.ItemsSource = App.Current.GalleryList.Favorites;
+            Favorites.ItemsSource = App.Current.Favorites.All;
+            Task.Factory.StartNew(() =>
+            {
+                App.Current.SiteManager.WaitForLoadingComplete(null);
+                Dispatcher.BeginInvoke(() => { SearchResult.ItemsSource = App.Current.SiteManager.All; });
+            });
         }
 
         // 나갈 때..        
@@ -47,7 +37,7 @@ namespace DCView
             base.OnNavigatedFrom(e);
 
             // 세팅을 저장한다
-            App.Current.GalleryList.SaveFavorite();
+            App.Current.Favorites.Save();
             IsolatedStorageSettings.ApplicationSettings.Save();
         }
 
@@ -55,6 +45,7 @@ namespace DCView
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+
             
             // 설정 페이지
             if (!IsolatedStorageSettings.ApplicationSettings.Contains("DCView.passive_loadimg"))
@@ -100,24 +91,29 @@ namespace DCView
 
 
         // Panorama 1. 즐겨찾기에 관련된 
+
+        void NavigateViewArticle(string siteID, string boardID, string boardName)
+        {
+            Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?siteID={0}&boardID={1}&boardName={2}", siteID, boardID, boardName), UriKind.Relative);
+            NavigationService.Navigate(uri);
+        }
         
         // 즐겨찾기를 눌렀을 때
         private void Favorites_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            Gallery gal = ((FrameworkElement)sender).Tag as Gallery;
-            if (gal == null) return;
+            Favorites.Entry entry = ((FrameworkElement)sender).Tag as Favorites.Entry;
+            if (entry == null) return;
 
-            Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?id={0}", gal.ID), UriKind.Relative);
-            NavigationService.Navigate(uri);
+            NavigateViewArticle(entry.SiteID, entry.BoardID, entry.DisplayName);
         }
 
         // 삭제 명령
         private void RemoveFavorite(object sender, RoutedEventArgs e)
         {
             MenuItem item = sender as MenuItem;
-            var gal = item.Tag as Gallery;
+            var entry = item.Tag as Favorites.Entry;
 
-            App.Current.GalleryList.RemoveFavorite(gal);            
+            App.Current.Favorites.Remove(entry);
         }
 
         // Panorama 2. 전체 갤러리 창
@@ -125,20 +121,19 @@ namespace DCView
         // 검색결과창에서 갤러리를 눌렀을 때
         private void SearchResult_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            Gallery gal = ((FrameworkElement)sender).Tag as Gallery;
-            if (gal == null) return;
+            IBoard board = ((FrameworkElement)sender).Tag as IBoard;
+            if (board == null) return;
 
-            Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?id={0}", gal.ID), UriKind.Relative);
-            NavigationService.Navigate(uri);
+            NavigateViewArticle(board.Site.ID, board.ID, board.Name);
         }
 
         // 즐겨찾기에 추가
         private void AddFavorite_Click(object sender, RoutedEventArgs e)
         {
-            Gallery gal = ((FrameworkElement)sender).Tag as Gallery;
-            if (gal == null) return;
+            IBoard board = ((FrameworkElement)sender).Tag as IBoard;
+            if (board == null) return;
 
-            App.Current.GalleryList.AddFavorite(gal.ID, gal.Name);
+            App.Current.Favorites.Add(board.Site.ID, board.ID, board.Name);
         }       
 
         // 엔터를 눌렀을 때 결과창만 보여주기
@@ -153,7 +148,7 @@ namespace DCView
         // 찾기         
         DispatcherTimer dt = null; // 1초 기다리는 타이머
         CancellationTokenSource cancelTokenSource = null;
-        ObservableCollection<Gallery> searchResult = null;
+        ObservableCollection<IBoard> searchResult = null;
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             // 1초 기다리는 타이머가 없다면 만든다.
@@ -170,19 +165,24 @@ namespace DCView
 
                     if (SearchBox.Text.Length == 0)
                     {
-                        SearchResult.ItemsSource = App.Current.GalleryList.All;
+                        SearchResult.ItemsSource = App.Current.SiteManager.All;
                         return;
                     }
 
                     // 새로운 cancellation
                     cancelTokenSource = new CancellationTokenSource();
-                    searchResult = new ObservableCollection<Gallery>();
+                    searchResult = new ObservableCollection<IBoard>();
                     SearchResult.ItemsSource = searchResult;
 
-                    App.Current.GalleryList.Search(SearchBox.Text, cancelTokenSource.Token, gallery =>
+                    string text = SearchBox.Text;
+
+                    Task.Factory.StartNew( () =>
                     {
-                        Dispatcher.BeginInvoke(() => { searchResult.Add(gallery); });
-                    }).Start();
+                        App.Current.SiteManager.Search(text, cancelTokenSource.Token, board =>
+                        {
+                            Dispatcher.BeginInvoke(() => { searchResult.Add(board); });
+                        });
+                    });
                 };
             }
 
@@ -199,34 +199,13 @@ namespace DCView
             dt.Start();            
         }
         
-        void OnRefreshStatusChangedEventHandler(GalleryList.RefreshStatus status, DownloadProgressChangedEventArgs downloadArgs)
+        void OnRefreshStatusChangedEventHandler(string msg, int percent)
         {
-            switch(status)
+            Dispatcher.BeginInvoke(() => 
             {
-                case GalleryList.RefreshStatus.Downloading:
-                    Dispatcher.BeginInvoke(() => 
-                    {
-                        RefreshStatus.Text = string.Format("다운로드 중... {0}/{1} ", downloadArgs.BytesReceived, downloadArgs.TotalBytesToReceive);
-                        RefreshProgress.Value = downloadArgs.ProgressPercentage * 0.8;
-                    });
-                    break;
-
-                case GalleryList.RefreshStatus.Parsing:
-                    Dispatcher.BeginInvoke(() => 
-                    {
-                        RefreshStatus.Text = "결과 분석중입니다";
-                        RefreshProgress.Value = 80;
-                    });
-                    break;
-
-                case GalleryList.RefreshStatus.Saving:
-                    Dispatcher.BeginInvoke(() =>
-                    {
-                        RefreshStatus.Text = "리스트를 저장합니다";
-                        RefreshProgress.Value = 90;
-                    });
-                    break;
-            }
+                RefreshStatus.Text = msg;
+                RefreshProgress.Value = percent;
+            });     
         }
 
         private void RefreshGalleryListButton_Click(object sender, EventArgs e)
@@ -235,18 +214,21 @@ namespace DCView
             SearchResult.Visibility = Visibility.Collapsed;
             RefreshPanel.Visibility = Visibility.Visible;
 
-            var refreshTask = App.Current.GalleryList.RefreshAll(OnRefreshStatusChangedEventHandler);
+            // dcinside 의존성을 여기에 씀
+            ISite site = App.Current.SiteManager.GetSite("dcinside");
 
-            refreshTask.ContinueWith(prevTask =>
-            {
-                if (!prevTask.Result)
+            Task.Factory.StartNew( () =>
+            {                
+                bool result = site.Refresh(OnRefreshStatusChangedEventHandler);
+
+                if (!result)
                 {
                     MessageBox.Show("갤러리 목록을 얻어내는데 실패했습니다. 잠시 후 다시 실행해보세요");
                 }
                 
                 Dispatcher.BeginInvoke(() =>
                 {
-                    SearchResult.ItemsSource = App.Current.GalleryList.All;
+                    SearchResult.ItemsSource = App.Current.SiteManager.All;
 
                     SearchBox.Text = "";
                     SearchBox.Visibility = Visibility.Visible;

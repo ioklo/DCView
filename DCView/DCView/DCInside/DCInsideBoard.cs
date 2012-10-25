@@ -58,13 +58,19 @@ namespace DCView
     public class DCInsideBoard : IBoard
     {
         // 내부 변수
-        string id;        
+        DCInsideSite site;
+        string id;
+        string name;
         
-        public DCInsideBoard(string id)
-        {            
+        public DCInsideBoard(DCInsideSite site, string id, string name)
+        {
+            this.site = site;
             this.id = id;
+            this.name = name;
         }
 
+        public ISite Site { get { return site; } }
+        public string Name { get { return name; } }
         public string ID { get { return id; } }
 
         // 인터페이스 
@@ -516,8 +522,5 @@ namespace DCView
 
             return true;
         }
-
-
-
     }
 }

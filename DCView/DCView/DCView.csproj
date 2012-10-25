@@ -74,6 +74,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DCInside\DCInsideSite.cs" />
     <Compile Include="Interface\IArticle.cs" />
     <Compile Include="Interface\ILister.cs" />
     <Compile Include="Interface\INotifyActivated.cs" />
@@ -83,14 +84,15 @@
     <Compile Include="DCInside\DCInsideBoardSearch.cs" />
     <Compile Include="Interface\IBoard.cs" />
     <Compile Include="DCInside\DCInsideComment.cs" />
+    <Compile Include="Interface\ISite.cs" />
+    <Compile Include="Model\Favorites.cs" />
     <Compile Include="Model\Picture.cs" />
-    <Compile Include="Model\GalleryList.cs" />
+    <Compile Include="Model\SiteManager.cs" />
     <Compile Include="Util\DCViewWebClient.cs" />
     <Compile Include="Util\HtmlElementConverter.cs" />
     <Compile Include="Util\SilverlightUtil.cs" />
     <Compile Include="Views\BoolToColorConverter.cs" />
     <Compile Include="Interface\IComment.cs" />
-    <Compile Include="Model\Gallery.cs" />
     <Compile Include="Model\LoginInfo.cs" />
     <Compile Include="Util\CommentedTextBox.cs" />
     <Compile Include="Views\MainPanorama.xaml.cs">
