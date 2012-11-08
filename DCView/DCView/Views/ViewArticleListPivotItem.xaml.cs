@@ -101,41 +101,31 @@ namespace DCView
         }        
 
         // 다음 글 목록 얻어오기
-        private void GetNextArticleList()
+        private async void GetNextArticleList()
         {
             nextPageButton.IsEnabled = false;
             LoadingArticleListProgressBar.IsIndeterminate = true;
 
             CancellationTokenSource cts = new CancellationTokenSource();
 
-            Task.Factory.StartNew(() =>
+            try
             {
-                IEnumerable<IArticle> newArticles;
+                IEnumerable<IArticle> newArticles = null;
+                bool bEnded = await Task.Factory.StartNew(
+                    () => { return articleLister.Next(cts.Token, out newArticles); }, cts.Token);
 
-                try
-                {                    
-                    bool bEnded = articleLister.Next(cts.Token, out newArticles);
+                // TODO: 리스트의 마지막일때 처리
+                
+                foreach (var item in newArticles)
+                    ArticleList.Items.Insert(ArticleList.Items.Count - 1, item);
+            }
+            catch
+            {
+                MessageBox.Show("목록을 가져오는데 실패했습니다.");                
+            }
 
-                    // TODO: 리스트의 마지막일때 처리
-                    Dispatcher.BeginInvoke(() =>
-                    {
-                        foreach (var item in newArticles)
-                            ArticleList.Items.Insert(ArticleList.Items.Count - 1, item);
-
-                        nextPageButton.IsEnabled = true;
-                        LoadingArticleListProgressBar.IsIndeterminate = false;
-                    });
-                }
-                catch
-                {
-                    viewArticlePage.ShowErrorMessage("목록을 가져오는데 실패했습니다.");
-                    Dispatcher.BeginInvoke(() => 
-                    {
-                        nextPageButton.IsEnabled = true;
-                        LoadingArticleListProgressBar.IsIndeterminate = false;
-                    });
-                }
-            });            
+            nextPageButton.IsEnabled = true;
+            LoadingArticleListProgressBar.IsIndeterminate = false;
         }
 
         // 앱바를 업데이트 하기

@@ -125,7 +125,7 @@ namespace DCView
             isoSettings.Save();
         }
 
-        public void Login(CancellationToken ct)
+        public async void Login(CancellationToken ct)
         {
             if (!dispatcher.CheckAccess())
             {
@@ -139,25 +139,16 @@ namespace DCView
 
             LoginState = State.LoggingIn;
 
-            Task.Factory.StartNew(() =>
-            {
-                bool bSucceed = auth.Login(id, password, ct);
+            bool bSucceed = await Task.Factory.StartNew(() => auth.Login(id, password, ct));
 
-                if (bSucceed)
-                {
-                    dispatcher.BeginInvoke(() =>
-                    {
-                        LoginState = State.LoggedIn;
-                    });
-                }
-                else
-                {
-                    dispatcher.BeginInvoke(() =>
-                    {
-                        LoginState = State.NotLoggedIn;
-                    });
-                }
-            }, ct);                   
+            if (bSucceed)
+            {
+                LoginState = State.LoggedIn;
+            }
+            else
+            {
+                LoginState = State.NotLoggedIn;                
+            }            
         }
 
         public void Logout()

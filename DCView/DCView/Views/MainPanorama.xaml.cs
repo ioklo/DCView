@@ -16,7 +16,27 @@ using Microsoft.Phone.Tasks;
 namespace DCView
 {
     public partial class MainPanorama : PhoneApplicationPage
-    {   
+    {
+        // 게시판 목록 로딩 여부
+        private bool bLoadingCompleted = false;
+
+        // application bar 설정
+        ApplicationBar favoriteApplicationBar, allApplicationBar, settingApplicationBar;  
+
+        // 찾기         
+        DispatcherTimer dt = null; // 1초 기다리는 타이머
+        CancellationTokenSource cancelTokenSource = null;
+        ObservableCollection<IBoard> searchResult = null;
+
+
+
+        // 이벤트: 게시판 목록이 모두 로딩되었을 때
+        private void OnLoadingCompleted()
+        {
+            SearchResult.ItemsSource = App.Current.SiteManager.All;
+            bLoadingCompleted = true;
+        }
+
         public MainPanorama()
         {
             InitializeComponent();
@@ -24,12 +44,31 @@ namespace DCView
 
             ApplicationBar = favoriteApplicationBar;
             Favorites.ItemsSource = App.Current.Favorites.All;
+
             Task.Factory.StartNew(() =>
             {
                 App.Current.SiteManager.WaitForLoadingComplete(null);
-                Dispatcher.BeginInvoke(() => { SearchResult.ItemsSource = App.Current.SiteManager.All; });
+                Dispatcher.BeginInvoke(OnLoadingCompleted);
             });
         }
+
+        // 내부 함수
+        private void InitializeApplicationBar()
+        {
+            favoriteApplicationBar = new ApplicationBar();
+
+            allApplicationBar = new ApplicationBar();
+            ApplicationBarIconButton refreshListIconButton = new ApplicationBarIconButton();
+            refreshListIconButton.IconUri = new Uri("/Data/appbar.refresh.rest.png", UriKind.Relative);
+            refreshListIconButton.Click += RefreshGalleryListButton_Click;
+            refreshListIconButton.Text = "새로고침";
+            allApplicationBar.Buttons.Add(refreshListIconButton);
+
+            settingApplicationBar = new ApplicationBar();
+        }
+
+
+        
 
         // 나갈 때..        
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
@@ -55,23 +94,9 @@ namespace DCView
             FontSizeCheckBox.IsChecked = (App.FontSize)IsolatedStorageSettings.ApplicationSettings["DCView.fontsize"] == App.FontSize.Large;
         }
 
-        // application bar 설정
-        ApplicationBar favoriteApplicationBar, allApplicationBar, settingApplicationBar;
+        
 
-        void InitializeApplicationBar()
-        {
-            favoriteApplicationBar = new ApplicationBar();
-
-            allApplicationBar = new ApplicationBar();
-            ApplicationBarIconButton refreshListIconButton = new ApplicationBarIconButton();
-            refreshListIconButton.IconUri = new Uri("/Data/appbar.refresh.rest.png", UriKind.Relative);
-            refreshListIconButton.Click += RefreshGalleryListButton_Click;
-            refreshListIconButton.Text = "새로고침";
-            allApplicationBar.Buttons.Add(refreshListIconButton);
-
-            settingApplicationBar = new ApplicationBar();
-        }
-
+        
         private void PanoramaMain_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (PanoramaMain.SelectedItem == PanoramaFavorite)
@@ -91,7 +116,6 @@ namespace DCView
 
 
         // Panorama 1. 즐겨찾기에 관련된 
-
         void NavigateViewArticle(string siteID, string boardID, string boardName)
         {
             Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?siteID={0}&boardID={1}&boardName={2}", siteID, boardID, boardName), UriKind.Relative);
@@ -145,10 +169,7 @@ namespace DCView
             }
         }
         
-        // 찾기         
-        DispatcherTimer dt = null; // 1초 기다리는 타이머
-        CancellationTokenSource cancelTokenSource = null;
-        ObservableCollection<IBoard> searchResult = null;
+        
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             // 1초 기다리는 타이머가 없다면 만든다.
@@ -201,46 +222,42 @@ namespace DCView
         
         void OnRefreshStatusChangedEventHandler(string msg, int percent)
         {
-            Dispatcher.BeginInvoke(() => 
+            Dispatcher.BeginInvoke( () => 
             {
                 RefreshStatus.Text = msg;
                 RefreshProgress.Value = percent;
-            });     
+            });
         }
 
-        private void RefreshGalleryListButton_Click(object sender, EventArgs e)
+        // 즐겨찾기 갱신
+        private async void RefreshGalleryListButton_Click(object sender, EventArgs e)
         {
+            if (!bLoadingCompleted)
+            {
+                MessageBox.Show("아직 목록을 다 읽어들이지 못했습니다. 목록을 다 읽어 들인 다음 새로고침 해주세요.");
+                return;
+            }
+
             SearchBox.Visibility = Visibility.Collapsed;
             SearchResult.Visibility = Visibility.Collapsed;
             RefreshPanel.Visibility = Visibility.Visible;
 
             // dcinside 의존성을 여기에 씀
             ISite site = App.Current.SiteManager.GetSite("dcinside");
+            bool result = await Task.Factory.StartNew( () => { return site.Refresh(OnRefreshStatusChangedEventHandler); });
 
-            Task.Factory.StartNew( () =>
-            {                
-                bool result = site.Refresh(OnRefreshStatusChangedEventHandler);
-
-                if (!result)
-                {
-                    MessageBox.Show("갤러리 목록을 얻어내는데 실패했습니다. 잠시 후 다시 실행해보세요");
-                }
+            if (!result)
+                MessageBox.Show("갤러리 목록을 얻어내는데 실패했습니다. 잠시 후 다시 실행해보세요");
                 
-                Dispatcher.BeginInvoke(() =>
-                {
-                    SearchResult.ItemsSource = App.Current.SiteManager.All;
+            SearchResult.ItemsSource = App.Current.SiteManager.All;
 
-                    SearchBox.Text = "";
-                    SearchBox.Visibility = Visibility.Visible;
-                    SearchResult.Visibility = Visibility.Visible;                    
-                    RefreshPanel.Visibility = Visibility.Collapsed;
-                });
-
-            });
+            SearchBox.Text = "";
+            SearchBox.Visibility = Visibility.Visible;
+            SearchResult.Visibility = Visibility.Visible;                    
+            RefreshPanel.Visibility = Visibility.Collapsed;
         }
 
         // 3. 설정창.
-
         private void FontSizeCheckBox_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             if (!FontSizeCheckBox.IsChecked.HasValue) return;
@@ -259,9 +276,7 @@ namespace DCView
             WebBrowserTask task = new WebBrowserTask();
             task.Uri = new Uri("http://dcview.codeplex.com/", UriKind.Absolute);
             task.Show();
-        }
-
-        
+        }       
 
     }
 }

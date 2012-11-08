@@ -11,13 +11,15 @@ using System.Windows.Shapes;
 using System.Collections.Generic;
 using System.Text;
 using MyApps.Common.HtmlParser;
+using System.Windows.Media.Imaging;
 
 namespace DCView.Util
 {
     public class HtmlElementConverter
     {
         private static StringHtmlEntityConverter stringHtmlConverter = new StringHtmlEntityConverter();
-        static public IEnumerable<UIElement> GetTextBlocksFromString(string input, Action<Uri> tapAction)
+
+        static public IEnumerable<Tuple<UIElement, Picture>> GetUIElementFromString(string input, Action<Uri> tapAction)
         {
             StringBuilder curPlainString = new StringBuilder();
 
@@ -57,7 +59,7 @@ namespace DCView.Util
                                 (tag.Kind == Tag.TagKind.OpenAndClose))
                         {
                             foreach (var obj in MakeTextBlocks(curPlainString.ToString(), tapAction))
-                                yield return obj;
+                                yield return new Tuple<UIElement, Picture>((UIElement)obj, null);
                             curPlainString.Clear();
                             continue;
                         }
@@ -68,22 +70,30 @@ namespace DCView.Util
                         if (curPlainString.Length != 0)
                         {
                             foreach (var obj in MakeTextBlocks(curPlainString.ToString(), tapAction))
-                                yield return obj;
+                                yield return new Tuple<UIElement, Picture>((UIElement)obj, null);
                             curPlainString.Clear();
                         }
                         continue;
                     }
 
-                    // 이미지 처리.. 몰라 ㅋ
+                    // 이미지 처리.. 몰라 
                     if (tag.Name.Equals("img", StringComparison.CurrentCultureIgnoreCase))
                     {
+                        string url;
+                        if (tag.Attrs.TryGetValue("src", out url))                        
+                        {
+                            var pic = new Picture(new Uri(url, UriKind.Absolute), "");
+                            var grid = new Grid();
+                            
+                            yield return Tuple.Create((UIElement)grid, pic);
+                        }                        
                     }
                 }
             }
 
             if (curPlainString.Length != 0)
                 foreach (var obj in MakeTextBlocks(curPlainString.ToString(), tapAction))
-                    yield return obj;
+                    yield return new Tuple<UIElement, Picture>((UIElement)obj, null);
 
             // 1. <br> <br />은 \n으로 바꿈
             // 2. <p> </p>는 하나의 paragraph로 처리

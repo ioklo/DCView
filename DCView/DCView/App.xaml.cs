@@ -15,6 +15,8 @@ using Microsoft.Phone.Shell;
 using System.IO.IsolatedStorage;
 using DCView;
 using System.Threading;
+using ImageTools.IO.Gif;
+using ImageTools.IO;
 
 namespace DCView
 {
@@ -236,6 +238,10 @@ namespace DCView
             SiteManager = new SiteManager();
             LoginInfo = new LoginInfo();
             Favorites = new Favorites();
+
+            Decoders.AddDecoder<GifDecoder>();
+
+
         }
     }
 }

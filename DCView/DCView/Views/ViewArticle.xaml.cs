@@ -40,19 +40,6 @@ namespace DCView
         WriteArticlePivotItem writeArticlePivotItem = null;
 
         Thickness pivotMargin = new Thickness(6, 14, 6, 0);
-
-        // 공통 함수
-        public void ShowErrorMessage(string msg)
-        {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.BeginInvoke(() => ShowErrorMessage(msg));
-                return;
-            }
-
-            MessageBox.Show(msg);
-        }                
-
         
         // 생성자
         public ViewArticle()

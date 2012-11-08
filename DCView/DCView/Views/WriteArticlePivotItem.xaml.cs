@@ -57,7 +57,8 @@ namespace DCView
             appBar.Buttons.Add(cancelButton);
         }
 
-        private void Submit()
+        // 글쓰기 제출
+        private async void Submit()
         {
             if (FormTitle.Text.Trim().Length == 0 || FormText.Text.Trim().Length == 0)
             {
@@ -87,46 +88,45 @@ namespace DCView
                 attachStream.Add(new AttachmentStream() { Stream = result.ChosenPhoto, Filename = name });
             }
 
-            CancellationTokenSource cts = new CancellationTokenSource();
-
-            string title = Title;
-            string text = Text;
-
+            
             submitButton.IsEnabled = false;
             WriteProgressBar.IsIndeterminate = true;
 
-            Task.Factory.StartNew(() =>
+            try
+            {               
+                CancellationTokenSource cts = new CancellationTokenSource();
+
+                string title = Title;
+                string text = Text;
+
+                bool result = await Task.Factory.StartNew ( () =>                    
+                {
+                    return board.WriteArticle(title, text, attachStream, cts.Token);
+                }, cts.Token);
+
+                // 성공했으면 
+                if (result)
+                {
+                    // 글쓰기 창을 닫고..
+                    viewArticlePage.RemoveWriteForm();                            
+
+                    // 글 목록을 reload
+                    viewArticlePage.RefreshArticleList();                        
+                }                    
+                else
+                {
+                    MessageBox.Show("글쓰기에 실패했습니다. 다시 시도해 보세요");
+                }
+            }
+            catch
             {
-                try
-                {
-                    // 성공했으면 
-                    if (board.WriteArticle(title, text, attachStream, cts.Token))
-                    {
-                        Dispatcher.BeginInvoke(() =>
-                        {
-                            // 글쓰기 창을 닫고..
-                            viewArticlePage.RemoveWriteForm();                            
-
-                            // 글 목록을 reload
-                            viewArticlePage.RefreshArticleList();
-                        });
-                        return;
-                    }
-                    
-                }
-                catch
-                {
-                                        
-                }
-
-                viewArticlePage.ShowErrorMessage("글쓰기에 실패했습니다. 다시 시도해 보세요");
-                Dispatcher.BeginInvoke(() => 
-                { 
-                    submitButton.IsEnabled = true;
-                    WriteProgressBar.IsIndeterminate = false;
-                });                
-
-            }, cts.Token);            
+                MessageBox.Show("글쓰기에 실패했습니다. 다시 시도해 보세요");            
+            }
+            finally
+            {
+                submitButton.IsEnabled = true;
+                WriteProgressBar.IsIndeterminate = false;
+            }                
         }        
 
         private void ModifyImage(object sender, RoutedEventArgs e)

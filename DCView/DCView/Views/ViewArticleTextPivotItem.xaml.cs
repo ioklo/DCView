@@ -19,6 +19,8 @@ using System.Windows.Media.Imaging;
 using DCView.Util;
 using MyApps.Common;
 using System.IO;
+using ImageTools.Controls;
+using ImageTools;
 
 namespace DCView
 {
@@ -44,9 +46,6 @@ namespace DCView
         IArticle article = null;
         ViewArticle viewArticlePage;
 
-        Grid loadImageGrid = null;
-        Button loadImageButton = null;
-
         CommentedTextBox replyTextBox = null;
 
         Action<Uri> tapAction = (Action<Uri>)(uri =>
@@ -59,8 +58,7 @@ namespace DCView
         public ViewArticleTextPivotItem(ViewArticle viewArticlePage)
         {
             InitializeComponent();
-            InitializeAppBar();
-            InitializeLoadImageButton();
+            InitializeAppBar();            
 
             this.Header = "내용";
             this.viewArticlePage = viewArticlePage;            
@@ -127,16 +125,22 @@ namespace DCView
             return textBox;
         }
 
-        void InitializeLoadImageButton()
+        private Button CreateLoadImageButton(List<Tuple<Grid, Picture>> imgContainers)
         {
-            loadImageGrid = new Grid();
-            loadImageButton = new Button();
-            loadImageButton.Content = "그림 불러오기";
-            loadImageButton.FontSize = 14;
-            loadImageButton.BorderThickness = new Thickness(1);
-            loadImageButton.HorizontalAlignment = HorizontalAlignment.Center;
-            loadImageButton.Click += new RoutedEventHandler(loadImageButton_Click);
-            loadImageGrid.Children.Add(loadImageButton);
+            var grid = new Grid();            
+
+            var button = new Button();
+            button.Content = "그림 불러오기";
+            button.FontSize = 14;
+            button.BorderThickness = new Thickness(1);
+            button.HorizontalAlignment = HorizontalAlignment.Center;
+            button.Click += (o, e) =>
+            {
+                button.IsEnabled = false;
+                button.Visibility = Visibility.Collapsed;
+                LoadImagesAsync(imgContainers);
+            };
+            return button;            
         }
 
 
@@ -167,84 +171,140 @@ namespace DCView
             }
 
             string text = replyTextBox.Text;
-            CommentSubmit(text, sender as ApplicationBarIconButton);
             this.Focus();
+            CommentSubmit(text, sender as ApplicationBarIconButton);
         }
 
         // 리플 달기
-        private bool CommentSubmit(string text, ApplicationBarIconButton submitButton)
+        private async void CommentSubmit(string text, ApplicationBarIconButton submitButton)
         {
-            if (article == null) return false;
+            if (article == null) return;
 
             if (text.Trim() == string.Empty)
             {
                 MessageBox.Show("댓글 내용을 입력해주세요");
-                return false;
+                return;
             }
 
             submitButton.IsEnabled = false; 
 
             CancellationTokenSource cts = new CancellationTokenSource();
 
-            Task.Factory.StartNew( () =>
+            try
             {
-                try
-                {
-                    if (!article.WriteComment(text, cts.Token))
-                    {
-                        viewArticlePage.ShowErrorMessage("댓글달기에 실패했습니다 다시 시도해보세요");
-                        Dispatcher.BeginInvoke(() => { submitButton.IsEnabled = true; });
-                        return;
-                    }
+                bool succ = await Task.Factory.StartNew(
+                    () => { return article.WriteComment(text, cts.Token); }, cts.Token);
 
-                    // 성공 했으면
-                    Dispatcher.BeginInvoke(() => 
-                    {
-                        GetAndShowArticleText(); 
-                        submitButton.IsEnabled = true;                         
-                    });
-                }
-                catch
+                if (!succ)
                 {
-                    viewArticlePage.ShowErrorMessage("댓글달기에 실패했습니다 다시 시도해보세요");
+                    MessageBox.Show("댓글달기에 실패했습니다 다시 시도해보세요");
                     Dispatcher.BeginInvoke(() => { submitButton.IsEnabled = true; });
-                    return;                    
+                    return;
                 }
-            });
 
-            return true;
-        }
-
-        void LoadImageAsync(Image image, Picture pic)
-        {
-            Task.Factory.StartNew(() =>
+                // 성공 했으면
+                GetAndShowArticleText();
+            }
+            catch
             {
-                try
+                MessageBox.Show("댓글달기에 실패했습니다 다시 시도해보세요");                
+            }
+
+            submitButton.IsEnabled = true;
+        }
+
+        private async void LoadImagesAsync(List<Tuple<Grid, Picture>> imgContainers)
+        {
+            await Task.Factory.StartNew( () => 
+            {
+                List<Task> loadingTasks = new List<Task>();
+
+                foreach(var tuple in imgContainers)
                 {
-                    HttpWebRequest request = WebRequest.CreateHttp(pic.Uri);
-                    request.UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
-                    request.Headers["Referer"] = pic.Referer;
-                    request.CookieContainer = WebClientEx.CookieContainer;
-                    HttpWebResponse response = (HttpWebResponse)Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null).GetResult();
-
-
-                    MemoryStream stream = new MemoryStream();
-                    response.GetResponseStream().CopyTo(stream);                    
-                    
-                    Dispatcher.BeginInvoke(() => 
-                    {
-                        BitmapSource source = new BitmapImage();
-                        source.SetSource(stream);
-                        image.Source = source; 
-                    });
+                    loadingTasks.Add(LoadImageAsync(tuple.Item1, tuple.Item2));
                 }
-                catch
-                {
 
-                }
+                Task.WaitAll(loadingTasks.ToArray());
             });
         }
 
+        // 이미지 로딩 부분
+        private async Task LoadImageAsync(Grid grid, Picture pic)
+        {
+            try
+            {
+                HttpWebRequest request = WebRequest.CreateHttp(pic.Uri);
+                request.UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
+                request.Headers["Referer"] = pic.Referer;
+                request.CookieContainer = WebClientEx.CookieContainer;
+                HttpWebResponse response = (HttpWebResponse)await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null);
+
+                MemoryStream stream = new MemoryStream((int)response.ContentLength);
+                await response.GetResponseStream().CopyToAsync(stream);
+                               
+                stream.Seek(0, SeekOrigin.Begin);
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    if (response.ContentType.Equals("image/gif", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        ExtendedImage source = new ExtendedImage();
+                        source.SetSource(stream);
+
+                        var image = new AnimatedImage();
+                        image.Margin = new Thickness(3);
+                        image.Source = source;
+                        image.Tap += image_Tap;
+                        image.LoadingFailed += (o, e) =>
+                        {
+                            var tb = new TextBlock();
+                            tb.Text = "로딩 실패";
+                            tb.Foreground = new SolidColorBrush(Colors.Red);
+                            grid.Children.Add(tb);
+                        };
+                        grid.Children.Add(image);
+                    }
+                    else
+                    {
+                        var source = new BitmapImage();
+                        source.SetSource(stream);
+
+                        var image = new Image();
+                        image.Margin = new Thickness(3);
+                        image.Source = source;
+                        image.Tag = pic;
+                        image.Tap += image_Tap;
+                        image.ImageFailed += (o, e) =>
+                        {
+                            var tb = new TextBlock();
+                            tb.Text = "로딩 실패";
+                            tb.Foreground = new SolidColorBrush(Colors.Red);
+                            grid.Children.Add(tb);
+                        };
+                        grid.Children.Add(image);
+                    }
+                });
+            }
+            catch
+            {
+
+            }            
+        }
+
+        
+        void image_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            var image = sender as Image;
+            if (image == null) return;
+
+            var pic = image.Tag as Picture;
+            if (pic == null) return;
+ 	        
+            WebBrowserTask task = new WebBrowserTask();
+            task.Uri = pic.Uri;
+            task.Show();
+        }
+        
         private void ShowArticleText(ArticleData data)
         {
             if (!Dispatcher.CheckAccess())
@@ -265,48 +325,35 @@ namespace DCView
             title.Margin = new Thickness(0, 12, 0, 12);
             ArticleText.Children.Add(title);
 
+            List<Tuple<Grid, Picture>> imgContainers = new List<Tuple<Grid, Picture>>();
 
-            if ((bool)IsolatedStorageSettings.ApplicationSettings["DCView.passive_loadimg"] && article.Pictures.Count != 0)
+            
+            Button loadImgBtn = CreateLoadImageButton(imgContainers);
+            Grid loadImggrid = new Grid();
+            loadImggrid.Children.Add(loadImgBtn);
+            ArticleText.Children.Add(loadImggrid);
+
+            // 그림 들어갈 자리에 Grid 하나씩 넣기..
+            foreach (Picture p in article.Pictures)
             {
-                loadImageButton.Content = "그림 불러오기";
-                loadImageButton.IsEnabled = true;                
+                Picture pic = p;
+                var grid = new Grid();
 
-                ArticleText.Children.Add(loadImageGrid);                
-            }
-            else
-            {
-                foreach (Picture pic in article.Pictures)
-                {   
-                    var image = new Image()
-                    {
-                        // Source = new BitmapImage(pic.Uri),
-                        Margin = new Thickness(3),
-                    };
-
-                    LoadImageAsync(image, pic);
-
-                    image.Tap += (o1, e1) =>
-                    {
-                        WebBrowserTask task = new WebBrowserTask();
-                        task.Uri = pic.Uri;
-                        task.Show();
-                    };
-
-                    image.ImageOpened += delegate(object o1, RoutedEventArgs rea)
-                    {
-                        ArticleText.InvalidateArrange();
-                    };
-
-                    ArticleText.Children.Add(image);
-                }
+                imgContainers.Add(Tuple.Create(grid, pic));
+                ArticleText.Children.Add(grid);
             }
 
             var margin = new TextBlock();
             margin.Margin = new Thickness(0, 0, 0, 12);
             ArticleText.Children.Add(margin);
 
-            foreach (var textBlock in HtmlElementConverter.GetTextBlocksFromString(data.Text, tapAction))
-                ArticleText.Children.Add(textBlock);
+            foreach (var tuple in HtmlElementConverter.GetUIElementFromString(data.Text, tapAction))
+            {
+                ArticleText.Children.Add(tuple.Item1);
+
+                if (tuple.Item2 != null)
+                    imgContainers.Add(Tuple.Create((Grid)tuple.Item1, tuple.Item2));
+            }
 
             // 기타 정보
             var status = new TextBlock();
@@ -327,11 +374,16 @@ namespace DCView
                 //cmtName.Foreground = App.Current.Resources["PhoneAccentBrush"] as Brush;
                 ArticleText.Children.Add(cmtName);
 
-                foreach (var blocks in HtmlElementConverter.GetTextBlocksFromString(cmt.Text, tapAction))
-                    ArticleText.Children.Add(blocks);
+                foreach (var tuple in HtmlElementConverter.GetUIElementFromString(cmt.Text, tapAction))
+                {                    
+                    ArticleText.Children.Add(tuple.Item1);
+
+                    if (tuple.Item2 != null)
+                        imgContainers.Add(Tuple.Create((Grid)tuple.Item1, tuple.Item2));
+                }
 
                 // 댓글마다 충전물좀 넣기
-                ArticleText.Children.Add(new Rectangle() { Height = 20 });
+                ArticleText.Children.Add(new System.Windows.Shapes.Rectangle() { Height = 20 });
             }
 
             // ReplyTextBox를 새로 만듦
@@ -339,6 +391,14 @@ namespace DCView
             ArticleText.Children.Add(replyTextBox);
 
             ArticleTextScroll.ScrollToVerticalOffset(0);
+
+            bool bPassiveLoading = (bool)IsolatedStorageSettings.ApplicationSettings["DCView.passive_loadimg"] && imgContainers.Count != 0;
+
+            if (!bPassiveLoading)
+            {
+                loadImgBtn.Visibility = Visibility.Collapsed;
+                LoadImagesAsync(imgContainers);
+            }
         }
 
         // 글을 웹브라우저에서 읽기         
@@ -352,50 +412,58 @@ namespace DCView
         }
 
         // 지금 읽고 있는 글 다시 불러와서 article.Text에 넣기
-        private void GetAndShowArticleText()
+        private async void GetAndShowArticleText()
         {
             ArticleText.Children.Clear(); // 이전 글 안보이게 지우기
             if (article == null) return;
 
             // 프로그레스 바 켬
-            LoadingArticleTextProgressBar.IsIndeterminate = true;
-            CancellationTokenSource cts = new CancellationTokenSource();
+            LoadingArticleTextProgressBar.IsIndeterminate = true;            
 
-            Task.Factory.StartNew( () =>
+            try
             {
-                try
-                {
-                    string text;                                        
-                    if (!article.GetText(cts.Token, out text))
-                    {
-                        viewArticlePage.ShowErrorMessage("글을 읽어들이는데 실패했습니다. 다시 시도해보세요");
-                        Dispatcher.BeginInvoke(() => { LoadingArticleTextProgressBar.IsIndeterminate = false; });
-                        return;
-                    }
+                CancellationTokenSource cts = new CancellationTokenSource();                
+                ArticleData data = new ArticleData();
 
-                    // 이것을 기반으로 ArticleData 생성                    
-                    ArticleData data = new ArticleData();
+                bool result = await Task.Factory.StartNew( () => 
+                {
+                    string text = null;
+                    if (!article.GetText(cts.Token, out text)) return false;
+
+                    // ArticleData 생성                                        
 
                     // TODO: 현재는 첫번째 이후 코멘트를 가져올 방법이 없다 
                     data.Text = text;
                     data.CommentLister = article.GetCommentLister();
+
                     IEnumerable<IComment> newComments;
                     bool bEnded = data.CommentLister.Next(cts.Token, out newComments);
+
                     data.Comments.AddRange(newComments);
 
                     // Cache에 집어넣기
                     cachedData.Add(article, data);
+                    return true;
+                
+                }, cts.Token);
 
-                    // UI를 건드리기 때문에 Dispatcher로 해야한다.
-                    ShowArticleText(data);
-                    Dispatcher.BeginInvoke(() => { LoadingArticleTextProgressBar.IsIndeterminate = false; });
-                }
-                catch
+                if (!result)
                 {
-                    viewArticlePage.ShowErrorMessage("글을 읽어들이는데 실패했습니다. 다시 시도해보세요");
-                    Dispatcher.BeginInvoke(() => { LoadingArticleTextProgressBar.IsIndeterminate = false; });
+                    MessageBox.Show("글을 읽어들이는데 실패했습니다. 다시 시도해보세요");                    
+                    return;
                 }
-            });
+                
+                ShowArticleText(data);
+            }
+            catch
+            {
+                MessageBox.Show("글을 읽어들이는데 실패했습니다. 다시 시도해보세요");
+                
+            }
+            finally
+            {
+                LoadingArticleTextProgressBar.IsIndeterminate = false;
+            }
         }
 
         public void SetArticle(IArticle article)
@@ -410,67 +478,6 @@ namespace DCView
             }          
             else
                 ShowArticleText(data);
-        }
-
-        // 버튼을 눌렀을 때 
-        private void loadImageButton_Click(object sender, RoutedEventArgs e)
-        {
-            loadImageButton.Content = string.Format("로딩중 {0}/{1}", 0, article.Pictures.Count);
-            loadImageButton.IsEnabled = false;
-
-            int insertIndex = ArticleText.Children.IndexOf(loadImageGrid) + 1;
-
-            List<Image> failedImage = new List<Image>();
-            int openedImageCount = 0;
-
-            foreach (Picture pic in article.Pictures)
-            {
-                Uri curUri = pic.Uri;
-
-                var image = new Image()
-                {
-                    Margin = new Thickness(3),
-                };
-
-                LoadImageAsync(image, pic);
-
-                image.Tap += (o1, e1) =>
-                {
-                    WebBrowserTask task = new WebBrowserTask();
-                    task.Uri = curUri;
-                    task.Show();
-                };
-
-                // 이미지가 열렸을 때.. 
-                image.ImageOpened += delegate(object o1, RoutedEventArgs rea)
-                {
-                    openedImageCount++;
-
-                    if (failedImage.Count != 0)
-                        loadImageButton.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", openedImageCount, article.Pictures.Count, failedImage.Count);
-                    else
-                        loadImageButton.Content = string.Format("불러오기 {0}/{1}", openedImageCount, article.Pictures.Count);
-
-                    if (failedImage.Count == 0 && openedImageCount == article.Pictures.Count)
-                    {
-                        // 버튼 제거하기
-                        ArticleText.Children.Remove(loadImageGrid);
-                        ArticleText.InvalidateArrange();
-                    }
-                };
-
-                // 이미지 로딩에 실패했을 때..
-                image.ImageFailed += (o1, e1) =>
-                {
-                    if (failedImage.IndexOf(image) == -1)
-                        failedImage.Add(image);
-                    
-                    loadImageButton.Content = string.Format("불러오기 {0}/{1}, 실패 {2}", openedImageCount, article.Pictures.Count, failedImage.Count);
-                };
-
-                ArticleText.Children.Insert(insertIndex, image);
-                insertIndex++;
-            }            
         }
 
         void INotifyActivated.OnActivated()
