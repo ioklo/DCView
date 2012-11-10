@@ -197,7 +197,7 @@
     <Content Include="Data\idlist.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SplashScreenImage.jpg" />
+    <Content Include="SplashScreenImage1.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\MainPanorama.xaml">

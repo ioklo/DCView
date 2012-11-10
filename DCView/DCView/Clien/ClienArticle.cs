@@ -156,6 +156,11 @@ namespace DCView
 
                 ClienComment comment = new ClienComment();
 
+                comment.Level = 0;
+
+                if (line.Contains("<img src=\"../skin/board/cheditor/img/blet_re2.gif\">"))
+                    comment.Level = 1;
+
                 match = Regex.Match(line, "<img src='/cs2/data/member/.*?/(.*?).gif");
                 if (match.Success)
                 {

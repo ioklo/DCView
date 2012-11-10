@@ -28,8 +28,6 @@ namespace DCView
         CancellationTokenSource cancelTokenSource = null;
         ObservableCollection<IBoard> searchResult = null;
 
-
-
         // 이벤트: 게시판 목록이 모두 로딩되었을 때
         private void OnLoadingCompleted()
         {
@@ -50,6 +48,7 @@ namespace DCView
                 App.Current.SiteManager.WaitForLoadingComplete(null);
                 Dispatcher.BeginInvoke(OnLoadingCompleted);
             });
+
         }
 
         // 내부 함수
@@ -66,9 +65,6 @@ namespace DCView
 
             settingApplicationBar = new ApplicationBar();
         }
-
-
-        
 
         // 나갈 때..        
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)

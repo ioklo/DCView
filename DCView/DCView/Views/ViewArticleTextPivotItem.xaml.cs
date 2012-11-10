@@ -361,29 +361,46 @@ namespace DCView
             status.HorizontalAlignment = HorizontalAlignment.Stretch;
             status.TextAlignment = TextAlignment.Right;
             status.Style = Application.Current.Resources["DCViewTextSmallStyle"] as Style;
-            status.Margin = new Thickness(0, 0, 0, 12);
+            status.Margin = new Thickness(0, 0, 0, 0);
             ArticleText.Children.Add(status);
 
             // 댓글
             foreach (var cmt in data.Comments)
             {
-                var cmtName = new TextBlock();
-                cmtName.Text = cmt.Name;
-                cmtName.Style = Application.Current.Resources["DCViewTextSmallStyle"] as Style;
-                cmtName.Margin = new Thickness(0, 12, 0, 3);
-                //cmtName.Foreground = App.Current.Resources["PhoneAccentBrush"] as Brush;
-                ArticleText.Children.Add(cmtName);
+                var rect = new System.Windows.Shapes.Rectangle();
+                rect.HorizontalAlignment = HorizontalAlignment.Stretch;
+                rect.VerticalAlignment = VerticalAlignment.Stretch;
+                rect.Fill = (Brush)App.Current.Resources["PhoneAccentBrush"];
+                rect.SetValue(Grid.ColumnProperty, 0);
+
+                var cmtPanel = new StackPanel();
+                cmtPanel.Margin = new Thickness(6, 0, 0, 0);
+                cmtPanel.SetValue(Grid.ColumnProperty, 1);
 
                 foreach (var tuple in HtmlElementConverter.GetUIElementFromString(cmt.Text, tapAction))
-                {                    
-                    ArticleText.Children.Add(tuple.Item1);
+                {
+                    cmtPanel.Children.Add(tuple.Item1);
 
                     if (tuple.Item2 != null)
                         imgContainers.Add(Tuple.Create((Grid)tuple.Item1, tuple.Item2));
                 }
 
-                // 댓글마다 충전물좀 넣기
-                ArticleText.Children.Add(new System.Windows.Shapes.Rectangle() { Height = 20 });
+                var cmtName = new TextBlock();
+                cmtName.Text = cmt.Name;
+                cmtName.Style = Application.Current.Resources["DCViewTextSmallStyle"] as Style;
+                cmtName.Margin = new Thickness(0, 3, 0, 3);
+                cmtPanel.Children.Add(cmtName);
+                
+
+                var cmtGrid = new Grid();
+                
+                cmtGrid.Margin = new Thickness(cmt.Level * 20, 10, 0, 10);
+                cmtGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(5) });
+                cmtGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+                cmtGrid.Children.Add(rect);
+                cmtGrid.Children.Add(cmtPanel);
+                
+                ArticleText.Children.Add(cmtGrid);
             }
 
             // ReplyTextBox를 새로 만듦

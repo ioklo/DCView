@@ -13,7 +13,8 @@ namespace DCView
 {
     public class ClienComment : IComment
     {
-        public string Name {get; set;}
-        public string Text {get; set;}
+        public int Level { get; set; }
+        public string Name { get; set; }
+        public string Text { get; set; }
     }
 }
