@@ -55,6 +55,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CS.Windows.Controls">
+      <HintPath>..\packages\WindowsPhoneControls.0.3.0\lib\sl4-windowsphone71\CS.Windows.Controls.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZLib.Phone">
       <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\ICSharpCode.SharpZLib.Phone.dll</HintPath>
     </Reference>
@@ -137,7 +140,6 @@
     <Compile Include="Views\BoolToColorConverter.cs" />
     <Compile Include="Interface\IComment.cs" />
     <Compile Include="Model\LoginInfo.cs" />
-    <Compile Include="Util\CommentedTextBox.cs" />
     <Compile Include="Views\MainPanorama.xaml.cs">
       <DependentUpon>MainPanorama.xaml</DependentUpon>
     </Compile>

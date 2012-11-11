@@ -54,6 +54,14 @@ namespace DCView
             });
         }
 
+        public IEnumerable<ISite> Sites
+        {
+            get
+            {
+                return sites;
+            }
+        }
+
         
 
         public ISite GetSite(string siteID)
@@ -93,9 +101,8 @@ namespace DCView
         }        
         
         // 이것도 조금 오래 걸릴 수 있다.
-        public void Search(string text, CancellationToken token, Action<IBoard> OnSearchGallery)        
+        public void Search(string text, CancellationToken token, ISite site, Action<IBoard> OnSearchGallery)
         {
-            foreach (var site in sites)
             foreach (var board in site.Boards)
             {
                 if (token.IsCancellationRequested)

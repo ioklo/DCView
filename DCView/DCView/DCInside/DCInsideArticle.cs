@@ -38,6 +38,8 @@ namespace DCView
             get { return board.GetArticleUri(this); }
         }
 
+        public bool CanWriteComment { get { return true; } }
+
         public DCInsideArticle(DCInsideBoard board)
         {
             this.board = board;

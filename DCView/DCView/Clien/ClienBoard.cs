@@ -28,6 +28,11 @@ namespace DCView
             this.id = id;
             this.name = name;
         }
+
+        public string DisplayTitle
+        {
+            get { return "클리앙 - " + name; }
+        }
         
         public ISite Site
         {
@@ -44,10 +49,14 @@ namespace DCView
             get { return name; }
         }
 
+        public bool CanWriteArticle { get { return false; } }
+
         Uri IBoard.Uri
         {
             get { throw new NotImplementedException(); }
         }
+
+        public bool CanSearch { get { return false; } }
 
         ILister<IArticle> IBoard.GetArticleLister(int page)
         {
@@ -56,8 +65,8 @@ namespace DCView
 
         ILister<IArticle> IBoard.GetSearchLister(string text, SearchType searchType)
         {
-            // search가 아님;
-            return new ArticleLister(this, id, 0);
+            // 지원하지 않는 기능
+            throw new NotSupportedException();
         }
 
         bool IBoard.WriteArticle(string title, string text, System.Collections.Generic.List<AttachmentStream> attachments, System.Threading.CancellationToken ct)

@@ -21,6 +21,8 @@ namespace DCView
         int ViewCount { get; }
         string Status { get; }
 
+        bool CanWriteComment { get; }
+
         List<Picture> Pictures { get; }
         ILister<IComment> GetCommentLister();
 

@@ -13,6 +13,8 @@ using System;
 using System.IO.IsolatedStorage;
 using System.Threading.Tasks;
 using Microsoft.Phone.Tasks;
+using System.Linq;
+
 namespace DCView
 {
     public partial class MainPanorama : PhoneApplicationPage
@@ -28,10 +30,19 @@ namespace DCView
         CancellationTokenSource cancelTokenSource = null;
         ObservableCollection<IBoard> searchResult = null;
 
+        public class SearchSiteItem
+        {
+            public string Name { get { return Site.Name; } }
+            public ISite Site { get; set; }
+        }
+
         // 이벤트: 게시판 목록이 모두 로딩되었을 때
         private void OnLoadingCompleted()
         {
-            SearchResult.ItemsSource = App.Current.SiteManager.All;
+            foreach (var site in App.Current.SiteManager.Sites)
+                SearchSite.Items.Add(new SearchSiteItem() { Site = site });
+
+            SearchResult.ItemsSource = App.Current.SiteManager.Sites.First().Boards;
             bLoadingCompleted = true;
         }
 
@@ -41,14 +52,13 @@ namespace DCView
             InitializeApplicationBar();
 
             ApplicationBar = favoriteApplicationBar;
-            Favorites.ItemsSource = App.Current.Favorites.All;
+            Favorites.ItemsSource = App.Current.Favorites.All;            
 
             Task.Factory.StartNew(() =>
             {
                 App.Current.SiteManager.WaitForLoadingComplete(null);
                 Dispatcher.BeginInvoke(OnLoadingCompleted);
             });
-
         }
 
         // 내부 함수
@@ -165,24 +175,28 @@ namespace DCView
             }
         }
         
-        
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            
             // 1초 기다리는 타이머가 없다면 만든다.
             if (dt == null)
             {
+
                 dt = new DispatcherTimer();
                 dt.Interval = new TimeSpan(0, 0, 0, 1, 500);
 
                 // 1초 있다가 할일을 정의해주고
                 dt.Tick += (o, ea) =>
                 {
+                    SearchSiteItem siteItem = SearchSite.SelectedItem as SearchSiteItem;
+                    if (siteItem == null) return;
+
                     // 더이상 수행은 멈추고 
                     dt.Stop();
 
                     if (SearchBox.Text.Length == 0)
                     {
-                        SearchResult.ItemsSource = App.Current.SiteManager.All;
+                        SearchResult.ItemsSource = siteItem.Site.Boards;
                         return;
                     }
 
@@ -195,7 +209,7 @@ namespace DCView
 
                     Task.Factory.StartNew( () =>
                     {
-                        App.Current.SiteManager.Search(text, cancelTokenSource.Token, board =>
+                        App.Current.SiteManager.Search(text, cancelTokenSource.Token, siteItem.Site, board =>
                         {
                             Dispatcher.BeginInvoke(() => { searchResult.Add(board); });
                         });
@@ -227,25 +241,30 @@ namespace DCView
 
         // 즐겨찾기 갱신
         private async void RefreshGalleryListButton_Click(object sender, EventArgs e)
-        {
+        {            
+
             if (!bLoadingCompleted)
             {
                 MessageBox.Show("아직 목록을 다 읽어들이지 못했습니다. 목록을 다 읽어 들인 다음 새로고침 해주세요.");
                 return;
             }
 
+            // 현재 선택된 사이트에 대해서 갱신
+            SearchSiteItem siteItem = SearchSite.SelectedItem as SearchSiteItem;
+            if (siteItem == null) return;
+            ISite site = siteItem.Site;
+
             SearchBox.Visibility = Visibility.Collapsed;
             SearchResult.Visibility = Visibility.Collapsed;
             RefreshPanel.Visibility = Visibility.Visible;
 
             // dcinside 의존성을 여기에 씀
-            ISite site = App.Current.SiteManager.GetSite("dcinside");
             bool result = await Task.Factory.StartNew( () => { return site.Refresh(OnRefreshStatusChangedEventHandler); });
 
             if (!result)
                 MessageBox.Show("갤러리 목록을 얻어내는데 실패했습니다. 잠시 후 다시 실행해보세요");
-                
-            SearchResult.ItemsSource = App.Current.SiteManager.All;
+
+            SearchResult.ItemsSource = site.Boards;
 
             SearchBox.Text = "";
             SearchBox.Visibility = Visibility.Visible;
@@ -272,6 +291,15 @@ namespace DCView
             WebBrowserTask task = new WebBrowserTask();
             task.Uri = new Uri("http://dcview.codeplex.com/", UriKind.Absolute);
             task.Show();
+        }
+
+        private void SearchSite_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SearchSiteItem siteItem = SearchSite.SelectedItem as SearchSiteItem;
+            if (siteItem == null) return;
+
+            SearchResult.ItemsSource = siteItem.Site.Boards;
+            SearchBox.Text = "";
         }       
 
     }

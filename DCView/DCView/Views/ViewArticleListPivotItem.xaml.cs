@@ -30,8 +30,8 @@ namespace DCView
         
         public ViewArticleListPivotItem(ViewArticle viewArticlePage, IBoard board)
         {
-            InitializeComponent();
-            InitializeAppBar();
+            InitializeComponent();            
+            InitializeAppBar(board);
             InitializeNextButton();
 
             this.viewArticlePage = viewArticlePage;
@@ -39,7 +39,7 @@ namespace DCView
             this.Header = "목록";            
         }
 
-        private void InitializeAppBar()
+        private void InitializeAppBar(IBoard board)
         {
             appBar = new ApplicationBar();
             appBar.IsMenuEnabled = true;
@@ -53,21 +53,27 @@ namespace DCView
             refreshListIconButton.Click += refreshListIconButton_Click;
             appBar.Buttons.Add(refreshListIconButton);
 
-            var writeIconButton = new ApplicationBarIconButton()
+            if (board.CanWriteArticle)
             {
-                IconUri = new Uri("/Data/appbar.edit.rest.png", UriKind.Relative),
-                Text = "글쓰기"
-            };
-            writeIconButton.Click += writeIconButton_Click;
-            appBar.Buttons.Add(writeIconButton);
+                var writeIconButton = new ApplicationBarIconButton()
+                {
+                    IconUri = new Uri("/Data/appbar.edit.rest.png", UriKind.Relative),
+                    Text = "글쓰기"
+                };
+                writeIconButton.Click += writeIconButton_Click;
+                appBar.Buttons.Add(writeIconButton);
+            }
 
-            var searchIconButton = new ApplicationBarIconButton()
+            if (board.CanSearch)
             {
-                IconUri = new Uri("/Data/appbar.feature.search.rest.png", UriKind.Relative),
-                Text = "검색"
-            };
-            searchIconButton.Click += searchIconButton_Click;
-            appBar.Buttons.Add(searchIconButton);
+                var searchIconButton = new ApplicationBarIconButton()
+                {
+                    IconUri = new Uri("/Data/appbar.feature.search.rest.png", UriKind.Relative),
+                    Text = "검색"
+                };
+                searchIconButton.Click += searchIconButton_Click;
+                appBar.Buttons.Add(searchIconButton);
+            }
 
             var webViewList = new ApplicationBarMenuItem();
             webViewList.Text = "웹브라우저로 보기";
@@ -208,6 +214,12 @@ namespace DCView
         // 검색 아이콘 클릭
         private void searchIconButton_Click(object sender, EventArgs e)
         {
+            if (!board.CanSearch)
+            {
+                MessageBox.Show("검색을 지원하지 않습니다");
+                return;
+            }
+
             ToggleSearchPanel();
         }
 

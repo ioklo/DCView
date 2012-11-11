@@ -37,6 +37,8 @@ namespace DCView
         public string Title {get; set;}        
         public DateTime Date {get; set;}
         public int CommentCount { get; set; }
+
+        public bool CanWriteComment { get { return false; } }
       
 
         public Uri Uri

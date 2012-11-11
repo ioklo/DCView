@@ -10,6 +10,7 @@ namespace DCView
         string ID { get; }
         string Name { get; }                // 이 사이트의 대표 이름
         IEnumerable<IBoard> Boards { get; } // 이 사이트에서 접근할 수 있는 게시판
+        bool CanLogin { get; }
 
         bool Refresh(Action<string, int> OnStatusChanged);
         void Load();    // 전체 보드를 다 읽어온다

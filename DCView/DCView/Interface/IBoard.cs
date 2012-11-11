@@ -33,6 +33,10 @@ namespace DCView
         ISite Site { get; }
         string ID { get; }   // 게시판 접근용 아이디
         string Name { get; } // 게시판의 이름
+        string DisplayTitle { get; } // 화면 위에 보여줄 이름
+
+        bool CanWriteArticle { get; }
+        bool CanSearch { get; }
 
         Uri Uri { get; }
         ILister<IArticle> GetArticleLister(int page);

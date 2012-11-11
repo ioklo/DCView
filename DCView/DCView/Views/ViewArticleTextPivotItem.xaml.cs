@@ -21,6 +21,7 @@ using MyApps.Common;
 using System.IO;
 using ImageTools.Controls;
 using ImageTools;
+using CS.Windows.Controls;
 
 namespace DCView
 {
@@ -46,7 +47,7 @@ namespace DCView
         IArticle article = null;
         ViewArticle viewArticlePage;
 
-        CommentedTextBox replyTextBox = null;
+        WatermarkTextBox replyTextBox = null;
 
         Action<Uri> tapAction = (Action<Uri>)(uri =>
         {
@@ -99,18 +100,18 @@ namespace DCView
             replyAppBar.Buttons.Add(submitReplyIconButton);
         }
 
-        private CommentedTextBox CreateReplyTextBox()
+        private WatermarkTextBox CreateReplyTextBox()
         {
             var inputScope = new InputScope();
             inputScope.Names.Add(new InputScopeName() { NameValue = InputScopeNameValue.Chat });
 
-            var textBox = new CommentedTextBox();
+            var textBox = new WatermarkTextBox();
 
             textBox.AcceptsReturn = true;
             textBox.TextWrapping = TextWrapping.Wrap;
             textBox.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
             textBox.InputScope = inputScope;
-            textBox.Comment = "댓글";
+            textBox.WatermarkText = "댓글";
             textBox.Margin = new Thickness(-15, 0, -15, 0);
 
             textBox.SizeChanged += (o1, e1) =>
@@ -403,9 +404,12 @@ namespace DCView
                 ArticleText.Children.Add(cmtGrid);
             }
 
-            // ReplyTextBox를 새로 만듦
-            replyTextBox = CreateReplyTextBox();
-            ArticleText.Children.Add(replyTextBox);
+            if (article.CanWriteComment)
+            {
+                // ReplyTextBox를 새로 만듦
+                replyTextBox = CreateReplyTextBox();
+                ArticleText.Children.Add(replyTextBox);
+            }
 
             ArticleTextScroll.ScrollToVerticalOffset(0);
 

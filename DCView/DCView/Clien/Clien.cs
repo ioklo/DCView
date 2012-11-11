@@ -20,7 +20,6 @@ namespace DCView
         {
             boards.Add(new ClienBoard(this, "park", "모두의 공원"));
             boards.Add(new ClienBoard(this, "news", "새로운 소식"));
-            boards.Add(new ClienBoard(this, "use", "사용기 게시판"));
         }
 
         string ISite.ID
@@ -31,6 +30,11 @@ namespace DCView
         string ISite.Name
         {
             get { return "클리앙"; }
+        }
+
+        bool ISite.CanLogin
+        {
+            get { return false; }
         }
 
         System.Collections.Generic.IEnumerable<IBoard> ISite.Boards

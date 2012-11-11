@@ -8,7 +8,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
-    xmlns:iso="clr-namespace:System.IO.IsolatedStorage;assembly=System.Windows"
+    xmlns:my="clr-namespace:DCView"
+    xmlns:cs="clr-namespace:CS.Windows.Controls;assembly=CS.Windows.Controls"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -41,15 +42,18 @@
                 <ListBox x:Name="Favorites">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Tap="Favorites_Tap" Tag="{Binding}" Text="{Binding DisplayName}" Style="{StaticResource PhoneTextLargeStyle}" Margin="12" 
-                                       HorizontalAlignment="Stretch"
-                                       toolkit:TiltEffect.IsTiltEnabled="True">
-                                <toolkit:ContextMenuService.ContextMenu>
-                                    <toolkit:ContextMenu>
-                                        <toolkit:MenuItem Header="제거" Tag="{Binding}" Click="RemoveFavorite"/>
-                                    </toolkit:ContextMenu>
-                                </toolkit:ContextMenuService.ContextMenu>
-                            </TextBlock>
+                            <StackPanel Margin="0, 3, 0, 3">
+                                <TextBlock Tap="Favorites_Tap" Tag="{Binding}" Text="{Binding DisplayName}" Style="{StaticResource PhoneTextLargeStyle}" 
+                                           HorizontalAlignment="Stretch"
+                                           toolkit:TiltEffect.IsTiltEnabled="True">
+                                    <toolkit:ContextMenuService.ContextMenu>
+                                        <toolkit:ContextMenu>
+                                            <toolkit:MenuItem Header="제거" Tag="{Binding}" Click="RemoveFavorite"/>
+                                        </toolkit:ContextMenu>
+                                    </toolkit:ContextMenuService.ContextMenu>
+                                </TextBlock>
+                                <TextBlock Tag="{Binding}" Text="{Binding SiteID}" Style="{StaticResource PhoneTextSmallStyle}" />
+                            </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -57,19 +61,37 @@
 
             <!--Panorama 항목 2-->
             <controls:PanoramaItem x:Name="PanoramaAll">
-                <controls:PanoramaItem.Header>
-                    <TextBlock>전체</TextBlock>                    
-                </controls:PanoramaItem.Header>
+                <!--controls:PanoramaItem.Header>
+                    <TextBlock>전체</TextBlock>
+                </controls:PanoramaItem.Header-->
                 
-                <Grid>
+                <Grid>                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     
-                    <TextBox x:Name="SearchBox" Grid.Row="0" TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
+                    <!--<Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>-->
                     
-                    <ListBox x:Name="SearchResult" Grid.Row="1">
+                    <StackPanel Grid.Row="0">
+                        <toolkit:ListPicker x:Name="SearchSite"
+                            Grid.Row="0" Grid.Column="0" SelectionChanged="SearchSite_SelectionChanged">
+                            <toolkit:ListPicker.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </toolkit:ListPicker.ItemTemplate>
+                        </toolkit:ListPicker>
+
+                        <cs:WatermarkTextBox x:Name="SearchBox" 
+                                    Grid.Row="0" Grid.Column="1" WatermarkText="검색어를 입력하세요"
+                                    TextChanged="SearchBox_TextChanged" KeyUp="SearchBox_KeyUp" />
+                    </StackPanel>
+
+                    <ListBox x:Name="SearchResult" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="12,12" >
@@ -98,8 +120,9 @@
                         <TextBlock x:Name="RefreshStatus" HorizontalAlignment="Center" Style="{StaticResource PhoneTextNormalStyle}"></TextBlock>
                         <ProgressBar x:Name="RefreshProgress" Minimum="0" Maximum="100"></ProgressBar>
                         
-                    </StackPanel>                    
+                    </StackPanel>
                     
+
                 </Grid>                
             </controls:PanoramaItem>
 
@@ -117,7 +140,7 @@
 
                     <RichTextBox Grid.Row="1" VerticalAlignment="Top" Margin="0, 0, 0, 20" >
                         <RichTextBox.Blocks>
-                            <Paragraph>DCView 1.3.9, Copyright © &lt;IOKLO 2012
+                            <Paragraph>DCView 1.4.0, Copyright © &lt;IOKLO 2012
                                 <LineBreak />
                                 <Hyperlink Click="Hyperlink_Click">http://dcview.codeplex.com/</Hyperlink>
                             </Paragraph>

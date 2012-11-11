@@ -65,6 +65,8 @@ namespace DCView
             get { return "디시인사이드"; }
         }
 
+        bool ISite.CanLogin { get { return true; } }
+
         IEnumerable<IBoard> ISite.Boards
         {
             get { return boards; }

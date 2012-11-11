@@ -72,6 +72,9 @@ namespace DCView
         public ISite Site { get { return site; } }
         public string Name { get { return name; } }
         public string ID { get { return id; } }
+        public string DisplayTitle { get { return name + " 갤러리"; } }
+        public bool CanWriteArticle { get { return true; } }
+        public bool CanSearch { get { return true; } }
 
         // 인터페이스 
         public Uri Uri

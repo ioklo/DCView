@@ -136,9 +136,12 @@ namespace DCView
 
             IBoard board = App.Current.SiteManager.GetBoard(siteID, boardID, boardName);
 
+            if (!board.Site.CanLogin)
+                LoginStatus.Visibility = Visibility.Collapsed;
+
             viewArticleListPivotItem = new ViewArticleListPivotItem(this, board);
             
-            GalleryTitle.Text = boardName + " 갤러리"; // 왼쪽 상단 갤러리 이름 적기
+            GalleryTitle.Text = board.DisplayTitle; // 왼쪽 상단 갤러리 이름 적기
             MainPivot.Items.Clear();
             MainPivot.Items.Add(viewArticleListPivotItem);
 
@@ -231,7 +234,8 @@ namespace DCView
 
         public void ShowLoginDialog()
         {
-            MainPivot.IsEnabled = false;
+            // TODO: WatermarkTextBox의 IsEnabled가 false가 되면 익셉션 발생
+            // MainPivot.IsEnabled = false;
             ApplicationBar.IsMenuEnabled = false;
 
             LoginPanel.Visibility = Visibility.Visible;
@@ -239,7 +243,8 @@ namespace DCView
 
         public void HideLoginDialog()
         {
-            MainPivot.IsEnabled = true;
+            // TODO: WatermarkTextBox의 IsEnabled가 false가 되면 익셉션 발생
+            // MainPivot.IsEnabled = true;
             ApplicationBar.IsMenuEnabled = true;
 
             LoginPanel.Visibility = Visibility.Collapsed;
