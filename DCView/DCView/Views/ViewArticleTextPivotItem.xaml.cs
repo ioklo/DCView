@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using System.IO.IsolatedStorage;
 using System.Windows.Media.Imaging;
 using DCView.Util;
-using MyApps.Common;
+using DCView.Lib;
 using System.IO;
 using ImageTools.Controls;
 using ImageTools;

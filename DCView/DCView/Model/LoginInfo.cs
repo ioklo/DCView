@@ -10,7 +10,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.IO.IsolatedStorage;
-using MyApps.Common;
+using DCView.Lib;
 using System.Text;
 using DCView.Util;
 using System.Threading.Tasks;

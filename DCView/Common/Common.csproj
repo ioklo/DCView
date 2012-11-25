@@ -100,16 +100,8 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HtmlParser\HtmlParser.cs" />
-    <Compile Include="HtmlParser\IHtmlEntity.cs" />
     <Compile Include="NegateBoolConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringEngine.cs" />
-    <Compile Include="HtmlParser\StringHtmlEntityConverter.cs" />
-    <Compile Include="ThicknessWrapper.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="ViewModelBase.cs" />
-    <Compile Include="WebClientEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\folder.png" />

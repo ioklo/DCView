@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B2568A8B-E9A8-46AE-BBB3-F290F3F49625}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SandBox</RootNamespace>
+    <AssemblyName>SandBox</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\DCView\Board\Clien\Clien.cs">
+      <Link>Board\Clien\Clien.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Board\Clien\ClienArticle.cs">
+      <Link>Board\Clien\ClienArticle.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Board\Clien\ClienBoard.cs">
+      <Link>Board\Clien\ClienBoard.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Board\Clien\ClienComment.cs">
+      <Link>Board\Clien\ClienComment.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Board\DCInside\DCInsideSite.cs">
+      <Link>Board\DCInside\DCInsideSite.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Board\DCInside\DCInsideArticle.cs">
+      <Link>Board\DCInside\DCInsideArticle.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Board\DCInside\DCInsideAuth.cs">
+      <Link>Board\DCInside\DCInsideAuth.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Board\DCInside\DCInsideBoard.cs">
+      <Link>Board\DCInside\DCInsideBoard.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Board\DCInside\DCInsideBoardSearch.cs">
+      <Link>Board\DCInside\DCInsideBoardSearch.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Board\DCInside\DCInsideComment.cs">
+      <Link>Board\DCInside\DCInsideComment.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Interface\IArticle.cs">
+      <Link>Interface\IArticle.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Interface\ILister.cs">
+      <Link>Interface\ILister.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Interface\INotifyActivated.cs">
+      <Link>Interface\INotifyActivated.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Interface\IBoard.cs">
+      <Link>Interface\IBoard.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Interface\ISite.cs">
+      <Link>Interface\ISite.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Interface\IComment.cs">
+      <Link>Interface\IComment.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Lib\HtmlParser\HtmlParser.cs">
+      <Link>Lib\HtmlParser\HtmlParser.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Lib\HtmlParser\IHtmlEntity.cs">
+      <Link>Lib\HtmlParser\IHtmlEntity.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Lib\HtmlParser\StringHtmlEntityConverter.cs">
+      <Link>Lib\HtmlParser\StringHtmlEntityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Lib\TaskUtil.cs">
+      <Link>Lib\TaskUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Model\Favorites.cs">
+      <Link>Model\Favorites.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Model\Picture.cs">
+      <Link>Model\Picture.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Model\SiteManager.cs">
+      <Link>Model\SiteManager.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Lib\WebClient\DCViewWebClient.cs">
+      <Link>Lib\WebClient\DCViewWebClient.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\DCView\Lib\StringEngine.cs">
+      <Link>Lib\StringEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\DCView\Lib\WebClient\WebClientEx.cs">
+      <Link>Lib\WebClient\WebClientEx.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Adapters\HttpUtility.cs" />
+    <Compile Include="Adapters\StorageUtil.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -23,8 +23,8 @@ using Microsoft.Phone.Shell;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Tasks;
 using System.Windows.Media.Imaging;
-using MyApps.Common;
-using MyApps.Common.HtmlParser;
+using DCView.Lib;
+using DCView.Lib.HtmlParser;
 using DCView.Util;
 
 namespace DCView
