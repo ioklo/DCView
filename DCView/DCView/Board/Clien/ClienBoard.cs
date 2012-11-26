@@ -51,6 +51,15 @@ namespace DCView
 
         public bool CanSearch { get { return false; } }
 
+        public IEnumerable<IBoardOption> BoardOptions
+        {
+            get
+            {
+                return null;
+
+            }
+        }
+
         ILister<IArticle> IBoard.GetArticleLister(int page)
         {
             return new ArticleLister(this, id, page);

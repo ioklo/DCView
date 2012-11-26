@@ -19,19 +19,21 @@ namespace DCView
     {
         DCInsideBoard board;
         int page;
+        bool viewRecommend;
         int lastArticleID = int.MaxValue;
 
-        public DCInsideLister(DCInsideBoard board, int page)
+        public DCInsideLister(DCInsideBoard board, int page, bool viewRecommend)
         {
             this.board = board;
             this.page = page;
+            this.viewRecommend = viewRecommend;
         }
 
         public bool Next(CancellationToken ct, out IEnumerable<IArticle> result)
         {
             result = null;
             IEnumerable<DCInsideArticle> articles;
-            if (!board.GetArticleList(page, ct, out articles))
+            if (!board.GetArticleList(page, viewRecommend, ct, out articles))
                 throw new Exception();
 
             // 성공했으면 다음에 읽을 page를 하나 올려준다
@@ -54,7 +56,6 @@ namespace DCView
         }        
     }
 
-
     public class DCInsideBoard : IBoard
     {
         // 내부 변수
@@ -75,6 +76,40 @@ namespace DCView
         public string DisplayTitle { get { return name + " 갤러리"; } }
         public bool CanWriteArticle { get { return true; } }
         public bool CanSearch { get { return true; } }
+        public bool ViewRecommend { get; set; }
+
+        // 개념글
+        public class ViewRecommendOption : IBoardOption
+        {
+            DCInsideBoard board;
+
+            public ViewRecommendOption(DCInsideBoard board)
+            {
+                this.board = board;
+            }
+
+            public string Display { get { return "개념글 보기"; } }
+
+            public bool Toggle
+            {
+                get
+                {
+                    return board.ViewRecommend;
+                }
+                set
+                {
+                    board.ViewRecommend = value;
+                }
+            }
+        }
+
+        public IEnumerable<IBoardOption> BoardOptions
+        {
+            get
+            {
+                yield return new ViewRecommendOption(this);
+            }
+        }
 
         // 인터페이스 
         public Uri Uri
@@ -87,7 +122,7 @@ namespace DCView
 
         public ILister<IArticle> GetArticleLister(int page)
         {
-            return new DCInsideLister(this, page);
+            return new DCInsideLister(this, page, ViewRecommend);
         }
 
         public ILister<IArticle> GetSearchLister(string text, SearchType type)
@@ -120,16 +155,28 @@ namespace DCView
             return new Uri(string.Format("http://gall.dcinside.com/list.php?id={0}&no={1}", id, article.ID), UriKind.Absolute);
         }
 
-        public bool GetArticleList(int page, CancellationToken ct, out IEnumerable<DCInsideArticle> articles)
+        public bool GetArticleList(int page, bool bRecommend, CancellationToken ct, out IEnumerable<DCInsideArticle> articles)
         {
             // 현재 페이지에 대해서 
             DCViewWebClient webClient = new DCViewWebClient();
 
             // 접속할 사이트
-            string url = string.Format("http://m.dcinside.com/list.php?id={0}&page={1}&nocache={2}", 
-                id, 
-                page + 1, 
+            string url;
+
+            if (bRecommend)
+            {
+                url = string.Format("http://m.dcinside.com/list.php?id={0}&recommend=1&page={1}&nocache={2}",
+                id,
+                page + 1,
                 DateTime.Now.Ticks);
+            }
+            else
+            {
+                url = string.Format("http://m.dcinside.com/list.php?id={0}&page={1}&nocache={2}",
+                id,
+                page + 1,
+                DateTime.Now.Ticks);
+            }
 
             // 페이지를 받고
             string result = webClient.DownloadStringAsyncTask(new Uri(url, UriKind.Absolute), ct).GetResult();
@@ -250,7 +297,7 @@ namespace DCView
         }
 
         private static Regex getNumber = new Regex("no=(\\d+)[^>]*>");
-        private static Regex getArticleData = new Regex("<span class=\"list_right\"><span class=\"((list_pic_n)|(list_pic_y))\"></span>([^>]*)<span class=\"list_pic_re\">(\\[(\\d+)\\])?</span><br /><span class=\"list_pic_galler\">([^<]*)(<img[^>]*>)?<span>([^>]*)</span></span></span></a></li>");
+        private static Regex getArticleData = new Regex(@"<span class=\""list_right\""><span class=\""((list_pic_n)|(list_pic_y1?))\""></span>(.*?)<span class=\""list_pic_re\"">(\[(\d+)\])?</span><br /><span class=\""list_pic_galler\"">(.*?)(<img[^>]*>)?<span>(.*?)</span></span></span></a></li>");
         private List<DCInsideArticle> GetArticleListFromString(string input)
         {
             List<DCInsideArticle> result = new List<DCInsideArticle>();
@@ -307,13 +354,14 @@ namespace DCView
             while (se.Next(imageRegex, out match))
             {
                 string url = match.Groups[1].Value;
+                string browseurl = url;
 
                 int fIdx = url.IndexOf("&f_no=");
                 if (fIdx != -1)
                     url = url.Substring(0, fIdx);
 
                 pictures.Add(
-                    new Picture(url, "http://gall.dcinside.com"));
+                    new Picture(url, browseurl, "http://gall.dcinside.com"));
             }
 
             // div를 개수를 세서 안에 있는 div 

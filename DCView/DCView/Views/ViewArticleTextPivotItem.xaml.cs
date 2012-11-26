@@ -84,6 +84,11 @@ namespace DCView
             webViewText.Click += webViewText_Click;
             textAppBar.MenuItems.Add(webViewText);
 
+            var wifiSetting = new ApplicationBarMenuItem();
+            wifiSetting.Text = "와이파이 설정";
+            wifiSetting.Click += wifiSetting_Click;
+            textAppBar.MenuItems.Add(wifiSetting);
+
             // 리플 달기 상태에서의 앱바
             // i 완료
 
@@ -98,6 +103,13 @@ namespace DCView
             };
             submitReplyIconButton.Click += submitReplyIconButton_Click;
             replyAppBar.Buttons.Add(submitReplyIconButton);
+        }
+
+        private void wifiSetting_Click(object sender, EventArgs e)
+        {
+            ConnectionSettingsTask task = new ConnectionSettingsTask();
+            task.ConnectionSettingsType = ConnectionSettingsType.WiFi;
+            task.Show();
         }
 
         private WatermarkTextBox CreateReplyTextBox()
@@ -304,7 +316,7 @@ namespace DCView
             if (pic == null) return;
  	        
             WebBrowserTask task = new WebBrowserTask();
-            task.Uri = new Uri(pic.Uri, UriKind.Absolute);
+            task.Uri = new Uri(pic.BrowserUri, UriKind.Absolute);
             task.Show();
         }
         
