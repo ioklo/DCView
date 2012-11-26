@@ -301,14 +301,19 @@ namespace DCView
 
             StringEngine se = new StringEngine(input);
 
-            Regex imageRegex = new Regex("<img\\s+id=dc_image_elm[^>]*src='(http://dcimg[^']*)'", RegexOptions.IgnoreCase);
+            Regex imageRegex = new Regex("<img\\s+id=dc_image_elm[^>]*src='(http://dcimg.*?)'", RegexOptions.IgnoreCase);
             Match match;
 
             while (se.Next(imageRegex, out match))
             {
+                string url = match.Groups[1].Value;
+
+                int fIdx = url.IndexOf("&f_no=");
+                if (fIdx != -1)
+                    url = url.Substring(0, fIdx);
+
                 pictures.Add(
-                    new Picture(
-                        new Uri(match.Groups[1].Value, UriKind.Absolute), "http://gall.dcinside.com"));
+                    new Picture(url, "http://gall.dcinside.com"));
             }
 
             // div를 개수를 세서 안에 있는 div 

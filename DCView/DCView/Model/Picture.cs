@@ -7,11 +7,11 @@ namespace DCView
 {
     public class Picture
     {
-        Uri uri;
+        string uri;
 
-        public Uri Uri{ get { return uri; } }
+        public string Uri{ get { return uri; } }
 
-        public Picture(Uri uri, string referer)
+        public Picture(string uri, string referer)
         {
             this.uri = uri;
             Referer = referer;

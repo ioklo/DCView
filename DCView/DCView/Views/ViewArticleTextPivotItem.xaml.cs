@@ -234,10 +234,12 @@ namespace DCView
         {
             try
             {
-                HttpWebRequest request = WebRequest.CreateHttp(pic.Uri);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(pic.Uri);
                 request.UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
+                request.Method = "GET";
                 request.Headers["Referer"] = pic.Referer;
                 request.CookieContainer = WebClientEx.CookieContainer;
+                
                 HttpWebResponse response = (HttpWebResponse)await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null);
 
                 MemoryStream stream = new MemoryStream((int)response.ContentLength);
@@ -302,7 +304,7 @@ namespace DCView
             if (pic == null) return;
  	        
             WebBrowserTask task = new WebBrowserTask();
-            task.Uri = pic.Uri;
+            task.Uri = new Uri(pic.Uri, UriKind.Absolute);
             task.Show();
         }
         

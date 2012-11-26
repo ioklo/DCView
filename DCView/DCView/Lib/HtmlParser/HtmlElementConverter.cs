@@ -78,7 +78,7 @@ namespace DCView.Util
                         string url;
                         if (tag.Attrs.TryGetValue("src", out url))                        
                         {
-                            var pic = new Picture(new Uri(url, UriKind.Absolute), "");
+                            var pic = new Picture(url, "");
                             var grid = new Grid();
                             
                             yield return Tuple.Create((UIElement)grid, pic);

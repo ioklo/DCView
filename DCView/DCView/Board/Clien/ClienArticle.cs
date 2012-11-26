@@ -98,8 +98,8 @@ namespace DCView
 
             if (se.Next(new Regex("<div class=\"attachedImage\"><img.*?src='(.*?)'"), out match))
             {
-                var uri = new Uri(string.Format("http://clien.career.co.kr/cs2/bbs/" + match.Groups[1].Value), UriKind.Absolute);
-                Picture pic = new Picture(uri, Uri.ToString());
+                //var uri = new Uri(string.Format("http://clien.career.co.kr/cs2/bbs/" + match.Groups[1].Value), UriKind.Absolute);
+                Picture pic = new Picture(string.Format("http://clien.career.co.kr/cs2/bbs/{0}", match.Groups[1].Value), Uri.ToString());
                 
                 pictures.Add(pic);
                 HasImage = true;

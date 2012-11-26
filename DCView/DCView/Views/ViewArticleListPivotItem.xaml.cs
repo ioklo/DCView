@@ -78,7 +78,32 @@ namespace DCView
             var webViewList = new ApplicationBarMenuItem();
             webViewList.Text = "웹브라우저로 보기";
             webViewList.Click += webViewList_Click;
-            appBar.MenuItems.Add(webViewList);            
+            appBar.MenuItems.Add(webViewList);
+
+            var mainView = new ApplicationBarMenuItem();
+            mainView.Text = "처음 화면으로 가기";
+            mainView.Click += mainView_Click;
+            appBar.MenuItems.Add(mainView);
+
+            var wifiSetting = new ApplicationBarMenuItem();
+            wifiSetting.Text = "와이파이 설정";
+            wifiSetting.Click += wifiSetting_Click;
+            appBar.MenuItems.Add(wifiSetting);
+
+
+        }
+
+        private void wifiSetting_Click(object sender, EventArgs e)
+        {
+            ConnectionSettingsTask task = new ConnectionSettingsTask();
+            task.ConnectionSettingsType = ConnectionSettingsType.WiFi;
+            task.Show();
+        }
+
+        private void mainView_Click(object sender, EventArgs e)
+        {
+            // BackEntry를 모두 초기화 시키기
+            viewArticlePage.NavigationService.Navigate(new Uri("/Views/MainPanorama.xaml", UriKind.Relative));            
         }
 
         private void InitializeNextButton()

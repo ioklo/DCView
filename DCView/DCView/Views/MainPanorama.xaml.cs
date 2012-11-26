@@ -300,7 +300,50 @@ namespace DCView
 
             SearchResult.ItemsSource = siteItem.Site.Boards;
             SearchBox.Text = "";
-        }       
+        }
+
+        // 시작 메뉴에 추가
+        private void PinStartPage_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            var entry = item.Tag as Favorites.Entry;
+
+            PinToStart(entry.SiteID, entry.BoardID, entry.DisplayName);
+        }
+
+        private void PinStartPageGallery_Click(object sender, RoutedEventArgs e)
+        {
+            IBoard board = ((FrameworkElement)sender).Tag as IBoard;
+            if (board == null) return;
+
+            PinToStart(board.Site.ID, board.ID, board.Name);
+        }
+
+        private void PinToStart(string siteID, string boardID, string displayName)
+        {
+            StandardTileData data = new StandardTileData();
+            data.Title = displayName;
+            data.BackgroundImage = new Uri("/Background.png", UriKind.Relative);
+            data.BackContent = string.Empty;
+            data.BackBackgroundImage = new Uri("", UriKind.Relative);
+            data.BackTitle = string.Empty;
+
+            Uri uri = new Uri(string.Format("/Views/ViewArticle.xaml?siteID={0}&boardID={1}&boardName={2}", siteID, boardID, displayName), UriKind.Relative);
+
+            try
+            {
+                if (!ShellTile.ActiveTiles.Any(st => st.NavigationUri == uri))
+                    ShellTile.Create(uri, data);
+                else
+                {
+                    MessageBox.Show("이미 시작 화면에 고정되어 있습니다");
+                }
+            }
+            catch
+            {
+            }
+            
+        }
 
     }
 }
