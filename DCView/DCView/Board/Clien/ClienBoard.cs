@@ -55,8 +55,7 @@ namespace DCView
         {
             get
             {
-                return null;
-
+                yield break;
             }
         }
 
