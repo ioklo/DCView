@@ -13,6 +13,7 @@ namespace DCView
         // 기본 정보
         public string ID { get; set; }
         public string Name { get; set; }
+        public MemberStatus MemberStatus { get; set; }
         public string Title { get; set; }
         public DateTime Date { get; set; }
 
@@ -48,7 +49,6 @@ namespace DCView
             return board.WriteComment(this, text, ct);
         }
 
-        public MemberStatus MemberStatus { get { return MemberStatus.Fix; } }
 
         class CommentLister : ILister<IComment>
         {

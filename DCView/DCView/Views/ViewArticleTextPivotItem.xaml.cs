@@ -342,7 +342,7 @@ namespace DCView
 
             List<Tuple<Grid, Picture>> imgContainers = new List<Tuple<Grid, Picture>>();
 
-            
+
             Button loadImgBtn = CreateLoadImageButton(imgContainers);
             Grid loadImggrid = new Grid();
             loadImggrid.Children.Add(loadImgBtn);
@@ -370,52 +370,27 @@ namespace DCView
                     imgContainers.Add(Tuple.Create((Grid)tuple.Item1, tuple.Item2));
             }
 
-            // 기타 정보
-            /*var status = new TextBlock();
-            status.Text = article.Status;
-            status.HorizontalAlignment = HorizontalAlignment.Stretch;
-            status.TextAlignment = TextAlignment.Right;
-            status.Style = Application.Current.Resources["DCViewTextSmallStyle"] as Style;
-            status.Margin = new Thickness(0, 0, 0, 0);
-            ArticleText.Children.Add(status);*/
-
+            // 글쓴이 정보
+            var status = new ArticleStatusView();
+            status.DataContext = new ArticleViewModel(article);
+            status.HorizontalAlignment = HorizontalAlignment.Right;
+            ArticleText.Children.Add(status);
+            
             // 댓글
             foreach (var cmt in data.Comments)
             {
-                var rect = new System.Windows.Shapes.Rectangle();
-                rect.HorizontalAlignment = HorizontalAlignment.Stretch;
-                rect.VerticalAlignment = VerticalAlignment.Stretch;
-                rect.Fill = (Brush)App.Current.Resources["PhoneAccentBrush"];
-                rect.SetValue(Grid.ColumnProperty, 0);
-
-                var cmtPanel = new StackPanel();
-                cmtPanel.Margin = new Thickness(6, 0, 0, 0);
-                cmtPanel.SetValue(Grid.ColumnProperty, 1);
-
+                var commentView = new CommentView();
+                commentView.DataContext = new CommentViewModel(cmt);
+                
                 foreach (var tuple in HtmlElementConverter.GetUIElementFromString(cmt.Text, tapAction))
                 {
-                    cmtPanel.Children.Add(tuple.Item1);
+                    commentView.Contents.Children.Add(tuple.Item1);
 
                     if (tuple.Item2 != null)
                         imgContainers.Add(Tuple.Create((Grid)tuple.Item1, tuple.Item2));
                 }
 
-                var cmtName = new TextBlock();
-                cmtName.Text = cmt.Name;
-                cmtName.Style = Application.Current.Resources["DCViewTextSmallStyle"] as Style;
-                cmtName.Margin = new Thickness(0, 3, 0, 3);
-                cmtPanel.Children.Add(cmtName);
-                
-
-                var cmtGrid = new Grid();
-                
-                cmtGrid.Margin = new Thickness(cmt.Level * 20, 10, 0, 10);
-                cmtGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(5) });
-                cmtGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-                cmtGrid.Children.Add(rect);
-                cmtGrid.Children.Add(cmtPanel);
-                
-                ArticleText.Children.Add(cmtGrid);
+                ArticleText.Children.Add(commentView);
             }
 
             if (article.CanWriteComment)

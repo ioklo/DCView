@@ -14,8 +14,6 @@
 
     <controls:PivotItem.Resources>
         <my:BoolToColorConverter x:Key="BoolToColorConverter" />
-        <my:DateToElapsedTimeStringConverter x:Key="DateToElapsedTimeStringConverter" />
-        <my:MemberStatusToImageSourceConverter x:Key="MemberStatusToImageSourceConverter" />
     </controls:PivotItem.Resources>
   
 
@@ -55,25 +53,19 @@
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="12, 12" Tap="ArticleListItem_Tap" Tag="{Binding}">
+                    <Grid Margin="12, 12" Tap="ArticleListItem_Tap" Tag="{Binding Article}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Rectangle Grid.Column="0" Width="5" HorizontalAlignment="Stretch" Fill="{Binding Path=HasImage, Converter={StaticResource BoolToColorConverter}}" />
+                        <Rectangle Grid.Column="0" Width="5" HorizontalAlignment="Stretch" Fill="{Binding HasImageBrush}" />
                         <StackPanel Grid.Column="1" Margin="0, 0, 0, 3">
                             <TextBlock Text="{Binding Title}" 
                                        Style="{StaticResource DCViewTextMediumStyle}"
                                        TextWrapping="Wrap" />
-                            
-                            <StackPanel Orientation="Horizontal" Margin="12, 0, 0, 0">
-                                <TextBlock Text="{Binding Name}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
-                                <!-- Image  Stretch="Uniform" Source="{Binding MemberStatus, Converter={StaticResource MemberStatusToImageSourceConverter}}" VerticalAlignment="Stretch"  /-->
-                                <TextBlock Text=" | " Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
-                                <TextBlock Text="{Binding Path=Date, Converter={StaticResource DateToElapsedTimeStringConverter}}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
-                                <TextBlock Text=" | 댓글 " Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
-                                <TextBlock Text="{Binding CommentCount}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
-                            </StackPanel>
+
+                            <my:ArticleStatusView />
+
                         </StackPanel>
                     </Grid>
                 </DataTemplate>

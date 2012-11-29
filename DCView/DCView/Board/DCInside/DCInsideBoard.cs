@@ -297,7 +297,7 @@ namespace DCView
         }
 
         private static Regex getNumber = new Regex("no=(\\d+)[^>]*>");
-        private static Regex getArticleData = new Regex(@"<span class=\""list_right\""><span class=\""((list_pic_n)|(list_pic_y1?))\""></span>(.*?)<span class=\""list_pic_re\"">(\[(\d+)\])?</span><br /><span class=\""list_pic_galler\"" ><span >(.*?)</span>(<img[^>]*>)?<span>(.*?)</span></span></span></a></li>");
+        private static Regex getArticleData = new Regex(@"<span class=\""list_right\""><span class=\""((list_pic_n)|(list_pic_y1?))\""></span>(.*?)<span class=\""list_pic_re\"">(\[(\d+)\])?</span><br /><span class=\""list_pic_galler\"" ><span >(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>");
 
         private List<DCInsideArticle> GetArticleListFromString(string input)
         {
@@ -328,6 +328,14 @@ namespace DCView
                 article.CommentCount = matchArticleData.Groups[5].Length == 0 ? 0 : int.Parse(matchArticleData.Groups[6].Value);
                 article.Name = HttpUtility.HtmlDecode(matchArticleData.Groups[7].Value).Trim();
                 article.Date = DateTime.Parse(matchArticleData.Groups[9].Value);
+
+                if (line2.Contains("gallercon.gif"))
+                    article.MemberStatus = MemberStatus.Fix;
+                else if (line2.Contains("gallercon1.gif"))
+                    article.MemberStatus = MemberStatus.Default;
+                else
+                    article.MemberStatus = MemberStatus.Anonymous;
+
 
                 result.Add(article);
             }
@@ -403,7 +411,7 @@ namespace DCView
             }
 
             Regex commentStart = new Regex("<div\\s+class=\"m_reply_list m_list\">");
-            Regex getCommentName = new Regex("<p>(<a[^>]*>)?\\[([^<]*)(<img[^>]*>)?\\](</a>)?</p>");
+            Regex getCommentName = new Regex(@"<p\s*?>(<a[^>]*>)?\[([^<]*)(<img[^>]*>)?\](</a>)?</p>");
             Regex getCommentText = new Regex("<div class=\"m_list_text\">([^<]*)</div>");
 
             comments.Clear();
@@ -420,6 +428,13 @@ namespace DCView
                 var cmt = new DCInsideComment();
                 cmt.Level = 0;
                 cmt.Name = HttpUtility.HtmlDecode(match.Groups[2].Value.Trim());
+
+                if (line.Contains("gallercon.gif"))
+                    cmt.MemberStatus = MemberStatus.Fix;
+                else if (line.Contains("gallercon1.gif"))
+                    cmt.MemberStatus = MemberStatus.Default;
+                else
+                    cmt.MemberStatus = MemberStatus.Anonymous;
 
                 // 내용
                 if (!se.Next(getCommentText, out match)) continue;

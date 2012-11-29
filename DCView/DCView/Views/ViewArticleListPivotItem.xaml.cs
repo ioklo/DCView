@@ -150,9 +150,11 @@ namespace DCView
                     () => { return articleLister.Next(cts.Token, out newArticles); }, cts.Token);
 
                 // TODO: 리스트의 마지막일때 처리
-                
+
                 foreach (var item in newArticles)
-                    ArticleList.Items.Insert(ArticleList.Items.Count - 1, item);
+                {
+                    ArticleList.Items.Insert(ArticleList.Items.Count - 1, new ArticleViewModel(item));
+                }
             }
             catch
             {
