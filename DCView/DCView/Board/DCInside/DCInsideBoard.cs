@@ -297,7 +297,8 @@ namespace DCView
         }
 
         private static Regex getNumber = new Regex("no=(\\d+)[^>]*>");
-        private static Regex getArticleData = new Regex(@"<span class=\""list_right\""><span class=\""((list_pic_n)|(list_pic_y1?))\""></span>(.*?)<span class=\""list_pic_re\"">(\[(\d+)\])?</span><br /><span class=\""list_pic_galler\"">(.*?)(<img[^>]*>)?<span>(.*?)</span></span></span></a></li>");
+        private static Regex getArticleData = new Regex(@"<span class=\""list_right\""><span class=\""((list_pic_n)|(list_pic_y1?))\""></span>(.*?)<span class=\""list_pic_re\"">(\[(\d+)\])?</span><br /><span class=\""list_pic_galler\"" ><span >(.*?)</span>(<img[^>]*>)?<span>(.*?)</span></span></span></a></li>");
+
         private List<DCInsideArticle> GetArticleListFromString(string input)
         {
             List<DCInsideArticle> result = new List<DCInsideArticle>();

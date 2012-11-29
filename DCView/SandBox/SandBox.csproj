@@ -96,6 +96,9 @@
     <Compile Include="..\DCView\Interface\IComment.cs">
       <Link>Interface\IComment.cs</Link>
     </Compile>
+    <Compile Include="..\DCView\Interface\MemberStatus.cs">
+      <Link>Interface\MemberStatus.cs</Link>
+    </Compile>
     <Compile Include="..\DCView\Lib\HtmlParser\HtmlParser.cs">
       <Link>Lib\HtmlParser\HtmlParser.cs</Link>
     </Compile>

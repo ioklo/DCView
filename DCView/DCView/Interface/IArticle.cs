@@ -10,6 +10,7 @@ namespace DCView
         // 기본 정보
         string ID { get; }
         string Name { get; }
+        MemberStatus MemberStatus { get; }
         string Title { get; }
         DateTime Date { get; }
 
@@ -19,7 +20,6 @@ namespace DCView
         bool HasImage { get; }    
         int CommentCount { get; }
         int ViewCount { get; }
-        string Status { get; }
 
         bool CanWriteComment { get; }
 

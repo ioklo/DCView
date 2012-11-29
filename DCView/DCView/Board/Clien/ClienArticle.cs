@@ -51,22 +51,9 @@ namespace DCView
             get { return 0;  }
         }
 
-        public string Status
+        public MemberStatus MemberStatus
         {
-            get
-            {
-                string dateString = string.Empty;
-                TimeSpan elapsed = DateTime.Now.Subtract(Date);
-
-                if (elapsed < new TimeSpan(1, 0, 0))
-                    dateString = string.Format("{0}분 전", elapsed.Minutes);
-                else if (elapsed < new TimeSpan(1, 0, 0, 0))
-                    dateString = string.Format("{0}시간 전", elapsed.Hours);
-                else
-                    dateString = Date.ToString("MM-dd");
-
-                return string.Format("{0} | {1} | 댓글 {2}", Name, dateString, CommentCount);
-            }
+            get { return MemberStatus.Anonymous; }
         }
 
         public System.Collections.Generic.List<Picture> Pictures

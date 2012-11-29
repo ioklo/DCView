@@ -131,12 +131,15 @@
     <Compile Include="Interface\IBoard.cs" />
     <Compile Include="Board\DCInside\DCInsideComment.cs" />
     <Compile Include="Interface\ISite.cs" />
+    <Compile Include="Interface\MemberStatus.cs" />
     <Compile Include="Lib\HtmlParser\HtmlParser.cs" />
     <Compile Include="Lib\HtmlParser\IHtmlEntity.cs" />
     <Compile Include="Lib\HtmlParser\StringHtmlEntityConverter.cs" />
     <Compile Include="Lib\StringEngine.cs" />
     <Compile Include="Lib\TaskUtil.cs" />
     <Compile Include="Lib\StorageUtil.cs" />
+    <Compile Include="Lib\WPF\DateToElapsedTimeStringConverter.cs" />
+    <Compile Include="Lib\WPF\MemberStatusToImageSourceConverter.cs" />
     <Compile Include="Lib\WPF\ViewModelBase.cs" />
     <Compile Include="Lib\WebClient\WebClientEx.cs" />
     <Compile Include="Lib\WPF\NegateBoolConverter.cs" />
@@ -206,6 +209,8 @@
     <Content Include="Data\idlist.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="g_default.png" />
+    <Content Include="g_fix.png" />
     <Content Include="SplashScreenImage1.jpg" />
   </ItemGroup>
   <ItemGroup>

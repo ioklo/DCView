@@ -371,13 +371,13 @@ namespace DCView
             }
 
             // 기타 정보
-            var status = new TextBlock();
+            /*var status = new TextBlock();
             status.Text = article.Status;
             status.HorizontalAlignment = HorizontalAlignment.Stretch;
             status.TextAlignment = TextAlignment.Right;
             status.Style = Application.Current.Resources["DCViewTextSmallStyle"] as Style;
             status.Margin = new Thickness(0, 0, 0, 0);
-            ArticleText.Children.Add(status);
+            ArticleText.Children.Add(status);*/
 
             // 댓글
             foreach (var cmt in data.Comments)

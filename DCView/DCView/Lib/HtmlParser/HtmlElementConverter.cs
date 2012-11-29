@@ -29,8 +29,7 @@ namespace DCView.Util
                     PlainString plainString = (PlainString)entity;
                     curPlainString.Append(plainString.Content);
                 }
-
-                if (entity is Tag)
+                else if (entity is Tag)
                 {
                     Tag tag = (Tag)entity;
 
@@ -51,8 +50,8 @@ namespace DCView.Util
                             pDepth--;
 
                         if ((tag.Kind == Tag.TagKind.Open && pDepth > 1) ||
-                                (tag.Kind == Tag.TagKind.Close && pDepth == 0) ||
-                                (tag.Kind == Tag.TagKind.OpenAndClose))
+                            (tag.Kind == Tag.TagKind.Close && pDepth == 0) ||
+                            (tag.Kind == Tag.TagKind.OpenAndClose))
                         {
                             foreach (var obj in MakeTextBlocks(curPlainString.ToString(), tapAction))
                                 yield return new Tuple<UIElement, Picture>((UIElement)obj, null);

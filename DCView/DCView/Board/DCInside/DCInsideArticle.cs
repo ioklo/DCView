@@ -38,24 +38,6 @@ namespace DCView
             this.board = board;
         }
 
-        public string Status
-        {
-            get
-            {
-                string dateString = string.Empty;
-                TimeSpan elapsed = DateTime.Now.Subtract(Date);
-
-                if (elapsed < new TimeSpan(1, 0, 0))
-                    dateString = string.Format("{0}분 전", elapsed.Minutes);
-                else if (elapsed < new TimeSpan(1, 0, 0, 0))
-                    dateString = string.Format("{0}시간 전", elapsed.Hours);
-                else
-                    dateString = Date.ToString("MM-dd");
-
-                return string.Format("{0} | {1} | 댓글 {2}", Name, dateString, CommentCount);
-            }
-        }
-
         public bool GetText(CancellationToken ct, out string text)
         {
             return board.GetArticleText(this, ct, out text);
@@ -65,6 +47,8 @@ namespace DCView
         {
             return board.WriteComment(this, text, ct);
         }
+
+        public MemberStatus MemberStatus { get { return MemberStatus.Fix; } }
 
         class CommentLister : ILister<IComment>
         {

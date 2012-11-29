@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
-    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"                    
     xmlns:my="clr-namespace:DCView"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
@@ -13,7 +13,9 @@
     d:DesignHeight="480" d:DesignWidth="480">
 
     <controls:PivotItem.Resources>
-        <my:BoolToColorConverter x:Key="BoolToColorConverter" />        
+        <my:BoolToColorConverter x:Key="BoolToColorConverter" />
+        <my:DateToElapsedTimeStringConverter x:Key="DateToElapsedTimeStringConverter" />
+        <my:MemberStatusToImageSourceConverter x:Key="MemberStatusToImageSourceConverter" />
     </controls:PivotItem.Resources>
   
 
@@ -40,6 +42,7 @@
                 <Button Grid.Column="1" Content="검색" Click="SearchButton_Click"/>
             </Grid>
         </StackPanel>
+        
 
         <ListBox x:Name="ArticleList" Grid.Row="1"
                  ManipulationCompleted="ArticleList_ManipulationCompleted">
@@ -48,6 +51,7 @@
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />                    
                 </Style>
             </ListBox.ItemContainerStyle>
+            
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -59,10 +63,17 @@
                         <Rectangle Grid.Column="0" Width="5" HorizontalAlignment="Stretch" Fill="{Binding Path=HasImage, Converter={StaticResource BoolToColorConverter}}" />
                         <StackPanel Grid.Column="1" Margin="0, 0, 0, 3">
                             <TextBlock Text="{Binding Title}" 
-                                                   Style="{StaticResource DCViewTextMediumStyle}"
-                                                   TextWrapping="Wrap" />
-
-                            <TextBlock Text="{Binding Status}" Style="{StaticResource DCViewTextSmallStyle}" />
+                                       Style="{StaticResource DCViewTextMediumStyle}"
+                                       TextWrapping="Wrap" />
+                            
+                            <StackPanel Orientation="Horizontal" Margin="12, 0, 0, 0">
+                                <TextBlock Text="{Binding Name}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
+                                <!-- Image  Stretch="Uniform" Source="{Binding MemberStatus, Converter={StaticResource MemberStatusToImageSourceConverter}}" VerticalAlignment="Stretch"  /-->
+                                <TextBlock Text=" | " Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
+                                <TextBlock Text="{Binding Path=Date, Converter={StaticResource DateToElapsedTimeStringConverter}}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
+                                <TextBlock Text=" | 댓글 " Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
+                                <TextBlock Text="{Binding CommentCount}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
+                            </StackPanel>
                         </StackPanel>
                     </Grid>
                 </DataTemplate>

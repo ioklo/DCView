@@ -13,7 +13,7 @@ namespace SandBox
         static void Main(string[] args)
         {
             ISite dcinside = new DCInsideSite();
-            IBoard board = dcinside.GetBoard("", "");
+            IBoard board = dcinside.GetBoard("windowsphone", "윈도우폰");
 
             ILister<IArticle> articles = board.GetArticleLister(0);
 
@@ -21,10 +21,12 @@ namespace SandBox
             IEnumerable<IArticle> result;
             if (articles.Next(cts.Token, out result))
             {
-                var article = result.ElementAt(2);
-
-                int a = 0;
-                article.WriteComment("b", cts.Token);
+                foreach (IArticle article in result)
+                {
+                    Console.WriteLine(article.Title);
+                }
+                // var article = result.ElementAt(2);                
+                // article.WriteComment("b", cts.Token);
             }
             
 
