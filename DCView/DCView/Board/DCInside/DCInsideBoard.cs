@@ -211,7 +211,8 @@ namespace DCView
         {
             throw new NotImplementedException();
         }
-        
+
+           
         
         
         private bool GetCodeAndMobileKey(CancellationToken ct, out string code, out string mobileKey)
@@ -226,19 +227,16 @@ namespace DCView
             string response = client.DownloadStringAsyncTask(
                 new Uri("http://m.dcinside.com/write.php?id=windowsphone&mode=write", UriKind.Absolute),
                 ct).GetResult();
-
-            Regex codeRegex = new Regex("<input type=\"hidden\" name=\"code\" value=\"([^\"]*)\"");
-
+            
             StringEngine se = new StringEngine(response);
             Match match;
 
-            if (!se.Next(codeRegex, out match))
+            if (!se.Next(DCRegexManager.WriteCode, out match))
                 return false;
 
             code = match.Groups[1].Value;
 
-            Regex mobileKeyRegex = new Regex("<input type=\"hidden\" name=\"mobile_key\" id=\"mobile_key\" value=\"([^\"]*)\"");
-            if (!se.Next(mobileKeyRegex, out match))
+            if (!se.Next(DCRegexManager.WriteMobileKey, out match))
                 return false;
 
 
@@ -296,9 +294,6 @@ namespace DCView
             return true;
         }
 
-        private static Regex getNumber = new Regex("no=(\\d+)[^>]*>");
-        private static Regex getArticleData = new Regex(@"<span class=\""list_right\""><span class=\""((list_pic_n)|(list_pic_y1?))\""></span>(.*?)<span class=\""list_pic_re\"">(\[(\d+)\])?</span><br /><span class=\""list_pic_galler\"" ><span >(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>");
-
         private List<DCInsideArticle> GetArticleListFromString(string input)
         {
             List<DCInsideArticle> result = new List<DCInsideArticle>();
@@ -315,11 +310,11 @@ namespace DCView
                 DCInsideArticle article = new DCInsideArticle(this);
 
                 // Number
-                Match matchGetNumber = getNumber.Match(line);
+                Match matchGetNumber = DCRegexManager.ListArticleNumber.Match(line);
                 if (!matchGetNumber.Success) break;
                 article.ID = matchGetNumber.Groups[1].Value;
 
-                Match matchArticleData = getArticleData.Match(line2);
+                Match matchArticleData = DCRegexManager.ListArticleData.Match(line2);
                 if (!matchArticleData.Success) continue;
 
                 // HasImage
@@ -356,11 +351,10 @@ namespace DCView
             // <img  id=dc_image_elm0 src='http://dcimg1.dcinside.com/viewimage.php?id=windowsphone&no=29bcc427b78a77a16fb3dab004c86b6fc3a0be4a5f9fd1a8cc77865e83c2029da6f5d553d560d273a5d0802458ed844942b60ffcef4cc95a9e820f3d0eb76388a4ded971bc29b6cc1fd6a780e7e52f627fdf1b9b6a40491c7fa25f4acaa4663f080794f8abd4e01cc6&f_no=7bee837eb38760f73f8081e240847d6ecaa51e16c7795ecc2584471ef43a7f730867c7d42ef66cf9f0827af5263d'width=550  /></a><br/> <br/>        </p>
 
             StringEngine se = new StringEngine(input);
-
-            Regex imageRegex = new Regex("<img\\s+id=dc_image_elm[^>]*src='(http://dcimg.*?)'", RegexOptions.IgnoreCase);
+            
             Match match;
 
-            while (se.Next(imageRegex, out match))
+            while (se.Next(DCRegexManager.TextImage, out match))
             {
                 string url = match.Groups[1].Value;
                 string browseurl = url;
@@ -374,18 +368,15 @@ namespace DCView
             }
 
             // div를 개수를 세서 안에 있는 div 
-            var textRegex = new Regex("<div id=\"memo_img\"[^>]*>");
-
-            if (!se.Next(textRegex, out match))
+            if (!se.Next(DCRegexManager.TextStart, out match))
                 return false;
 
             int start = se.Cursor;
-            int count = 1;
-            var divRegex = new Regex("(<\\s*div[^>]*>)|(<\\s*/\\s*div\\s*>)", RegexOptions.IgnoreCase); // div 또는 /div
+            int count = 1;            
 
             while (count > 0)
             {
-                if (!se.Next(divRegex, out match))
+                if (!se.Next(DCRegexManager.TextDIV, out match))
                     break;
 
                 if (match.Groups[1].Value.Length != 0)
@@ -410,19 +401,15 @@ namespace DCView
                 text = input.Substring(start, match.Index - start).Trim();
             }
 
-            Regex commentStart = new Regex("<div\\s+class=\"m_reply_list m_list\">");
-            Regex getCommentName = new Regex(@"<p\s*?>(<a[^>]*>)?\[([^<]*)(<img[^>]*>)?\](</a>)?</p>");
-            Regex getCommentText = new Regex("<div class=\"m_list_text\">([^<]*)</div>");
-
             comments.Clear();
 
             // 댓글 가져오기
-            while (se.Next(commentStart, out match))
+            while (se.Next(DCRegexManager.CommentStart, out match))
             {
                 string line;
 
                 if (!se.GetNextLine(out line)) continue;
-                match = getCommentName.Match(line);
+                match = DCRegexManager.CommentName.Match(line);
                 if (!match.Success) continue;
 
                 var cmt = new DCInsideComment();
@@ -437,15 +424,14 @@ namespace DCView
                     cmt.MemberStatus = MemberStatus.Anonymous;
 
                 // 내용
-                if (!se.Next(getCommentText, out match)) continue;
+                if (!se.Next(DCRegexManager.CommentText, out match)) continue;
                 cmt.Text = HttpUtility.HtmlDecode(match.Groups[1].Value.Trim());
 
                 comments.Add(cmt);
             }
 
-            // CommentUserID 얻기
-            Regex userRegex = new Regex("<input[^>]*id=\"user_no\"[^>]*value=\"(\\d+)\"/>");
-            if (se.Next(userRegex, out match))
+            // CommentUserID 얻기            
+            if (se.Next(DCRegexManager.TextCommentUserID, out match))
             {
                 commentUserID = match.Groups[1].Value;
             }
@@ -526,9 +512,7 @@ namespace DCView
             Stream responseStream = response.GetResponseStream();
 
             // 여기서 FL_DATA와 OFL_DATA를 뽑아낸다
-            Regex fl_dataRegex = new Regex(@"\('FL_DATA'\).value\s+=\s+'([^']*?)'");
-            Regex ofl_dataRegex = new Regex(@"\('OFL_DATA'\)\.value\s*=\s*'([^']*?)'");
-
+            
             flData = null;
             oflData = null;
             using (var reader = new StreamReader(responseStream))
@@ -538,7 +522,7 @@ namespace DCView
                 {
                     if (flData == null)
                     {
-                        var flDataRegexMatch = fl_dataRegex.Match(line);
+                        var flDataRegexMatch = DCRegexManager.WriteFLData.Match(line);
                         if (flDataRegexMatch.Success)
                             flData = flDataRegexMatch.Groups[1].Value;
                         continue;
@@ -546,7 +530,7 @@ namespace DCView
 
                     if (oflData == null)
                     {
-                        var oflDataRegexMatch = ofl_dataRegex.Match(line);
+                        var oflDataRegexMatch = DCRegexManager.WriteOFLData.Match(line);
                         if (oflDataRegexMatch.Success)
                             oflData = oflDataRegexMatch.Groups[1].Value;
                     }

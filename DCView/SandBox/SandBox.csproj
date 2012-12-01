@@ -117,6 +117,9 @@
     <Compile Include="..\DCView\Model\Picture.cs">
       <Link>Model\Picture.cs</Link>
     </Compile>
+    <Compile Include="..\DCView\Model\RegexManager.cs">
+      <Link>Model\RegexManager.cs</Link>
+    </Compile>
     <Compile Include="..\DCView\Model\SiteManager.cs">
       <Link>Model\SiteManager.cs</Link>
     </Compile>

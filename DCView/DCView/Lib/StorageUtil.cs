@@ -40,13 +40,13 @@ namespace DCView.Lib
        
 
         // appPath의 리소스를 storagePath에 넣습니다.
-        static public bool CopyResourceToStorage(string appPath, string storagePath)
+        static public bool CopyResourceToStorage(string appPath, string storagePath, bool bForce = false)
         {
             StreamResourceInfo info = Application.GetResourceStream(new Uri(appPath, UriKind.Relative));
             if (info == null)
                 return false;
 
-            if (isoStorage.FileExists(storagePath))
+            if (!bForce && isoStorage.FileExists(storagePath))
                 return true;
 
             // storagePath에 디렉토리 자동생성

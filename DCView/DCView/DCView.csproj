@@ -144,6 +144,7 @@
     <Compile Include="Lib\WPF\ThicknessWrapper.cs" />
     <Compile Include="Model\Favorites.cs" />
     <Compile Include="Model\Picture.cs" />
+    <Compile Include="Model\RegexManager.cs" />
     <Compile Include="Model\SiteManager.cs" />
     <Compile Include="Lib\WebClient\DCViewWebClient.cs" />
     <Compile Include="Lib\HtmlParser\HtmlElementConverter.cs" />
@@ -215,6 +216,9 @@
     <Content Include="Data\idlist.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\pattern_dc.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="SplashScreenImage1.jpg" />
   </ItemGroup>
   <ItemGroup>
@@ -247,9 +251,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Util\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

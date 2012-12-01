@@ -1,0 +1,31 @@
+﻿1
+dc.write.code 
+<input type="hidden" name="code" value="([^"]*)"
+dc.write.mobileKey
+<input type="hidden" name="mobile_key" id="mobile_key" value="([^"]*)"
+dc.write.flData
+\('FL_DATA'\).value\s+=\s+'([^']*?)'
+dc.write.oflData
+\('OFL_DATA'\)\.value\s*=\s*'([^']*?)'
+dc.list.articleNumber 
+no=(\d+)[^>]*>
+dc.list.articleData
+<span class="list_right"><span class="((list_pic_n)|(list_pic_y1?))"></span>(.*?)<span class="list_pic_re">(\[(\d+)\])?</span><br /><span class="list_pic_galler" ><span >(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>
+dc.searchlist.articleNumber 
+no=(\d+)[^>]*>
+dc.searchlist.articleData 
+<span class="list_right"><span class="((list_pic_n)|(list_pic_y1?))"></span>(.*?)<span class="list_pic_re">(\[(\d+)\])?</span><br /><span class="list_pic_galler" ><span >(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>
+dc.text.textImage 
+<img\s+id=dc_image_elm[^>]*src='(http://dcimg.*?)'
+dc.text.textStart 
+<div id="memo_img"[^>]*>
+dc.text.textDIV 
+(<\s*div[^>]*>)|(<\s*/\s*div\s*>)
+dc.text.commentUserID 
+<input[^>]*id="user_no"[^>]*value="(\d+)"/>
+dc.comment.start 
+<div\s+class="m_reply_list m_list">
+dc.comment.name
+<p\s*?>(<a[^>]*>)?\[([^<]*)(<img[^>]*>)?\](</a>)?</p>
+dc.comment.text 
+<div class="m_list_text">([^<]*)</div>

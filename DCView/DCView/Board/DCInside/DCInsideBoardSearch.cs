@@ -22,12 +22,7 @@ namespace DCView
         int page;
         int serpos;
         string searchText;
-        SearchType searchType;
-
-        private Regex getNumber = new Regex("no=(\\d+)[^>]*>");
-        private Regex getArticleData = new Regex("<span class=\"list_right\"><span class=\"((list_pic_n)|(list_pic_y))\"></span>(.*?)<span class=\"list_pic_re\">(\\[(\\d+)\\])?</span><br /><span class=\"list_pic_galler\">(.*?)(<img[^>]*>)?<span>([^>]*)</span></span></span></a></li>");
-        
-
+        SearchType searchType;        
 
         public DCInsideBoardSearchLister(DCInsideBoard board, string text, SearchType searchType )
         {
@@ -125,11 +120,11 @@ namespace DCView
                 DCInsideArticle article = new DCInsideArticle(board);
 
                 // Number
-                Match matchGetNumber = getNumber.Match(line);
+                Match matchGetNumber = DCRegexManager.SearchListArticleNumber.Match(line);
                 if (!matchGetNumber.Success) break;
                 article.ID = matchGetNumber.Groups[1].Value;
 
-                Match matchArticleData = getArticleData.Match(line2);
+                Match matchArticleData = DCRegexManager.SearchListArticleData.Match(line2);
                 if (!matchArticleData.Success) continue;
 
                 // HasImage

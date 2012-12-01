@@ -139,6 +139,15 @@
                     <StackPanel Grid.Row="0" Margin="0, 0, 10, 0">
                         <CheckBox x:Name="PassiveLoadImgCheckBox" Content="이미지 수동으로 불러오기" Tap="PassiveLoadImage" />
                         <CheckBox x:Name="FontSizeCheckBox" Content="목록/내용 글씨 크게" Tap="FontSizeCheckBox_Tap"/>
+                        <TextBlock Text="패턴 관리"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Content="초기화" x:Name="PatternResetButton" Grid.Column="0" Click="PatternReset_Click" Margin="0,1,0,-1"/>
+                            <Button Content="업데이트" x:Name="PatternUpdateButton" Grid.Column="1" Click="PatternUpdate_Click"/>
+                        </Grid>
                     </StackPanel>
 
                     <RichTextBox Grid.Row="1" VerticalAlignment="Top" Margin="0, 0, 0, 20" >
