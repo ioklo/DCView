@@ -32,6 +32,6 @@ using System.Resources;
 //
 // 모든 값을 지정하거나 아래와 같이 '*'를 사용하여 수정 버전 및 빌드 번호가 자동으로 
 // 지정되도록 할 수 있습니다.
-[assembly: AssemblyVersion("1.4.2")]
-[assembly: AssemblyFileVersion("1.4.2")]
+[assembly: AssemblyVersion("1.4.4")]
+[assembly: AssemblyFileVersion("1.4.4")]
 [assembly: NeutralResourcesLanguageAttribute("ko-KR")]

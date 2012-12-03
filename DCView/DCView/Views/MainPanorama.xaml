@@ -152,7 +152,7 @@
 
                     <RichTextBox Grid.Row="1" VerticalAlignment="Top" Margin="0, 0, 0, 20" >
                         <RichTextBox.Blocks>
-                            <Paragraph>DCView 1.4.2, Copyright © &lt;IOKLO 2012
+                            <Paragraph>DCView 1.4.4, Copyright © &lt;IOKLO 2012
                                 <LineBreak />
                                 <Hyperlink Click="Hyperlink_Click">http://dcview.codeplex.com/</Hyperlink>
                             </Paragraph>
