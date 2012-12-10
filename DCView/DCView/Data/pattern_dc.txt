@@ -26,6 +26,6 @@ dc.text.commentUserID
 dc.comment.start 
 <div\s+class="m_reply_list m_list">
 dc.comment.name
-<p\s*?>(<a[^>]*>)?\[([^<]*)(<img[^>]*>)?\](</a>)?</p>
+<p\s*?>(<a[^>]*>)?\[([^<]*)(<img[^>]*>)?\](</a>)?
 dc.comment.text 
-<div class="m_list_text">([^<]*)</div>
+<div class="m_list_text">(.*?)</div>
