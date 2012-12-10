@@ -131,7 +131,7 @@ namespace DCView
                     match = Regex.Match(line, @"<a[^>]*?>(.*?)</a>\s*(<span>\[(\d+)\]</span>)?");
                     if (!match.Success) continue;
 
-                    article.Title = HttpUtility.HtmlDecode(match.Groups[1].Value);
+                    article.Title = match.Groups[1].Value;
                     if (match.Groups[3].Success)
                         article.CommentCount = int.Parse(match.Groups[3].Value);
                     else

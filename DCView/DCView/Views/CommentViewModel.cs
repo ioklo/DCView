@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -26,7 +27,7 @@ namespace DCView
 
         public string Name
         {
-            get { return Comment.Name; }
+            get { return HttpUtility.HtmlDecode(Comment.Name); }
         }
 
         public Brush MemberStatusBrush

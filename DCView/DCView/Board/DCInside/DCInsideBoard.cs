@@ -189,7 +189,7 @@ namespace DCView
 
         public bool GetArticleText(DCInsideArticle article, CancellationToken ct, out string text)
         {
-            DCViewWebClient webClient = new DCViewWebClient();            
+            DCViewWebClient webClient = new DCViewWebClient();
             string url = string.Format("http://m.dcinside.com/view.php?id={0}&no={1}&nocache={2}", id, article.ID, DateTime.Now.Ticks);
 
             string result = webClient.DownloadStringAsyncTask(new Uri(url, UriKind.Absolute), ct).GetResult();
@@ -319,9 +319,9 @@ namespace DCView
 
                 // HasImage
                 article.HasImage = matchArticleData.Groups[3].Length != 0;
-                article.Title = HttpUtility.HtmlDecode(matchArticleData.Groups[4].Value);
+                article.Title = matchArticleData.Groups[4].Value;
                 article.CommentCount = matchArticleData.Groups[5].Length == 0 ? 0 : int.Parse(matchArticleData.Groups[6].Value);
-                article.Name = HttpUtility.HtmlDecode(matchArticleData.Groups[7].Value).Trim();
+                article.Name = matchArticleData.Groups[7].Value.Trim();
                 article.Date = DateTime.Parse(matchArticleData.Groups[9].Value);
 
                 if (line2.Contains("gallercon.gif"))
@@ -414,7 +414,7 @@ namespace DCView
 
                 var cmt = new DCInsideComment();
                 cmt.Level = 0;
-                cmt.Name = HttpUtility.HtmlDecode(match.Groups[2].Value.Trim());
+                cmt.Name = match.Groups[2].Value.Trim();
 
                 if (line.Contains("gallercon.gif"))
                     cmt.MemberStatus = MemberStatus.Fix;
@@ -425,7 +425,7 @@ namespace DCView
 
                 // 내용
                 if (!se.Next(DCRegexManager.CommentText, out match)) continue;
-                cmt.Text = HttpUtility.HtmlDecode(match.Groups[1].Value.Trim());
+                cmt.Text = match.Groups[1].Value.Trim();
 
                 comments.Add(cmt);
             }

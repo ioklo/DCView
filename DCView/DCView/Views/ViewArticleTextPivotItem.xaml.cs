@@ -249,7 +249,10 @@ namespace DCView
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(pic.Uri);
                 request.UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
                 request.Method = "GET";
-                request.Headers["Referer"] = pic.Referer;
+
+                // 빈 스트링인 경우 요청이 예외가 난다
+                if (pic.Referer != string.Empty)
+                    request.Headers["Referer"] = pic.Referer;
                 request.CookieContainer = WebClientEx.CookieContainer;
                 
                 HttpWebResponse response = (HttpWebResponse)await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null);
@@ -335,13 +338,12 @@ namespace DCView
             var title = new TextBlock();
             title.TextWrapping = TextWrapping.Wrap;
             title.Style = Application.Current.Resources["DCViewTextMediumStyle"] as Style;
-            title.Text = article.Title;
+            title.Text = HttpUtility.HtmlDecode(article.Title);
             title.FontWeight = FontWeights.Bold;
             title.Margin = new Thickness(0, 12, 0, 12);
             ArticleText.Children.Add(title);
 
             List<Tuple<Grid, Picture>> imgContainers = new List<Tuple<Grid, Picture>>();
-
 
             Button loadImgBtn = CreateLoadImageButton(imgContainers);
             Grid loadImggrid = new Grid();

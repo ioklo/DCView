@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -27,9 +28,9 @@ namespace DCView
             }
         }
 
-        public string Title { get { return Article.Title; } }
+        public string Title { get { return HttpUtility.HtmlDecode(Article.Title); } }
 
-        public string Name { get { return Article.Name; } }
+        public string Name { get { return HttpUtility.HtmlDecode(Article.Name); } }
         public DateTime Date { get { return Article.Date; } }        
 
         public Brush MemberStatusBrush

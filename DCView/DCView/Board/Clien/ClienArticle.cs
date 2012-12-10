@@ -83,10 +83,10 @@ namespace DCView
 
             pictures.Clear();
 
-            if (se.Next(new Regex("<div class=\"attachedImage\"><img.*?src='(.*?)'"), out match))
+            if (se.Next(new Regex("<div class=\"attachedImage\"><img.*?src=(?<quote>'|\")(?<url>.*?)\\k<quote>"), out match))
             {
                 //var uri = new Uri(string.Format("http://clien.career.co.kr/cs2/bbs/" + match.Groups[1].Value), UriKind.Absolute);
-                Picture pic = new Picture(string.Format("http://clien.career.co.kr/cs2/bbs/{0}", match.Groups[1].Value), Uri.ToString());
+                Picture pic = new Picture(string.Format("http://clien.career.co.kr/cs2/bbs/{0}", match.Groups["url"].Value), Uri.ToString());
                 
                 pictures.Add(pic);
                 HasImage = true;
@@ -126,7 +126,7 @@ namespace DCView
             }
             else
             {
-                text = HttpUtility.HtmlDecode(result.Substring(start, match.Index - start).Trim());
+                text = result.Substring(start, match.Index - start).Trim();
             }
 
             comments.Clear();
@@ -175,7 +175,7 @@ namespace DCView
                     sb.Append(line);
                 }
 
-                comment.Text = HttpUtility.HtmlDecode(sb.ToString().Trim());
+                comment.Text = sb.ToString().Trim();
                 comments.Add(comment);
             }
 
