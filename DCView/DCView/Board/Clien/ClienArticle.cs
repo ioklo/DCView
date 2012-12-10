@@ -84,8 +84,7 @@ namespace DCView
             pictures.Clear();
 
             if (se.Next(new Regex("<div class=\"attachedImage\"><img.*?src=(?<quote>'|\")(?<url>.*?)\\k<quote>"), out match))
-            {
-                //var uri = new Uri(string.Format("http://clien.career.co.kr/cs2/bbs/" + match.Groups[1].Value), UriKind.Absolute);
+            {   
                 Picture pic = new Picture(string.Format("http://clien.career.co.kr/cs2/bbs/{0}", match.Groups["url"].Value), Uri.ToString());
                 
                 pictures.Add(pic);

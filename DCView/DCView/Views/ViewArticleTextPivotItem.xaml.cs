@@ -138,10 +138,8 @@ namespace DCView
             return textBox;
         }
 
-        private Button CreateLoadImageButton(List<Tuple<Grid, Picture>> imgContainers)
-        {
-            var grid = new Grid();            
-
+        private FrameworkElement CreateLoadImageButton(List<Tuple<Grid, Picture>> imgContainers)
+        {            
             var button = new Button();
             button.Content = "그림 불러오기";
             button.FontSize = 14;
@@ -153,7 +151,11 @@ namespace DCView
                 button.Visibility = Visibility.Collapsed;
                 LoadImagesAsync(imgContainers);
             };
-            return button;            
+
+            var grid = new Grid();
+            grid.Children.Add(grid);
+
+            return grid;
         }
 
 
@@ -333,7 +335,8 @@ namespace DCView
 
             // 일단 기존의 ArticleText를 없앤다
             ArticleText.Children.Clear();
-
+            // var panel = new ListBox();
+            
             // 제목
             var title = new TextBlock();
             title.TextWrapping = TextWrapping.Wrap;
@@ -345,10 +348,8 @@ namespace DCView
 
             List<Tuple<Grid, Picture>> imgContainers = new List<Tuple<Grid, Picture>>();
 
-            Button loadImgBtn = CreateLoadImageButton(imgContainers);
-            Grid loadImggrid = new Grid();
-            loadImggrid.Children.Add(loadImgBtn);
-            ArticleText.Children.Add(loadImggrid);
+            var loadImageButton = CreateLoadImageButton(imgContainers);
+            ArticleText.Children.Add(loadImageButton);
 
             // 그림 들어갈 자리에 Grid 하나씩 넣기..
             foreach (Picture p in article.Pictures)
@@ -408,7 +409,7 @@ namespace DCView
 
             if (!bPassiveLoading)
             {
-                loadImgBtn.Visibility = Visibility.Collapsed;
+                loadImageButton.Visibility = Visibility.Collapsed;
                 LoadImagesAsync(imgContainers);
             }
         }
