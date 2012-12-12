@@ -15,7 +15,7 @@ namespace DCView.Util
     {
         private static StringHtmlEntityConverter stringHtmlConverter = new StringHtmlEntityConverter();
 
-        static public IEnumerable<Tuple<UIElement, Picture>> GetUIElementFromString(string input, Action<Uri> tapAction)
+        static public IEnumerable<FrameworkElement> GetUIElementFromString(string input, Action<Uri> tapAction)
         {
             StringBuilder curPlainString = new StringBuilder();
 
@@ -54,7 +54,7 @@ namespace DCView.Util
                             (tag.Kind == Tag.TagKind.OpenAndClose))
                         {
                             foreach (var obj in MakeTextBlocks(curPlainString.ToString(), tapAction))
-                                yield return new Tuple<UIElement, Picture>((UIElement)obj, null);
+                                yield return obj;
                             curPlainString.Clear();
                             continue;
                         }
@@ -65,7 +65,9 @@ namespace DCView.Util
                         if (curPlainString.Length != 0)
                         {
                             foreach (var obj in MakeTextBlocks(curPlainString.ToString(), tapAction))
-                                yield return new Tuple<UIElement, Picture>((UIElement)obj, null);
+                            {
+                                yield return obj;
+                            }
                             curPlainString.Clear();
                         }
                         continue;
@@ -79,8 +81,9 @@ namespace DCView.Util
                         {
                             var pic = new Picture(url, "");
                             var grid = new Grid();
-                            
-                            yield return Tuple.Create((UIElement)grid, pic);
+                            grid.Tag = pic;
+
+                            yield return grid;
                         }                        
                     }
                 }
@@ -88,7 +91,7 @@ namespace DCView.Util
 
             if (curPlainString.Length != 0)
                 foreach (var obj in MakeTextBlocks(curPlainString.ToString(), tapAction))
-                    yield return new Tuple<UIElement, Picture>((UIElement)obj, null);
+                    yield return obj;
 
             // 1. <br> <br />은 \n으로 바꿈
             // 2. <p> </p>는 하나의 paragraph로 처리
@@ -126,7 +129,7 @@ namespace DCView.Util
                         LineHeight = 1.2,
                         Style = Application.Current.Resources["DCViewTextNormalStyle"] as Style,
                         Margin = new Thickness(0, 3, 0, 3),
-                        Foreground = new SolidColorBrush(Colors.Blue),
+                        // Foreground = new SolidColorBrush(Colors.Blue),
                     };
 
                     var underline = new Underline();

@@ -22,7 +22,7 @@ namespace DCView
             get
             {
                 if (Article.HasImage)
-                    return (Brush)Application.Current.Resources["PhoneAccentBrush"];
+                    return (Brush)Application.Current.Resources["DCViewAccentBrush"];
                 else
                     return (Brush)Application.Current.Resources["PhoneDisabledBrush"];
             }

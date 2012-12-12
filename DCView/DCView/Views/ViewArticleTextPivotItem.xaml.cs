@@ -22,6 +22,7 @@ using System.IO;
 using ImageTools.Controls;
 using ImageTools;
 using CS.Windows.Controls;
+using Microsoft.Phone;
 
 namespace DCView
 {
@@ -112,7 +113,7 @@ namespace DCView
             task.Show();
         }
 
-        private WatermarkTextBox CreateReplyTextBox()
+        private WatermarkTextBox CreateReplyTextBox(ListBox panel)
         {
             var inputScope = new InputScope();
             inputScope.Names.Add(new InputScopeName() { NameValue = InputScopeNameValue.Chat });
@@ -124,21 +125,25 @@ namespace DCView
             textBox.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
             textBox.InputScope = inputScope;
             textBox.WatermarkText = "댓글";
-            textBox.Margin = new Thickness(-15, 0, -15, 0);
+            textBox.Margin = new Thickness(-10, 0, -10, 0);
 
             textBox.SizeChanged += (o1, e1) =>
             {
                 if (FocusManager.GetFocusedElement() == textBox)
-                    ArticleTextScroll.ScrollToVerticalOffset(ArticleText.ActualHeight);
+                {                    
+                    VirtualizingStackPanel vstackPanel = (VirtualizingStackPanel)GetChildren(panel).FirstOrDefault(dobj => dobj is VirtualizingStackPanel);
+                    if(vstackPanel != null)
+                        vstackPanel.SetVerticalOffset(vstackPanel.ExtentHeight - vstackPanel.ViewportHeight);
+                }
             };
 
-            textBox.GotFocus += (o1, e1) => { UpdateAppBar(); };
-            textBox.LostFocus += (o1, e1) => { UpdateAppBar(); };
+            textBox.GotFocus += (o1, e1) => UpdateAppBar();
+            textBox.LostFocus += (o1, e1) => UpdateAppBar();
 
             return textBox;
         }
 
-        private FrameworkElement CreateLoadImageButton(List<Tuple<Grid, Picture>> imgContainers)
+        private FrameworkElement CreateLoadImageButton(ListBox panel, List<Grid> imgContainers)
         {            
             var button = new Button();
             button.Content = "그림 불러오기";
@@ -149,11 +154,11 @@ namespace DCView
             {
                 button.IsEnabled = false;
                 button.Visibility = Visibility.Collapsed;
-                LoadImagesAsync(imgContainers);
+                LoadImagesAsync(panel, imgContainers);
             };
 
             var grid = new Grid();
-            grid.Children.Add(grid);
+            grid.Children.Add(button);
 
             return grid;
         }
@@ -228,27 +233,85 @@ namespace DCView
             submitButton.IsEnabled = true;
         }
 
-        private async void LoadImagesAsync(List<Tuple<Grid, Picture>> imgContainers)
+        private async void LoadImagesAsync(ListBox panel, List<Grid> imgContainers)
         {
-            await Task.Factory.StartNew( () => 
+            List<Task> loadingTasks = new List<Task>();
+
+            foreach(var v in imgContainers)
             {
-                List<Task> loadingTasks = new List<Task>();
+                Grid grid = v;
+                Picture pic = grid.Tag as Picture;
+                if (pic == null) continue;
 
-                foreach(var tuple in imgContainers)
-                {
-                    loadingTasks.Add(LoadImageAsync(tuple.Item1, tuple.Item2));
-                }
+                var task = LoadImageAsync(panel, grid, pic);
+                loadingTasks.Add(task);
+            }
 
-                Task.WaitAll(loadingTasks.ToArray());
-            });
+            await Task.Factory.StartNew(() => Task.WaitAll(loadingTasks.ToArray()));
         }
 
-        // 이미지 로딩 부분
-        private async Task LoadImageAsync(Grid grid, Picture pic)
+        private List<WriteableBitmap> LoadImage(Stream stream)
         {
+            const int maxWidth = 512;
+            const int maxHeight = 1024;
+
+            var bitmap = Dispatcher.InvokeAsync(() => PictureDecoder.DecodeJpeg(stream)).GetResult();
+
+            // 메모리를 적게 쓰기 위해서 다운 사이징
+            // 1. width 최대치를 maxWidth로 고정
+            if (bitmap.PixelWidth > maxWidth)
+            {
+                float ratio = (float)maxWidth / bitmap.PixelWidth;
+
+                int downWidth = (int)(bitmap.PixelWidth * ratio);
+                int downHeight = (int)(bitmap.PixelHeight * ratio);
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    // SaveJpeg만 리사이즈 기능을 갖고 있나보다..
+                    bitmap.SaveJpeg(ms, downWidth, downHeight, 0, 90);
+                    ms.Seek(0L, SeekOrigin.Begin);
+                    bitmap = Dispatcher.InvokeAsync(() => PictureDecoder.DecodeJpeg(ms)).GetResult();
+                }
+            }
+
+            // Height가 maxHeight인 꽉차는 비트맵의 개수
+            int n = bitmap.PixelHeight / maxHeight;
+
+            List<WriteableBitmap> bitmaps = new List<WriteableBitmap>();
+
+            int chunk = maxHeight * bitmap.PixelWidth;
+            for (int i = 0; i < n; i++)
+            {
+                var wbmp = Dispatcher.InvokeAsync(() => new WriteableBitmap(bitmap.PixelWidth, maxHeight)).GetResult();
+                Array.Copy(bitmap.Pixels, i * chunk, wbmp.Pixels, 0, chunk);
+                bitmaps.Add(wbmp);
+            }
+
+            // 남은 비트맵
+            int restHeight = bitmap.PixelHeight % maxHeight;
+            if (restHeight != 0)
+            {
+                var wbmp = Dispatcher.InvokeAsync(() => new WriteableBitmap(bitmap.PixelWidth, restHeight)).GetResult();
+                Array.Copy(bitmap.Pixels, n * chunk, wbmp.Pixels, 0, bitmap.PixelWidth * restHeight);
+                bitmaps.Add(wbmp);
+            }
+
+            return bitmaps;            
+        }
+
+        // 이미지 로딩 부분 UI 스레드에서 이루어짐
+        private async Task LoadImageAsync(ListBox panel, Grid grid, Picture pic)
+        {
+            // Status를 위한 텍스트 블럭 삽입
+            var status = new TextBlock();
+
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(pic.Uri);
+                status.Text = "[이미지를 불러오는 중..]";
+                grid.Children.Add(status);
+
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(HttpUtility.HtmlDecode(pic.Uri));
                 request.UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
                 request.Method = "GET";
 
@@ -264,57 +327,76 @@ namespace DCView
                                
                 stream.Seek(0, SeekOrigin.Begin);
 
-                await Dispatcher.InvokeAsync(() =>
+                if (response.ContentType.Equals("image/gif", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    if (response.ContentType.Equals("image/gif", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        ExtendedImage source = new ExtendedImage();
-                        source.SetSource(stream);
+                    // grid의 위치를 알아내고
+                    int i = panel.Items.IndexOf(grid) + 1;
 
-                        var image = new AnimatedImage();
-                        image.Margin = new Thickness(3);
-                        image.Source = source;
-                        image.Tap += image_Tap;
-                        image.LoadingFailed += (o, e) =>
-                        {
-                            var tb = new TextBlock();
-                            tb.Text = "로딩 실패";
-                            tb.Foreground = new SolidColorBrush(Colors.Red);
-                            grid.Children.Add(tb);
-                        };
-                        grid.Children.Add(image);
-                    }
-                    else
-                    {
-                        var source = new BitmapImage();
-                        source.SetSource(stream);
+                    ExtendedImage source = new ExtendedImage();
+                    source.SetSource(stream);
 
+                    var image = new AnimatedImage();
+                    image.Source = source;
+                    image.Tap += image_Tap;
+                    image.Tag = pic;
+                    image.LoadingFailed += (o, e) =>
+                    {
+                        var tb = new TextBlock();
+                        tb.Text = "로딩 실패";
+                        tb.Foreground = new SolidColorBrush(Colors.Red);
+                        grid.Children.Add(tb);
+                    };
+                    panel.Items.Insert(i, image);
+                }
+
+                // 이상하게도 PictureDecoder.DecodeJpeg이 png까지 디코딩을 할 수가 있어서.. 그냥 쓰고 있다
+                else if (response.ContentType.Equals("image/jpg", StringComparison.CurrentCultureIgnoreCase) ||
+                         response.ContentType.Equals("image/jpeg", StringComparison.CurrentCultureIgnoreCase) ||
+                         response.ContentType.Equals("image/png", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    // 큰 이미지를 잘게 나눈다
+                    var wbmps = await Task.Factory.StartNew(() => LoadImage(stream));
+
+                    // grid의 위치를 알아내고
+                    int i = panel.Items.IndexOf(grid) + 1;
+                    foreach (var wbmp in wbmps)
+                    {
                         var image = new Image();
-                        image.Margin = new Thickness(3);
-                        image.Source = source;
+                        image.Source = wbmp;
                         image.Tag = pic;
                         image.Tap += image_Tap;
-                        image.ImageFailed += (o, e) =>
-                        {
-                            var tb = new TextBlock();
-                            tb.Text = "로딩 실패";
-                            tb.Foreground = new SolidColorBrush(Colors.Red);
-                            grid.Children.Add(tb);
-                        };
-                        grid.Children.Add(image);
+                        panel.Items.Insert(i, image);
+                        i++;
                     }
-                });
+                    // panel.Items.RemoveAt(i);
+                }
+                else
+                {
+                    var source = new BitmapImage();
+                    source.SetSource(stream);
+
+                    int i = panel.Items.IndexOf(grid) + 1;
+
+                    var image = new Image();
+                    image.Source = source;
+                    image.Tag = pic;
+                    image.Tap += image_Tap;
+                    panel.Items.Insert(i, image);
+                }
+
+                grid.Children.Clear();
             }
             catch
             {
-
-            }            
+                status.Text = "[이미지 불러오기 실패]";
+            }
+   
         }
 
         
         void image_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            var image = sender as Image;
+            var image = sender as FrameworkElement;
             if (image == null) return;
 
             var pic = image.Tag as Picture;
@@ -324,7 +406,24 @@ namespace DCView
             task.Uri = new Uri(pic.BrowserUri, UriKind.Absolute);
             task.Show();
         }
-        
+
+        IEnumerable<DependencyObject> GetChildren(DependencyObject obj)
+        {
+            int count = VisualTreeHelper.GetChildrenCount(obj);
+            for(int t = 0; t < count; t++)
+            {
+                var child = VisualTreeHelper.GetChild(obj, t);
+                yield return child;
+            }
+
+            for(int t = 0; t < count; t++)
+            {
+                var child = VisualTreeHelper.GetChild(obj, t);
+                foreach (var res in GetChildren(child))
+                    yield return res;
+            }
+        }
+
         private void ShowArticleText(ArticleData data)
         {
             if (!Dispatcher.CheckAccess())
@@ -333,85 +432,99 @@ namespace DCView
                 return;
             }
 
-            // 일단 기존의 ArticleText를 없앤다
-            ArticleText.Children.Clear();
-            // var panel = new ListBox();
+            Contents.Children.Clear();
+
+            // VirtualizingStackPanel을 쓰는 리스트 박스
+            var panel = new ListBox();
+            panel.ItemContainerStyle = Resources["ListBoxItemStyle"] as Style;
+            panel.ItemsPanel = Resources["ListBoxItemsPanelTemplate"] as ItemsPanelTemplate;
+            panel.ManipulationCompleted += (o, e) => this.Focus();
             
-            // 제목
+            // * 제목 title
             var title = new TextBlock();
             title.TextWrapping = TextWrapping.Wrap;
             title.Style = Application.Current.Resources["DCViewTextMediumStyle"] as Style;
             title.Text = HttpUtility.HtmlDecode(article.Title);
             title.FontWeight = FontWeights.Bold;
             title.Margin = new Thickness(0, 12, 0, 12);
-            ArticleText.Children.Add(title);
+            panel.Items.Add(title);
 
-            List<Tuple<Grid, Picture>> imgContainers = new List<Tuple<Grid, Picture>>();
-
-            var loadImageButton = CreateLoadImageButton(imgContainers);
-            ArticleText.Children.Add(loadImageButton);
+            // * 그림 불러오기 버튼
+            List<Grid> imgContainers = new List<Grid>();
+            var loadImageButton = CreateLoadImageButton(panel, imgContainers);
+            panel.Items.Add(loadImageButton);
 
             // 그림 들어갈 자리에 Grid 하나씩 넣기..
-            foreach (Picture p in article.Pictures)
+            foreach (Picture pic in article.Pictures)
             {
-                Picture pic = p;
                 var grid = new Grid();
+                grid.Tag = pic;
+                grid.Margin = new Thickness(0, 3, 0, 0);
 
-                imgContainers.Add(Tuple.Create(grid, pic));
-                ArticleText.Children.Add(grid);
+                imgContainers.Add(grid);
+                panel.Items.Add(grid);
             }
 
+            // * 12픽셀을 띄기 위해서 마진이 12인 텍스트 블럭 삽입
             var margin = new TextBlock();
             margin.Margin = new Thickness(0, 0, 0, 12);
-            ArticleText.Children.Add(margin);
+            panel.Items.Add(margin);
 
-            foreach (var tuple in HtmlElementConverter.GetUIElementFromString(data.Text, tapAction))
+            // * 본문
+            foreach (var elem in HtmlElementConverter.GetUIElementFromString(data.Text, tapAction))
             {
-                ArticleText.Children.Add(tuple.Item1);
+                panel.Items.Add(elem);
 
-                if (tuple.Item2 != null)
-                    imgContainers.Add(Tuple.Create((Grid)tuple.Item1, tuple.Item2));
+                if (elem is Grid && elem.Tag is Picture)
+                    imgContainers.Add((Grid)elem);
             }
 
-            // 글쓴이 정보
+            // * 글쓴이 정보
             var status = new ArticleStatusView();
             status.DataContext = new ArticleViewModel(article);
             status.HorizontalAlignment = HorizontalAlignment.Right;
-            ArticleText.Children.Add(status);
+            panel.Items.Add(status);
             
-            // 댓글
+            // * 댓글
             foreach (var cmt in data.Comments)
             {
                 var commentView = new CommentView();
                 commentView.DataContext = new CommentViewModel(cmt);
                 
-                foreach (var tuple in HtmlElementConverter.GetUIElementFromString(cmt.Text, tapAction))
+                foreach (var grid in HtmlElementConverter.GetUIElementFromString(cmt.Text, tapAction))
                 {
-                    commentView.Contents.Children.Add(tuple.Item1);
+                    commentView.Contents.Children.Add(grid);
 
-                    if (tuple.Item2 != null)
-                        imgContainers.Add(Tuple.Create((Grid)tuple.Item1, tuple.Item2));
+                    if (grid is Grid && grid.Tag is Picture)
+                        imgContainers.Add((Grid)grid);
                 }
 
-                ArticleText.Children.Add(commentView);
+                panel.Items.Add(commentView);
             }
 
+            // * 댓글을 달 수 있으면 ReplyTextBox 넣기
             if (article.CanWriteComment)
             {
                 // ReplyTextBox를 새로 만듦
-                replyTextBox = CreateReplyTextBox();
-                ArticleText.Children.Add(replyTextBox);
+                replyTextBox = CreateReplyTextBox(panel);
+                panel.Items.Add(replyTextBox);
             }
 
-            ArticleTextScroll.ScrollToVerticalOffset(0);
-
+            
             bool bPassiveLoading = (bool)IsolatedStorageSettings.ApplicationSettings["DCView.passive_loadimg"] && imgContainers.Count != 0;
 
+            // * 수동읽기가 설정이 되어있으면 버튼을 활성화
             if (!bPassiveLoading)
             {
                 loadImageButton.Visibility = Visibility.Collapsed;
-                LoadImagesAsync(imgContainers);
+                LoadImagesAsync(panel, imgContainers);
             }
+
+            // Contents에 panel을 추가.
+            Contents.Children.Add(panel);
+
+            // *스크롤을 처음으로 되돌림
+            panel.ScrollIntoView(title);
         }
 
         // 글을 웹브라우저에서 읽기         
@@ -427,7 +540,8 @@ namespace DCView
         // 지금 읽고 있는 글 다시 불러와서 article.Text에 넣기
         private async void GetAndShowArticleText()
         {
-            ArticleText.Children.Clear(); // 이전 글 안보이게 지우기
+            // 이전 글 안보이게 지우기
+            Contents.Children.Clear();
             if (article == null) return;
 
             // 프로그레스 바 켬
@@ -498,6 +612,21 @@ namespace DCView
             UpdateAppBar();
         }
 
-        
+        /*private void VirtualizingStackPanel_Loaded(object sender, RoutedEventArgs e)
+        {
+            // ItemsPanelTemplate 인 VirtualizingStackPanel을 얻기 위해서
+            DependencyObject dep = sender as DependencyObject;
+            while (dep != null)
+            {
+                if (dep is ListBox)
+                {
+                    ListBox box = dep as ListBox;
+                    box.Tag = sender;
+                    return;
+                }
+
+                dep = VisualTreeHelper.GetParent(dep);
+            }
+        }*/
     }
 }

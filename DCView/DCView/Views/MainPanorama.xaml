@@ -29,7 +29,7 @@
                     <TextBlock.Foreground>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="White" Offset="0" />
-                            <GradientStop Color="{StaticResource PhoneAccentColor}" Offset="0.419" />
+                            <GradientStop Color="{StaticResource DCViewAccentColor}" Offset="0.419" />
                             <GradientStop Color="White" Offset="1" />
                         </LinearGradientBrush>
                     </TextBlock.Foreground>
@@ -152,7 +152,7 @@
 
                     <RichTextBox Grid.Row="1" VerticalAlignment="Top" Margin="0, 0, 0, 20" >
                         <RichTextBox.Blocks>
-                            <Paragraph>DCView 1.4.4, Copyright © &lt;IOKLO 2012
+                            <Paragraph>DCView 1.4.5, Copyright © &lt;IOKLO 2012
                                 <LineBreak />
                                 <Hyperlink Click="Hyperlink_Click">http://dcview.codeplex.com/</Hyperlink>
                             </Paragraph>

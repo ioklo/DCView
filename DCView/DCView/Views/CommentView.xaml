@@ -11,7 +11,7 @@
         <ColumnDefinition Width="*" />
     </Grid.ColumnDefinitions>
 
-    <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{StaticResource PhoneAccentBrush}" Grid.Column="0" />
+    <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{StaticResource DCViewAccentBrush}" Grid.Column="0" />
     <StackPanel Margin="6, 0, 0, 0" Grid.Column="1">
         <StackPanel x:Name="Contents" />
 

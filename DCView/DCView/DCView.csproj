@@ -122,6 +122,7 @@
     <Compile Include="Board\Clien\ClienComment.cs" />
     <Compile Include="Board\DCInside\DCInsideSite.cs" />
     <Compile Include="Interface\IArticle.cs" />
+    <Compile Include="Interface\ICredential.cs" />
     <Compile Include="Interface\ILister.cs" />
     <Compile Include="Interface\INotifyActivated.cs" />
     <Compile Include="Board\DCInside\DCInsideArticle.cs" />
@@ -222,6 +223,12 @@
     <Content Include="SplashScreenImage1.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Data\Red.xaml">
+      <SubType>Designer</SubType>
+    </Resource>
+    <Resource Include="Data\ThemeResources.xaml">
+      <SubType>Designer</SubType>
+    </Resource>
     <Page Include="Views\CommentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

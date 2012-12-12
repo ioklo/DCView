@@ -17,6 +17,7 @@ using DCView;
 using System.Threading;
 using ImageTools.IO.Gif;
 using ImageTools.IO;
+using System.Collections;
 
 namespace DCView
 {
@@ -48,6 +49,9 @@ namespace DCView
             // 폰트..
             InitializeFontResource();
 
+            // theme
+            InitializeTheme();
+
             Initialize();
             
             // 디버깅하는 동안 그래픽 프로파일링 정보를 표시합니다.
@@ -68,6 +72,20 @@ namespace DCView
                 // 주의:- 디버그 모드에서만 사용합니다. 사용자 유휴 검색을 해제하는 응용 프로그램은 사용자가 전화를 사용하지 않을 경우에도
                 // 계속 실행되어 배터리 전원을 소모합니다.
                 // PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
+            }
+        }
+
+        private void InitializeTheme()
+        {
+            if (DateTime.Now.Month == 12 && DateTime.Now.Day == 24)
+            {
+                Resources.Add("DCViewAccentBrush", new SolidColorBrush(Color.FromArgb(0xFF, 0xE5, 0x14, 0x00)));
+                Resources.Add("DCViewAccentColor", Color.FromArgb(0xFF, 0xE5, 0x14, 0x00));
+            }
+            else
+            {
+                Resources.Add("DCViewAccentBrush", Resources["PhoneAccentBrush"]);
+                Resources.Add("DCViewAccentColor", Resources["PhoneAccentColor"]);
             }
         }
 

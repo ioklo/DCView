@@ -29,14 +29,14 @@
         <controls:Pivot Name="MainPivot" 
                         SelectionChanged="PivotMain_SelectionChanged">
             <controls:Pivot.Title>
-                <TextBlock x:Name="GalleryTitle" Text="갤러리" Foreground="{StaticResource PhoneAccentBrush}"/>
+                <TextBlock x:Name="GalleryTitle" Text="갤러리" Foreground="{StaticResource DCViewAccentBrush}"/>
             </controls:Pivot.Title>
         </controls:Pivot>
         
         <TextBlock x:Name="LoginStatus" VerticalAlignment="Top" HorizontalAlignment="Right" Text="로그인 중..." TextAlignment="Right" Tap="LoginStatus_Tap" Margin="0,32,0,0"/>
 
         <Grid x:Name="LoginPanel" Visibility="Collapsed" VerticalAlignment="Center">
-            <Border BorderBrush="{StaticResource PhoneAccentBrush}" BorderThickness="0, 10" Background="{StaticResource PhoneBackgroundBrush}">
+            <Border BorderBrush="{StaticResource DCViewAccentBrush}" BorderThickness="0, 10" Background="{StaticResource PhoneBackgroundBrush}">
                 <StackPanel>
                     <TextBlock Text="로그인" Style="{StaticResource PhoneTextExtraLargeStyle}" />
                 
