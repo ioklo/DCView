@@ -10,11 +10,11 @@ dc.write.oflData
 dc.list.articleNumber 
 no=(\d+)[^>]*>
 dc.list.articleData
-<span class="list_right"><span class="((list_pic_n)|(list_pic_y1?))"></span>(.*?)<span class="list_pic_re">(\[(\d+)\])?</span><br /><span class="list_pic_galler" ><span >(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>
+<span class="list_right"><span class="((list_pic_n)|(list_pic_y1?))"></span>(.*?)<span class="list_pic_re">(\[(\d+)\])?</span><br /><span class="list_pic_galler" ><span\s*>(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>
 dc.searchlist.articleNumber 
 no=(\d+)[^>]*>
 dc.searchlist.articleData 
-<span class="list_right"><span class="((list_pic_n)|(list_pic_y1?))"></span>(.*?)<span class="list_pic_re">(\[(\d+)\])?</span><br /><span class="list_pic_galler" ><span >(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>
+<span class="list_right"><span class="((list_pic_n)|(list_pic_y1?))"></span>(.*?)<span class="list_pic_re">(\[(\d+)\])?</span><br /><span class="list_pic_galler" ><span\s*>(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>
 dc.text.textImage 
 <img\s+id=dc_image_elm[^>]*src='(http://dcimg.*?)'
 dc.text.textStart 

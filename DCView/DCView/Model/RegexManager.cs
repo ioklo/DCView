@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows;
 using DCView.Lib;
 using DCView.Util;
 
@@ -50,12 +52,42 @@ namespace DCView
             Load();
         }
 
+        static bool IsResourceVersionLatest(out int resVer)
+        {
+            // ResourceVersion을 연다.
+            var sri = Application.GetResourceStream(new Uri("Data/pattern_version.txt", UriKind.Relative));
+
+            Debug.Assert(sri != null);
+
+            var reader = new StreamReader(sri.Stream);
+            resVer = int.Parse(reader.ReadLine());
+
+            // 로컬 버전은 세팅에서 읽어들일 수 있다.
+            var settings = IsolatedStorageSettings.ApplicationSettings;
+            int localVer;
+            if (!settings.TryGetValue("dcview.pattern_version", out localVer))
+            {
+                // 그런거 저장 안되어 있으면 무조건 리소스 버전이 최신버전
+                return true;
+            }
+
+            return resVer > localVer;
+        }
+
         static void Load()
         {
-            DCView.Lib.StorageUtil.CopyResourceToStorage("Data/pattern_dc.txt", "/pattern_dc.txt");
+            // 리소스에 있는 패턴 버전과 로컬의 패턴 버전 비교해서 리소스가 최신이면 덮어 쓴다
+            int resVer;
+            if (IsResourceVersionLatest(out resVer))
+            {
+                DCView.Lib.StorageUtil.CopyResourceToStorage("Data/pattern_dc.txt", "/pattern_dc.txt", true);
 
-            // Iso Setting 이용하지 않고 
+                var settings = IsolatedStorageSettings.ApplicationSettings;
+                settings.Add("dcview.pattern_version", resVer);
+                settings.Save();
+            }
 
+            // Iso Setting 이용하지 않고
             var storage = IsolatedStorageFile.GetUserStoreForApplication();
             using (var reader = new StreamReader(storage.OpenFile("/pattern_dc.txt", FileMode.Open), Encoding.UTF8))
             {
@@ -100,15 +132,37 @@ namespace DCView
 
         public static void Reset()
         {
-            DCView.Lib.StorageUtil.CopyResourceToStorage("Data/pattern_dc.txt", "/pattern_dc.txt", true);
+            // 로컬 버전 정보를 없앤다 -> 로딩시에 항상 리소스쪽 정보가 최신으로 인식되고 강제 복사된다
+            var settings = IsolatedStorageSettings.ApplicationSettings;
+            settings.Remove("dcview.pattern_version");
+            settings.Save();
+
             Load();
         }
 
-        public static bool Update()
+        public static string Update()
         {
             try
             {
+                var settings = IsolatedStorageSettings.ApplicationSettings;
                 DCViewWebClient client = new DCViewWebClient();
+
+                // 버전 확인
+                var verString = client.DownloadStringAsyncTask(new Uri(
+                    string.Format("http://ioklo.byus.net/dcview/pattern_version.txt?nocache={0}", DateTime.Now.Ticks), UriKind.Absolute), new CancellationTokenSource().Token).GetResult();
+
+                var reader = new StringReader(verString);
+                int updateVer = int.Parse(reader.ReadLine());
+                int localVer;
+
+                if (!settings.TryGetValue("dcview.pattern_version", out localVer))
+                    return "실패 - 패턴 버전을 가져올 수 없습니다";
+
+                // 현재 버전이 더 높으면 업데이트 안함
+                if (updateVer <= localVer)
+                    return "지금 패턴이 최신입니다";
+                
+                client = new DCViewWebClient();
                 var result = client.DownloadStringAsyncTask(new Uri(
                     string.Format("http://ioklo.byus.net/dcview/pattern_dc.txt?nocache={0}", DateTime.Now.Ticks), UriKind.Absolute), new CancellationTokenSource().Token).GetResult();
 
@@ -118,13 +172,18 @@ namespace DCView
                     writer.Write(result);
                 }
 
+                // 업데이트가 잘 끝나면 버전 기록
+                settings["dcview.pattern_version"] = updateVer;
+                settings.Save();
+
+                // 로딩
                 Load();
-                return true;
+                return "패턴이 업데이트 되었습니다";
             }
             catch
             {
                 Reset();
-                return false;
+                return "실패 - 패턴을 처음 상태로 되돌립니다";
             }
         }
     }

@@ -350,12 +350,9 @@ namespace DCView
             PatternResetButton.IsEnabled = false;
             PatternUpdateButton.IsEnabled = false;
 
-            bool result = await Task.Factory.StartNew(() => DCRegexManager.Update() );
-
-            if (result)
-                MessageBox.Show("패턴이 업데이트 되었습니다");
-            else
-                MessageBox.Show("패턴 업데이트에 실패했습니다");                
+            string msg = await Task.Factory.StartNew(() => DCRegexManager.Update() );
+            
+            MessageBox.Show(msg);            
 
             PatternUpdateButton.IsEnabled = true;
             PatternResetButton.IsEnabled = true;
