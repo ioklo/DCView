@@ -15,7 +15,7 @@ namespace DCView
         string id;
         string name;
 
-        public ClienBoard(Clien clien, string id, string name)
+        public ClienBoard(ClienSite clien, string id, string name)
         {
             this.site = clien;
             this.id = id;

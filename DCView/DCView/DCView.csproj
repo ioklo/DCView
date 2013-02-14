@@ -116,7 +116,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Board\Clien\Clien.cs" />
+    <Compile Include="Board\Clien\ClienSite.cs" />
     <Compile Include="Board\Clien\ClienArticle.cs" />
     <Compile Include="Board\Clien\ClienBoard.cs" />
     <Compile Include="Board\Clien\ClienComment.cs" />
@@ -126,7 +126,7 @@
     <Compile Include="Interface\ILister.cs" />
     <Compile Include="Interface\INotifyActivated.cs" />
     <Compile Include="Board\DCInside\DCInsideArticle.cs" />
-    <Compile Include="Board\DCInside\DCInsideAuth.cs" />
+    <Compile Include="Board\DCInside\DCInsideCredential.cs" />
     <Compile Include="Board\DCInside\DCInsideBoard.cs" />
     <Compile Include="Board\DCInside\DCInsideBoardSearch.cs" />
     <Compile Include="Interface\IBoard.cs" />
@@ -151,11 +151,13 @@
     <Compile Include="Lib\HtmlParser\HtmlElementConverter.cs" />
     <Compile Include="Lib\WPF\BoolToColorConverter.cs" />
     <Compile Include="Interface\IComment.cs" />
-    <Compile Include="Model\LoginInfo.cs" />
     <Compile Include="Views\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CommentViewModel.cs" />
+    <Compile Include="Views\Login\DCInsideLoginPanel.xaml.cs">
+      <DependentUpon>DCInsideLoginPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainPanorama.xaml.cs">
       <DependentUpon>MainPanorama.xaml</DependentUpon>
     </Compile>
@@ -233,6 +235,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Login\DCInsideLoginPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainPanorama.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -258,7 +264,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

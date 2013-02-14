@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace DCView
 {
@@ -12,7 +13,6 @@ namespace DCView
     public class SiteManager
     {
         // favorite과 gallery의 분리
-        // Dictionary<string, Gallery> galleries = new Dictionary<string, Gallery>();
 
         ManualResetEvent loadingComplete = new ManualResetEvent(false);
         List<ISite> sites = new List<ISite>();
@@ -30,7 +30,7 @@ namespace DCView
         public SiteManager()
         {
             sites.Add(new DCInsideSite());
-            sites.Add(new Clien());
+            sites.Add(new ClienSite());
 
             // 만들어 지자 마자, loading을 시작한다            
             Task.Factory.StartNew(() =>
@@ -105,6 +105,19 @@ namespace DCView
                     board.Name.IndexOf(text, StringComparison.CurrentCultureIgnoreCase) >= 0)
                     OnSearchGallery(board);
             }
+        }
+
+        public Tuple<ICredential, UserControl> GetCredential(string siteID, ViewArticle page)
+        {
+            ISite site = GetSite(siteID);
+
+            if (site is DCInsideSite)
+            {
+                return Tuple.Create<ICredential, UserControl>(site.Credential, new DCInsideLoginPanel((DCInsideCredential)site.Credential, page));
+            }
+            else
+                return Tuple.Create<ICredential, UserControl>(null, null);
+
         }
     }
 }

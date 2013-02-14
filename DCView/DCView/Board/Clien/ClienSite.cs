@@ -5,15 +5,17 @@ using System.Collections.Generic;
 
 namespace DCView
 {
-    public class Clien : ISite
+    public class ClienSite : ISite
     {
         List<IBoard> boards = new List<IBoard>();
 
-        public Clien()
+        public ClienSite()
         {
             boards.Add(new ClienBoard(this, "park", "모두의 공원"));
             boards.Add(new ClienBoard(this, "news", "새로운 소식"));
         }
+
+        ICredential ISite.Credential { get { return null; } }
 
         string ISite.ID
         {

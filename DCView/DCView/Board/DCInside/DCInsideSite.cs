@@ -17,7 +17,8 @@ namespace DCView
     public class DCInsideSite : ISite
     {
         List<IBoard> boards = new List<IBoard>();
-
+        DCInsideCredential credential = new DCInsideCredential();
+        
         public void Load()
         {
             // DCView_list.txt 생성 
@@ -46,6 +47,11 @@ namespace DCView
                     boards.Add(new DCInsideBoard(this, id, name));
                 }
             }
+        }
+
+        ICredential ISite.Credential
+        {
+            get { return credential; }
         }
 
         string ISite.ID

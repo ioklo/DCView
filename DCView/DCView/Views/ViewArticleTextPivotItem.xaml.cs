@@ -183,15 +183,9 @@ namespace DCView
         // 
         void submitReplyIconButton_Click(object sender, EventArgs e)
         {
-            // 제출하기 전에 로그인 확인 부터
-            if (App.Current.LoginInfo.LoginState != LoginInfo.State.LoggedIn)
-            {
-                viewArticlePage.ShowLoginDialog();
-                return;
-            }
-
             string text = replyTextBox.Text;
             this.Focus();
+
             CommentSubmit(text, sender as ApplicationBarIconButton);
         }
 

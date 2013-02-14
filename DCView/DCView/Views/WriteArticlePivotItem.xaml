@@ -22,25 +22,29 @@
 
         <ScrollViewer Grid.Row="1">
             <StackPanel x:Name="ContentPanel" Margin="12,0,12,0">
+				
+				<Rectangle Stroke="Black" Fill="#FFF4F4F5" RadiusX="10" RadiusY="10" />
 
-                <cs:WatermarkTextBox x:Name="FormTitle" WatermarkText="제목" />
+				<cs:WatermarkTextBox x:Name="FormTitle" WatermarkText="제목" />
 
-                <cs:WatermarkTextBox x:Name="FormText" 
-                     AcceptsReturn="True" 
-                     Height="340"
-                     WatermarkText="내용" 
-                     TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" />
-
+				<cs:WatermarkTextBox x:Name="FormText" 
+                    AcceptsReturn="True" 
+                    Height="340"
+                    WatermarkText="내용" 
+                    TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" />
+				
                 <TextBlock Text="이미지 첨부" Style="{StaticResource PhoneTextNormalStyle}"/>
 
                 <toolkit:WrapPanel x:Name="ImagesPanel">
-                    <Button x:Name="AddImageButton" Width="128" Height="128" Click="AddImage" BorderThickness="1">
-                        <!--Image Source="/appbar.edit.rest.png"></Image--> 추가
+                    <Button x:Name="AddImageButton" Width="128" Height="128" Click="AddImage" BorderThickness="1" Content="추가">
+                        <!--Image Source="/appbar.edit.rest.png"></Image-->
+
                     </Button>
                 </toolkit:WrapPanel>
 
             </StackPanel>
         </ScrollViewer>
+        <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="10" Margin="-620,-162,0,0" RadiusY="10" RadiusX="10" Stroke="Black" VerticalAlignment="Top" Width="0"/>
 
 
     </Grid>

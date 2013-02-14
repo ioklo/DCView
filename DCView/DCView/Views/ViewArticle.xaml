@@ -24,7 +24,6 @@
     
     <!--LayoutRoot에는 다른 모든 페이지 내용이 배치되는 루트 표가 포함됩니다.-->
     <Grid x:Name="LayoutRoot" Language="ko-kr">
-
         
         <controls:Pivot Name="MainPivot" 
                         SelectionChanged="PivotMain_SelectionChanged">
@@ -33,35 +32,13 @@
             </controls:Pivot.Title>
         </controls:Pivot>
         
-        <TextBlock x:Name="LoginStatus" VerticalAlignment="Top" HorizontalAlignment="Right" Text="로그인 중..." TextAlignment="Right" Tap="LoginStatus_Tap" Margin="0,32,0,0"/>
-
-        <Grid x:Name="LoginPanel" Visibility="Collapsed" VerticalAlignment="Center">
-            <Border BorderBrush="{StaticResource DCViewAccentBrush}" BorderThickness="0, 10" Background="{StaticResource PhoneBackgroundBrush}">
-                <StackPanel>
-                    <TextBlock Text="로그인" Style="{StaticResource PhoneTextExtraLargeStyle}" />
-                
-                    <StackPanel x:Name="LoginForm">
-                        <TextBlock Text="아이디" Style="{StaticResource PhoneTextNormalStyle}"/>
-                        <TextBox x:Name="LoginIDTextBox" Text="{Binding Path=ID, Mode=TwoWay}"/>
-                        <TextBlock Text="비밀번호" Style="{StaticResource PhoneTextNormalStyle}"/>
-                        <PasswordBox x:Name="LoginPWTextBox" Password="{Binding Path=Password, Mode=TwoWay}"/>
-                        <CheckBox x:Name="SaveLoginInfoCheckBox" IsChecked="{Binding Path=SaveLoginInfo, Mode=TwoWay}" Content="아이디/비밀번호 저장"/>
-                        <CheckBox x:Name="AutoLoginCheckBox" IsChecked="{Binding Path=AutoLogin, Mode=TwoWay}" Content="시작할 때 자동으로 로그인 하기" />
-                    </StackPanel>
-                
-                    <Grid >
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Button x:Name="LoginSubmitButton" Content="로그인" Grid.Column="0" Click="LoginSubmitButton_Click"/>
-                        <Button x:Name="LoginPanelCloseButton" Content="닫기" Grid.Column="1" Click="LoginCloseButton_Click"/>
-                    </Grid>
-
-                </StackPanel>
-            </Border>
-        </Grid>
-
+        <TextBlock x:Name="LoginStatus" 
+                   VerticalAlignment="Top" 
+                   HorizontalAlignment="Right" 
+                   TextAlignment="Right" 
+                   Tap="LoginStatus_Tap" Margin="0,32,0,0"/>
+        
+        <Grid x:Name="LoginPanel" Visibility="Collapsed" VerticalAlignment="Center"/>
 
     </Grid>
 

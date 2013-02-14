@@ -15,5 +15,7 @@ namespace DCView
         bool Refresh(Action<string, int> OnStatusChanged);
         void Load();    // 전체 보드를 다 읽어온다
         IBoard GetBoard(string boardID, string boardName);
+
+        ICredential Credential { get; } // 로그인 정보
     }
 }

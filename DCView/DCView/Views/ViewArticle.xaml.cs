@@ -34,11 +34,15 @@ namespace DCView
     {
         bool bInitialized = false;
 
+        ICredential cred;
+        UserControl credPanel;
+
         ViewArticleListPivotItem viewArticleListPivotItem = null;
         ViewArticleListPivotItem viewSearchArticleListPivotItem = null; // 검색 결과
         ViewArticleTextPivotItem viewArticleTextPivotItem = null;
         WriteArticlePivotItem writeArticlePivotItem = null;
 
+        
         Thickness pivotMargin = new Thickness(6, 14, 6, 0);
         
         // 생성자
@@ -60,70 +64,55 @@ namespace DCView
             }
         }
 
+        void BindLoginInfo(string siteID)
+        {
+            // 로그인 정보
+            Tuple<ICredential, UserControl> credInfo = App.Current.SiteManager.GetCredential(siteID, this);
+            cred = credInfo.Item1;
+            credPanel = credInfo.Item2;            
+        }
+
+        void UnbindLoginInfo()
+        {
+            // LoginInfo 바인딩 제거
+            if (cred != null)
+            {
+                cred.OnStatusChanged -= LoginStatusChanged;
+                LayoutRoot.Children.Remove(credPanel);
+
+                cred = null;
+                credPanel = null;
+            }
+        }
+
         // 페이지에서 나가려고 할 때
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
 
-            // LoginInfo 바인딩 제거
-            App.Current.LoginInfo.PropertyChanged -= LoginInfo_PropertyChanged;
+            UnbindLoginInfo();
         }
 
-        void EnableLoginForm(bool bEnabled)
-        {
-            StackPanel panel = LoginForm;
-            foreach(var child in panel.Children)
-            {
-                Control ctrl = child as Control;
-                if (ctrl == null) continue;
-                ctrl.IsEnabled = bEnabled;   
-            }
-        }
-
-        void LoginInfo_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            LoginInfo info = sender as LoginInfo;
-            if (info == null) return;
-
-            switch(e.PropertyName)
-            {
-                case "LoginState":
-
-                    switch(info.LoginState)
-                    {
-                        case LoginInfo.State.LoggedIn:
-                            LoginStatus.Text = info.ID + " 로그인";
-                            EnableLoginForm(false);
-                            LoginSubmitButton.Content = "로그아웃";
-                            HideLoginDialog();
-                            break;
-
-                        case LoginInfo.State.LoggingIn:
-                            LoginStatus.Text = "로그인 중...";
-                            EnableLoginForm(false);
-                            LoginSubmitButton.Content = "로그인 취소";
-                            break;
-
-                        case LoginInfo.State.NotLoggedIn:
-                            LoginStatus.Text = "비회원";
-                            EnableLoginForm(true);
-                            LoginSubmitButton.Content = "로그인";
-                            break;
-                    }
-                    break;
-            }
-        }
-
+        
         // 이 페이지로 들어오려고 할 때
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
             Initialize();
-            LoginForm.DataContext = App.Current.LoginInfo;
-            LoginInfo_PropertyChanged(App.Current.LoginInfo, new PropertyChangedEventArgs("LoginState"));
+            BindLoginInfo(NavigationContext.QueryString["siteID"]);
 
-            App.Current.LoginInfo.PropertyChanged += LoginInfo_PropertyChanged;
+            if (cred != null)
+            {
+                LoginStatus.Text = cred.StatusText;
+                cred.OnStatusChanged += LoginStatusChanged;
+                LoginPanel.Children.Add(credPanel);
+            }
+        }
+
+        private void LoginStatusChanged(object sender, EventArgs status)
+        {
+            LoginStatus.Text = cred.StatusText;
         }
 
         private void Initialize()
@@ -234,7 +223,7 @@ namespace DCView
 
         public void ShowLoginDialog()
         {
-            // TODO: WatermarkTextBox의 IsEnabled가 false가 되면 익셉션 발생
+            // TODO: WatermarkTextBox의 IsEnabled가 false가 되면 예외 발생
             // MainPivot.IsEnabled = false;
             ApplicationBar.IsMenuEnabled = false;
 
@@ -243,10 +232,7 @@ namespace DCView
 
         public void HideLoginDialog()
         {
-            // TODO: WatermarkTextBox의 IsEnabled가 false가 되면 익셉션 발생
-            // MainPivot.IsEnabled = true;
             ApplicationBar.IsMenuEnabled = true;
-
             LoginPanel.Visibility = Visibility.Collapsed;
         }
 
@@ -254,44 +240,5 @@ namespace DCView
         {
             ShowLoginDialog();            
         }
-
-        private void LoginCloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            HideLoginDialog();
-        }
-
-        CancellationTokenSource loginCancelTokenSource;
-
-        private void LoginSubmitButton_Click(object sender, RoutedEventArgs e)
-        {
-            var loginInfo = App.Current.LoginInfo;
-
-            switch (loginInfo.LoginState)
-            {
-                // 로그인 중이라면 취소,
-                case LoginInfo.State.LoggingIn:
-                    if (loginCancelTokenSource != null)
-                    {
-                        loginCancelTokenSource.Cancel();
-                        loginCancelTokenSource = null;
-                    }
-                    break;
-
-                case LoginInfo.State.NotLoggedIn:
-                    {
-                        loginCancelTokenSource = new CancellationTokenSource();
-                        loginInfo.Login(loginCancelTokenSource.Token);
-                        break;
-                    }
-
-                case LoginInfo.State.LoggedIn:
-                    {
-                        loginInfo.Logout();
-                    }
-                    break;
-            }
-        }
-
-
     }
 }

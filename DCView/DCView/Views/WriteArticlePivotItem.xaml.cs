@@ -210,13 +210,8 @@ namespace DCView
 
         void submitButton_Click(object sender, EventArgs e)
         {
-            if (App.Current.LoginInfo.LoginState != LoginInfo.State.LoggedIn)
-            {
-                viewArticlePage.ShowLoginDialog();
-                return;
-            }
-
             this.Focus();
+
             Submit();
         }
 
@@ -224,8 +219,5 @@ namespace DCView
         {
             viewArticlePage.RemoveWriteForm();
         }
-
-        
-
     }
 }
