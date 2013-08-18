@@ -18,6 +18,7 @@ using System.Threading;
 using ImageTools.IO.Gif;
 using ImageTools.IO;
 using System.Collections;
+using DCView.Adapter;
 
 namespace DCView
 {
@@ -247,6 +248,8 @@ namespace DCView
 
         private void Initialize()
         {
+            WPAdapterFactory.Init();
+
             SiteManager = new SiteManager();
             Favorites = new Favorites();
 

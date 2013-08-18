@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
+using DCView.Board;
 
 namespace DCView
 {
@@ -82,7 +83,7 @@ namespace DCView
                             LoginIDTextBox.Text,
                             LoginPWTextBox.Password,
                             SaveLoginInfoCheckBox.IsChecked,
-                            AutoLoginCheckBox.IsChecked, loginCancelTokenSource.Token);
+                            AutoLoginCheckBox.IsChecked);
 
                         if (result)
                         {

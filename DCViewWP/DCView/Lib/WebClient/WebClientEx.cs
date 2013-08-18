@@ -8,14 +8,41 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using DCView.Adapter;
 
 namespace DCView.Lib
 {
     // 쿠키를 지원하는 WebClient
-    public class WebClientEx : WebClient
+    public class WebClientEx : WebClient, IWebClient
     {
         static private CookieContainer cookieContainer = new CookieContainer();
         static public CookieContainer CookieContainer { get { return cookieContainer; } }
+
+        Dictionary<Action<object, long, long, int>, DownloadProgressChangedEventHandler> eventHandlers = new Dictionary<Action<object, long, long, int>, DownloadProgressChangedEventHandler>();
+        event Action<object, long, long, int> IWebClient.DownloadProgressChanged
+        {
+            add
+            {
+                DownloadProgressChangedEventHandler handler = (obj, args) => { value(obj, args.BytesReceived, args.TotalBytesToReceive, args.ProgressPercentage); };                
+                eventHandlers.Add(value, handler);
+                DownloadProgressChanged += handler;
+            }
+
+            remove
+            {
+                DownloadProgressChangedEventHandler handler;
+                if (eventHandlers.TryGetValue(value, out handler))
+                {
+                    DownloadProgressChanged -= handler;
+                    eventHandlers.Remove(value);
+                }
+            }
+        }
+
+        public void SetHeader(string name, string data)
+        {
+            Headers[name] = data;
+        }
 
         [SecuritySafeCritical]
         public WebClientEx()
@@ -23,19 +50,12 @@ namespace DCView.Lib
             this.Encoding = System.Text.Encoding.UTF8;
         }
 
-        public Task<string> DownloadStringAsyncTask(Uri uri, CancellationToken ct)
+        public Task<string> DownloadStringAsyncTask(Uri uri)
         {
             var tcs = new TaskCompletionSource<string>();            
 
-            var registration = ct.Register(() =>
-                {
-                    this.CancelAsync();
-                });
-
             this.DownloadStringCompleted += (o, e) =>
             {
-                registration.Dispose();
-
                 // 취소되었거나
                 if (e.Cancelled)
                 {
@@ -58,19 +78,12 @@ namespace DCView.Lib
             return tcs.Task;
         }
 
-        public Task<string> UploadStringAsyncTask(Uri uri, string method, string data, CancellationToken ct)
+        public Task<string> UploadStringAsyncTask(Uri uri, string method, string data)
         {
             var tcs = new TaskCompletionSource<string>();
 
-            var registration = ct.Register(() =>
-            {
-                this.CancelAsync();
-            });
-
             this.UploadStringCompleted += (o, e) =>
             {
-                registration.Dispose();
-
                 // 취소되었거나
                 if (e.Cancelled)
                 {

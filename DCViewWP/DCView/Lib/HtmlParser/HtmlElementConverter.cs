@@ -3,7 +3,7 @@ using System.Net;
 using System.Windows;
 using System.Collections.Generic;
 using System.Text;
-using DCView.Lib.HtmlParser;
+using DCView.Misc;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Media;

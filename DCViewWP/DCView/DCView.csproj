@@ -27,10 +27,14 @@
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -89,26 +93,26 @@
     <Reference Include="Microsoft.Phone.Reactive" />
     <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.14-rc\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.14-rc\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks.Extensions.Phone, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.14-rc\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.Extensions.Phone.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.Extensions.Phone.dll</HintPath>
     </Reference>
     <Reference Include="PhoneCodeContractsAssemblies">
       <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\PhoneCodeContractsAssemblies.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime, Version=1.5.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Bcl.1.0.16-rc\lib\sl4-windowsphone71\System.Runtime.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Bcl.1.0.19\lib\sl4-windowsphone71\System.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Tasks, Version=1.5.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Bcl.1.0.16-rc\lib\sl4-windowsphone71\System.Threading.Tasks.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Bcl.1.0.19\lib\sl4-windowsphone71\System.Threading.Tasks.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
@@ -118,44 +122,20 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adapter\WPSetting.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Board\Clien\ClienSite.cs" />
-    <Compile Include="Board\Clien\ClienArticle.cs" />
-    <Compile Include="Board\Clien\ClienBoard.cs" />
-    <Compile Include="Board\Clien\ClienComment.cs" />
-    <Compile Include="Board\DCInside\DCInsideSite.cs" />
-    <Compile Include="Interface\IArticle.cs" />
-    <Compile Include="Interface\ICredential.cs" />
-    <Compile Include="Interface\ILister.cs" />
-    <Compile Include="Interface\INotifyActivated.cs" />
-    <Compile Include="Board\DCInside\DCInsideArticle.cs" />
-    <Compile Include="Board\DCInside\DCInsideCredential.cs" />
-    <Compile Include="Board\DCInside\DCInsideBoard.cs" />
-    <Compile Include="Board\DCInside\DCInsideBoardSearch.cs" />
-    <Compile Include="Interface\IBoard.cs" />
-    <Compile Include="Board\DCInside\DCInsideComment.cs" />
-    <Compile Include="Interface\ISite.cs" />
-    <Compile Include="Interface\MemberStatus.cs" />
-    <Compile Include="Lib\HtmlParser\HtmlParser.cs" />
-    <Compile Include="Lib\HtmlParser\IHtmlEntity.cs" />
-    <Compile Include="Lib\HtmlParser\StringHtmlEntityConverter.cs" />
-    <Compile Include="Lib\StringEngine.cs" />
-    <Compile Include="Lib\TaskUtil.cs" />
     <Compile Include="Lib\StorageUtil.cs" />
     <Compile Include="Lib\WPF\ViewModelBase.cs" />
     <Compile Include="Lib\WebClient\WebClientEx.cs" />
     <Compile Include="Lib\WPF\NegateBoolConverter.cs" />
     <Compile Include="Lib\WPF\ThicknessWrapper.cs" />
     <Compile Include="Model\Favorites.cs" />
-    <Compile Include="Model\Picture.cs" />
-    <Compile Include="Model\RegexManager.cs" />
     <Compile Include="Model\SiteManager.cs" />
     <Compile Include="Lib\WebClient\DCViewWebClient.cs" />
     <Compile Include="Lib\HtmlParser\HtmlElementConverter.cs" />
     <Compile Include="Lib\WPF\BoolToColorConverter.cs" />
-    <Compile Include="Interface\IComment.cs" />
     <Compile Include="Views\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
     </Compile>
@@ -185,6 +165,7 @@
     <Compile Include="Views\WriteArticlePivotItem.xaml.cs">
       <DependentUpon>WriteArticlePivotItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Adapter\WPAdapterFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -272,9 +253,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AluminumLua\vs2010\AluminumLua.WP7\AluminumLua.WP7.csproj">
-      <Project>{B12F60D9-14C3-4B3E-B075-1318E52E4780}</Project>
-      <Name>AluminumLua.WP7</Name>
+    <ProjectReference Include="..\ParsingLib\ParsingLib.csproj">
+      <Project>{2C38445D-5DA5-4D46-88C2-2BBC5EE2FC53}</Project>
+      <Name>ParsingLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
@@ -288,5 +269,10 @@
   -->
   <ProjectExtensions />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.0-rc\tools\Microsoft.Bcl.Build.targets" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.9-beta\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.9-beta\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.9-beta\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.9-beta\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
+  <!--Import Project="..\packages\Microsoft.Bcl.Build.1.0.0-rc\tools\Microsoft.Bcl.Build.targets" /> -->
 </Project>

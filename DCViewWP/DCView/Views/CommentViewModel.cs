@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
+using DCView.Board;
 
 namespace DCView
 {

@@ -24,8 +24,9 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Tasks;
 using System.Windows.Media.Imaging;
 using DCView.Lib;
-using DCView.Lib.HtmlParser;
+using DCView.Misc;
 using DCView.Util;
+using DCView.Board;
 
 namespace DCView
 {

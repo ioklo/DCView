@@ -14,6 +14,8 @@ using System.IO.IsolatedStorage;
 using System.Threading.Tasks;
 using Microsoft.Phone.Tasks;
 using System.Linq;
+using DCView.Board;
+using DCView.Misc;
 
 namespace DCView
 {

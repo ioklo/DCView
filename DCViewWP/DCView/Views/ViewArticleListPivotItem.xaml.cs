@@ -16,6 +16,7 @@ using Microsoft.Phone.Shell;
 using Microsoft.Phone.Tasks;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using DCView.Board;
 
 namespace DCView
 {
@@ -147,7 +148,7 @@ namespace DCView
             {
                 IEnumerable<IArticle> newArticles = null;
                 bool bEnded = await Task.Factory.StartNew(
-                    () => { return articleLister.Next(cts.Token, out newArticles); }, cts.Token);
+                    () => { return articleLister.Next(out newArticles); }, cts.Token);
 
                 // TODO: 리스트의 마지막일때 처리
 

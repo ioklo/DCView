@@ -3,9 +3,9 @@ using System.Net;
 using System.Windows;
 using System.Collections.Generic;
 using System.Threading;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using DCView.Board;
 
 namespace DCView
 {

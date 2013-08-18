@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DCView.Board;
 
 namespace SandBox
 {
@@ -12,14 +13,15 @@ namespace SandBox
     {
         static void Main(string[] args)
         {
+            SandboxAdapterFactory.Init();
+
             ISite dcinside = new DCInsideSite();
             IBoard board = dcinside.GetBoard("windowsphone", "윈도우폰");
 
             ILister<IArticle> articles = board.GetArticleLister(0);
 
-            var cts = new CancellationTokenSource();
             IEnumerable<IArticle> result;
-            if (articles.Next(cts.Token, out result))
+            if (articles.Next(out result))
             {
                 foreach (IArticle article in result)
                 {
@@ -28,9 +30,6 @@ namespace SandBox
                 // var article = result.ElementAt(2);                
                 // article.WriteComment("b", cts.Token);
             }
-            
-
-            
         }
     }
 }

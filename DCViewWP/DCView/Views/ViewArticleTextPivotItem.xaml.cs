@@ -23,6 +23,8 @@ using ImageTools.Controls;
 using ImageTools;
 using CS.Windows.Controls;
 using Microsoft.Phone;
+using DCView.Board;
+using DCView.Misc;
 
 namespace DCView
 {
@@ -207,7 +209,7 @@ namespace DCView
             try
             {
                 bool succ = await Task.Factory.StartNew(
-                    () => { return article.WriteComment(text, cts.Token); }, cts.Token);
+                    () => { return article.WriteComment(text); }, cts.Token);
 
                 if (!succ)
                 {
@@ -543,13 +545,12 @@ namespace DCView
 
             try
             {
-                CancellationTokenSource cts = new CancellationTokenSource();                
                 ArticleData data = new ArticleData();
 
                 bool result = await Task.Factory.StartNew( () => 
                 {
                     string text = null;
-                    if (!article.GetText(cts.Token, out text)) return false;
+                    if (!article.GetText(out text)) return false;
 
                     // ArticleData 생성                                        
 
@@ -558,7 +559,7 @@ namespace DCView
                     data.CommentLister = article.GetCommentLister();
 
                     IEnumerable<IComment> newComments;
-                    bool bEnded = data.CommentLister.Next(cts.Token, out newComments);
+                    bool bEnded = data.CommentLister.Next(out newComments);
 
                     data.Comments.AddRange(newComments);
 
@@ -566,7 +567,7 @@ namespace DCView
                     cachedData.Add(article, data);
                     return true;
                 
-                }, cts.Token);
+                });
 
                 if (!result)
                 {

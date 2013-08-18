@@ -16,6 +16,7 @@ using Microsoft.Phone.Shell;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using DCView.Board;
 
 namespace DCView
 {
@@ -101,8 +102,8 @@ namespace DCView
 
                 bool result = await Task.Factory.StartNew ( () =>                    
                 {
-                    return board.WriteArticle(title, text, attachStream, cts.Token);
-                }, cts.Token);
+                    return board.WriteArticle(title, text, attachStream);
+                });
 
                 // 성공했으면 
                 if (result)
