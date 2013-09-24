@@ -40,12 +40,18 @@ public class DummyArticle implements IArticle, IPreviewArticle
     @Override
     public String GetText()
     {
-        return String.format("Text Text %05d", id);  //To change body of implemented methods use File | Settings | File Templates.
+        return String.format("Text %05d", id);  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public IPage<IComment> GetComments()
     {
         return new PageComment();
+    }
+
+    @Override
+    public String GetName()
+    {
+        return String.format("_이름%05d_", id);
     }
 }

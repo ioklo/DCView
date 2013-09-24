@@ -5,6 +5,6 @@ public interface IPreviewArticle
     // async operation
     IArticle GetArticle();
 
+    String GetName();
     String GetTitle();
-    String GetText();
 }

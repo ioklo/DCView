@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content" >
+
+    <LinearLayout android:layout_width="5dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_orange_light"
+            android:orientation="horizontal">
+    </LinearLayout>
+
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_margin="3dp">
+
+        <TextView android:id="@+id/title"
+                  android:layout_width="fill_parent" android:layout_height="fill_parent"
+                  style="@android:style/TextAppearance.Holo.Medium"
+                  android:text="디씨뷰가 나왔습니다"
+                  android:layout_margin="2dp" />
+
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="무선마우스 | 2013/07/13 01:00:34 | 댓글 2"
+                android:id="@+id/name"
+                style="@android:style/TextAppearance.Holo.Small"
+                android:layout_margin="2dp" />
+
+
+
+    </LinearLayout>
+        <!-- CheckBox android:id="@+id/selectAttration" android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  style="@android:style/TextAppearance.DeviceDefault.Large"
+                  android:textStyle="bold"
+                  android:layout_weight="1"
+                  android:layout_centerVertical="true"
+                  android:layout_alignParentRight="true"
+                  android:focusable="false" /-->
+</LinearLayout>

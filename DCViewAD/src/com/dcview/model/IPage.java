@@ -1,8 +1,8 @@
 package com.dcview.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface IPage<T>
 {
-    ArrayList<T> GetNext();
+    List<T> GetNext();
 }

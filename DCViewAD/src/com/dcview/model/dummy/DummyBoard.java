@@ -30,6 +30,6 @@ public class DummyBoard implements IBoard
     @Override
     public IPage<IPreviewArticle> GetArticles()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new PreviewArticlePage();
     }
 }
