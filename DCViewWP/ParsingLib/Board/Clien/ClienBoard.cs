@@ -91,8 +91,8 @@ namespace DCView.Board
 
             public bool Next(out System.Collections.Generic.IEnumerable<IArticle> elems)
             {
-                string result = AdapterFactory.Instance.CreateWebClient().DownloadStringAsyncTask(
-                    new Uri(string.Format("http://clien.career.co.kr/cs2/bbs/board.php?bo_table={0}&page={1}&{2}", id, page + 1, DateTime.Now.Ticks), UriKind.Absolute))
+                string result = AdapterFactory.Instance.CreateWebClient(false).DownloadStringAsyncTask(
+                    new Uri(string.Format("http://www.clien.net/cs2/bbs/board.php?bo_table={0}&page={1}&{2}", id, page + 1, DateTime.Now.Ticks), UriKind.Absolute))
                     .GetResult();
 
                 StringEngine se = new StringEngine(result);

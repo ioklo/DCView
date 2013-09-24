@@ -16,9 +16,9 @@ namespace SandBox
             Instance = new SandboxAdapterFactory();
         }
 
-        public override IWebClient CreateWebClient()
+        public override IWebClient CreateWebClient(bool bMobile)
         {
-            return new SandboxWebClient();
+            return new SandboxWebClient(bMobile);
         }
 
         public override ISettings Settings

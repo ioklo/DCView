@@ -23,7 +23,7 @@
     </phone:PhoneApplicationPage.Resources>
     
     <!--LayoutRoot에는 다른 모든 페이지 내용이 배치되는 루트 표가 포함됩니다.-->
-    <Grid x:Name="LayoutRoot" Language="ko-kr">
+    <Grid x:Name="LayoutRoot" Language="ko-kr" Margin="0">
         
         <controls:Pivot Name="MainPivot" 
                         SelectionChanged="PivotMain_SelectionChanged">

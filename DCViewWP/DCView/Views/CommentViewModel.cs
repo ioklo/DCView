@@ -22,7 +22,7 @@ namespace DCView
         {
             get
             {
-                return new Thickness(Comment.Level * 20, 10, 0, 10);
+                return new Thickness(Comment.Level * 20, 0, 0, 0);
             }
         }
 

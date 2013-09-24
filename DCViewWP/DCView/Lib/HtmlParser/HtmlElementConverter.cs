@@ -13,21 +13,25 @@ namespace DCView.Util
 {
     public class HtmlElementConverter
     {
-        private static StringHtmlEntityConverter stringHtmlConverter = new StringHtmlEntityConverter();
-
         static public IEnumerable<FrameworkElement> GetUIElementFromString(string input, Action<Uri> tapAction)
         {
             StringBuilder curPlainString = new StringBuilder();
 
             int pDepth = 0;
 
-            foreach (IHtmlEntity entity in stringHtmlConverter.Convert(input))
+            foreach (IHtmlEntity entity in HtmlLexer.Lex(input))
             {
                 if (entity is PlainString)
                 {
                     // 바로 출력하지는 않고 
                     PlainString plainString = (PlainString)entity;
                     curPlainString.Append(plainString.Content);
+                }
+                else if (entity is WhiteSpaces)
+                {
+                    if (curPlainString.Length > 0 &&
+                        !char.IsWhiteSpace(curPlainString[curPlainString.Length - 1]))
+                        curPlainString.Append(' ');
                 }
                 else if (entity is Tag)
                 {
@@ -77,14 +81,14 @@ namespace DCView.Util
                     if (tag.Name.Equals("img", StringComparison.CurrentCultureIgnoreCase))
                     {
                         string url;
-                        if (tag.Attrs.TryGetValue("src", out url))                        
+                        if (tag.Attrs.TryGetValue("src", out url))
                         {
                             var pic = new Picture(url, "");
                             var grid = new Grid();
                             grid.Tag = pic;
 
                             yield return grid;
-                        }                        
+                        }
                     }
                 }
             }

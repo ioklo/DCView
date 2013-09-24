@@ -9,6 +9,14 @@ namespace DCView.Misc
     {
     }
 
+    public class WhiteSpaces : IHtmlEntity
+    {
+    }
+
+    public class Comment : IHtmlEntity
+    {
+    }
+
     // 태그.. 
     public class Tag : IHtmlEntity
     {
@@ -53,6 +61,11 @@ namespace DCView.Misc
     public class PlainString : IHtmlEntity
     {
         public string Content { get; set; }
+
+        public override string ToString()
+        {
+            return "PlainString: " + Content;
+        }
     }
 
 }
