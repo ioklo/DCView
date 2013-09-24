@@ -72,8 +72,8 @@ namespace DCView.Board
         {
             text = string.Empty;
 
-            var result = AdapterFactory.Instance.CreateWebClient().DownloadStringAsyncTask(
-                new Uri(string.Format("http://clien.career.co.kr/cs2/bbs/board.php?bo_table={0}&wr_id={1}", board.ID, id), UriKind.Absolute))
+            var result = AdapterFactory.Instance.CreateWebClient(false).DownloadStringAsyncTask(
+                new Uri(string.Format("http://www.clien.net/cs2/bbs/board.php?bo_table={0}&wr_id={1}", board.ID, id), UriKind.Absolute))
                 .GetResult();
 
             StringEngine se = new StringEngine(result);

@@ -9,7 +9,7 @@ namespace DCView.Adapter
 {
     public abstract class AdapterFactory
     {
-        public abstract IWebClient CreateWebClient();
+        public abstract IWebClient CreateWebClient(bool bMobile = true);
         public abstract ISettings Settings { get; }
 
         public abstract string UrlEncode(string str);

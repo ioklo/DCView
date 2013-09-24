@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DCView.Board;
+using DCView.Misc;
 
 namespace SandBox
 {
@@ -15,20 +16,36 @@ namespace SandBox
         {
             SandboxAdapterFactory.Init();
 
-            ISite dcinside = new DCInsideSite();
-            IBoard board = dcinside.GetBoard("windowsphone", "윈도우폰");
+            // ISite dcinside = new DCInsideSite();
+            // IBoard board = dcinside.GetBoard("windowsphone", "윈도우폰");
+
+            ISite site = new ClienSite();
+            IBoard board = site.GetBoard("news", "새로운 소식");
 
             ILister<IArticle> articles = board.GetArticleLister(0);
 
             IEnumerable<IArticle> result;
             if (articles.Next(out result))
             {
-                foreach (IArticle article in result)
+                string text;
+                result.First().GetText(out text);
+
+                Console.WriteLine(text);
+
+                StringHtmlEntityConverter conv = new DCView.Misc.StringHtmlEntityConverter();
+                foreach (IHtmlEntity entity in HtmlLexer.Lex(text))
                 {
-                    Console.WriteLine(article.Title);
+                    Console.WriteLine(entity);
                 }
-                // var article = result.ElementAt(2);                
-                // article.WriteComment("b", cts.Token);
+
+                // Console.WriteLine(text);
+
+                /*foreach (IArticle article in result)
+                {
+
+
+                    Console.WriteLine(article.Title);
+                } */               
             }
         }
     }

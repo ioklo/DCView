@@ -8,7 +8,6 @@ namespace DCView.Misc
 {
     public static class HtmlParser
     {
-        private static StringHtmlEntityConverter stringHtmlConverter = new StringHtmlEntityConverter();
         private static Regex urlRegex = new Regex(@"((https?|ftp|gopher|telnet|file|notes|ms-help):((//)|(\\\\))+[\w\d:#@%/;$()~_?\+-=\\\.&]*)");
 
         public class Splitted
@@ -41,7 +40,7 @@ namespace DCView.Misc
         static public string StripTags(string input)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (IHtmlEntity entity in stringHtmlConverter.Convert(input))
+            foreach (IHtmlEntity entity in HtmlLexer.Lex(input))
             {
                 if (entity is PlainString)
                 {
@@ -49,8 +48,11 @@ namespace DCView.Misc
                     PlainString plainString = (PlainString)entity;
                     sb.Append(plainString.Content);
                 }
-                //else if (sb.Length != 0 && sb[sb.Length-1] != ' ') 
-                //    sb.Append(" ");
+                else if (entity is WhiteSpaces)
+                {
+                    if (0 < sb.Length && !char.IsWhiteSpace(sb[sb.Length - 1]))
+                        sb.Append(' ');
+                }
             }
 
             return sb.ToString();

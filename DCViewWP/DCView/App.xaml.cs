@@ -81,11 +81,23 @@ namespace DCView
             if (DateTime.Now.Month == 12 && DateTime.Now.Day == 24)
             {
                 Resources.Add("DCViewAccentBrush", new SolidColorBrush(Color.FromArgb(0xFF, 0xE5, 0x14, 0x00)));
+                Resources.Add("DCViewAccentLightBrush", new SolidColorBrush(Color.FromArgb(0xFF, 0xF5, 0x24, 0x10)));
                 Resources.Add("DCViewAccentColor", Color.FromArgb(0xFF, 0xE5, 0x14, 0x00));
             }
             else
             {
-                Resources.Add("DCViewAccentBrush", Resources["PhoneAccentBrush"]);
+                const float alpha = 0.3f;
+                const float inv = 1.0f - alpha;
+
+                SolidColorBrush brush = (SolidColorBrush)Resources["PhoneAccentBrush"];
+                SolidColorBrush lightBrush = new SolidColorBrush(
+                    Color.FromArgb(255,
+                        (byte)Math.Min(255, (int)brush.Color.R * alpha + 255 * inv),
+                        (byte)Math.Min(255, (int)brush.Color.G * alpha + 255 * inv),
+                        (byte)Math.Min(255, (int)brush.Color.B * alpha + 255 * inv)));
+                        
+                Resources.Add("DCViewAccentBrush", brush);
+                Resources.Add("DCViewAccentLightBrush", lightBrush);
                 Resources.Add("DCViewAccentColor", Resources["PhoneAccentColor"]);
             }
         }

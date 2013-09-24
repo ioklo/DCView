@@ -10,6 +10,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
+                    Margin="0"
     d:DesignHeight="480" d:DesignWidth="480">
 
     <controls:PivotItem.Resources>
@@ -17,7 +18,7 @@
     </controls:PivotItem.Resources>
   
 
-    <Grid Margin="-5, 0">
+    <Grid Margin="0, 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
@@ -42,32 +43,34 @@
         </StackPanel>
         
 
-        <ListBox x:Name="ArticleList" Grid.Row="1"
+        <ListBox Margin="0" x:Name="ArticleList" Grid.Row="1"
                  ManipulationCompleted="ArticleList_ManipulationCompleted">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />                    
+                    <Setter Property="Margin" Value="0" />
                 </Style>
-            </ListBox.ItemContainerStyle>
-            
+            </ListBox.ItemContainerStyle>           
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="12, 12" Tap="ArticleListItem_Tap" Tag="{Binding Article}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Rectangle Grid.Column="0" Width="5" HorizontalAlignment="Stretch" Fill="{Binding HasImageBrush}" />
-                        <StackPanel Grid.Column="1" Margin="0, 0, 0, 3">
-                            <TextBlock Text="{Binding Title}" 
-                                       Style="{StaticResource DCViewTextMediumStyle}"
-                                       TextWrapping="Wrap" />
+                    <Border BorderThickness="0, 0, 0, 1" BorderBrush="{StaticResource PhoneSubtleBrush}">
+                        <Grid Margin="0" Tap="ArticleListItem_Tap" Tag="{Binding Article}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Rectangle Grid.Column="0" Width="6" HorizontalAlignment="Stretch" Fill="{Binding HasImageBrush}" />
+                            <StackPanel Grid.Column="1" Margin="0, 12">
+                                <TextBlock Text="{Binding Title}" 
+                                           Style="{StaticResource DCViewTextMediumStyle}"
+                                           TextWrapping="Wrap" />
 
-                            <my:ArticleStatusView />
+                                <my:ArticleStatusView />
 
-                        </StackPanel>
-                    </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

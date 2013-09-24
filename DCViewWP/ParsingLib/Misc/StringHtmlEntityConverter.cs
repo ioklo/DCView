@@ -2,9 +2,328 @@
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace DCView.Misc
 {
+    public class Scope : IDisposable
+    {
+        bool bAccept = false;
+        Action RollBackAction;
+
+        public Scope(Action action)
+        {
+            this.RollBackAction = action;
+        }
+
+        public void Accept()
+        {
+            bAccept = true;
+        }
+
+        public void Dispose()
+        {
+            // TODO: finalizer를 통해 들어왔을 때는 아무 일도 일어나지 않아야 한다
+            if (!bAccept)
+                RollBackAction();
+        }
+    }
+
+    public class Parser
+    {
+        private String buffer;
+
+        private int curIndex; // buffer에서의 인덱스
+
+        public Scope Open()
+        {
+            int baseIndex = curIndex;
+            Scope scope = new Scope(() => { curIndex = baseIndex; }); 
+            return scope;
+        }
+        
+        public Parser(string str)
+        {
+            // TODO: 조금씩 가져오는건 나중에 합시다.
+            buffer = str;
+        }
+
+        public bool ConsumeIf(Predicate<char> Pred, out string str)
+        {
+            bool bOnce = false;
+            int startIndex = curIndex;
+
+            using (Scope scope = Open())
+            {
+                while(curIndex < buffer.Length)
+                {
+                    // peek
+                    char c = buffer[curIndex];
+                    if (!Pred(c)) break;
+
+                    bOnce = true;
+                    curIndex++;
+                }
+
+                if (bOnce)
+                {
+                    scope.Accept();
+                    str = buffer.Substring(startIndex, curIndex - startIndex);
+                    return true;
+                }
+                
+                str = null;
+                return false;
+            }
+        }
+
+        public bool Consume(string str)
+        {
+            using (Scope scope = Open())
+            {
+                foreach (char c in str)
+                {
+                    if (buffer.Length <= curIndex)
+                        return false;
+
+                    if (buffer[curIndex] != c)
+                        return false;
+
+                    curIndex++;
+                }
+
+                scope.Accept();
+                return true;
+            }
+        }
+
+        // 모두 뒤져도 나오지 않았을 경우에
+        public bool ConsumeUntil(string str, out string output, bool bConsumeWhenFailed = false)
+        {
+            int pos = buffer.IndexOf(str, curIndex);
+
+            if (pos != -1)
+            {
+                output = buffer.Substring(curIndex, pos - curIndex);
+                curIndex = pos + str.Length;
+                return true;
+            }
+            
+            if (bConsumeWhenFailed)
+            {
+                curIndex = buffer.Length;
+                output = buffer.Substring(curIndex);
+                return true;
+            }
+
+            output = string.Empty;
+            return false;
+        }
+
+        // n개만큼 가져와본다, n개가 안될수도 있다
+        public String Peek(int n)
+        {
+            int end = Math.Min(curIndex + n, buffer.Length);
+            StringBuilder sb = new StringBuilder();
+
+            // curIndex로부터 n개
+            for( int t = curIndex; t < end; t++)
+                sb.Append(buffer[t]);
+
+            return sb.ToString();
+        }
+
+        public bool Valid
+        {
+            get { return curIndex < buffer.Length; }
+        }
+    }
+
+
+    // 다시 만들어 보는 HtmlLexer
+    // HtmlLexer 의 결과물은 -> PlainString 혹은 Tag
+    public class HtmlLexer
+    {
+        // state 모델의 문제는
+        // 내가 지금 왜 이 스테이트에 있는지 알 수가 없다. (디버깅이 어려움)
+        Parser parser;
+
+        private HtmlLexer(string str)
+        {
+            parser = new Parser(str);
+        }
+
+        private bool ConsumeWhiteSpaces()
+        {
+            string output;
+
+            return parser.ConsumeIf(c => Char.IsWhiteSpace(c), out output);
+        }
+
+        private bool GetEntity(out IHtmlEntity entity)
+        {
+            // 빈란
+            if (ConsumeWhiteSpaces())
+            {
+                entity = new WhiteSpaces();
+                return true;
+            }
+
+            // <!-- 으로 시작하는지
+            if (parser.Consume("<!--"))
+            {
+                // --> 가 없어도 모두 consume 하고 끝내면 된다
+                string temp;
+                parser.ConsumeUntil("-->", out temp, true);
+                entity = new Comment();
+                return true;
+            }
+
+            // Tag
+            Tag tag;
+            if (ConsumeTag(out tag))
+            {
+                entity = tag;
+                return true;
+            }
+        
+            // PlainString
+            PlainString plain;
+            if (ConsumePlainString(out plain))
+            {
+                entity = plain;
+                return true;
+            }
+
+            entity = null;
+            return false;
+        }
+
+        private bool ConsumePlainString(out PlainString plain)
+        {
+            string output;
+            if (parser.ConsumeIf(c => !Char.IsWhiteSpace(c) && c != '<', out output))
+            {
+                plain = new PlainString() { Content = output };
+                return true;
+            }
+
+            plain = null;
+            return false;            
+        }
+
+        private bool ConsumeAttribute(out string elem, out string value)
+        {
+            if (!parser.ConsumeIf(c => Char.IsLetter(c), out elem))
+            {
+                value = string.Empty;
+                return false;
+            }
+
+            ConsumeWhiteSpaces();
+
+            if (!parser.Consume("="))
+            {
+                value = string.Empty;
+                return true;
+            }
+
+            ConsumeWhiteSpaces();
+
+            if (parser.Consume("\""))
+            {
+                parser.ConsumeUntil("\"", out value, true);
+                return true;
+            }
+            else if (parser.Consume("'"))
+            {
+                parser.ConsumeUntil("'", out value, true);
+                return true;
+            }
+            else if (parser.ConsumeIf(c => Char.IsLetterOrDigit(c), out value))
+            {
+                return true;
+            }
+
+            value = string.Empty;
+            return false;
+        }
+
+        private bool ConsumeTag(out Tag tag)
+        {
+            tag = null;
+            Tag res = new Tag();
+
+            if (!parser.Consume("<")) return false;
+
+            ConsumeWhiteSpaces();
+
+            if (!parser.Consume("/"))
+                res.Kind = Tag.TagKind.Open;
+            else
+                res.Kind = Tag.TagKind.Close;
+
+            ConsumeWhiteSpaces();
+
+            string name;
+            if (!parser.ConsumeIf( c => Char.IsLetterOrDigit(c), out name))
+                return false;
+            
+            res.Name = name;
+
+            while (parser.Valid)
+            {
+                string elem, value;
+
+                // 성공하든 말든 상관없다
+                ConsumeWhiteSpaces();
+
+                // elem = "value" 꼴                
+                if (parser.Consume(">"))
+                {
+                    tag = res;
+                    return true;
+                }
+
+                using (Scope scope = parser.Open())
+                {
+                    if (parser.Consume("/"))
+                    {
+                        ConsumeWhiteSpaces();
+
+                        if (parser.Consume(">"))
+                        {
+                            res.Kind = Tag.TagKind.OpenAndClose;
+                            tag = res;
+                            scope.Accept();
+                            return true;
+                        }
+                    }
+                }
+
+                if (ConsumeAttribute(out elem, out value))
+                {
+                    res.Attrs[elem.ToLower()] = value;
+                    continue;
+                }
+
+                break;
+            }
+
+            return false;
+        }
+
+        static public IEnumerable<IHtmlEntity> Lex(string str)
+        {
+            HtmlLexer lexer = new HtmlLexer(str);
+
+            IHtmlEntity entity;
+            while (lexer.GetEntity(out entity))
+                yield return entity;
+        }
+    }
+
+
     public class StringHtmlEntityConverter
     {
         // 어떤 스테이트 실행기는.. 
@@ -152,6 +471,10 @@ namespace DCView.Misc
                 tag.Kind = Tag.TagKind.Close;
                 PassThroughWhiteSpaces(reader);
             }
+            else if (PassCharacter(reader, '!'))
+            {
+                // 주석 처리
+            }
             else
             {
                 tag.Kind = Tag.TagKind.Open;
@@ -277,6 +600,8 @@ namespace DCView.Misc
             // 종료 스테이트가 될 때까지 돌린다
             while (stateExecuter != null)
             {
+                Debug.WriteLine(stateExecuter);
+
                 StateExecuter<T> nextExecuter;
 
                 if (!stateExecuter(reader, data, out nextExecuter))
