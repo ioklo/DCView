@@ -143,7 +143,7 @@ namespace DCView.Misc
 
                 // 버전 확인
                 var verString = client.DownloadStringAsyncTask(new Uri(
-                    string.Format("http://ioklo.byus.net/dcview/pattern_version.txt?nocache={0}", DateTime.Now.Ticks), UriKind.Absolute)).GetResult();
+                    string.Format("http://ioklo.byus.net/dcview/pattern_version.txt?nocache={0}", DateTime.Now.Ticks), UriKind.Absolute)).Result;
 
                 var reader = new StringReader(verString);
                 int updateVer = int.Parse(reader.ReadLine());
@@ -158,7 +158,7 @@ namespace DCView.Misc
 
                 client = AdapterFactory.Instance.CreateWebClient();
                 var result = client.DownloadStringAsyncTask(new Uri(
-                    string.Format("http://ioklo.byus.net/dcview/pattern_dc.txt?nocache={0}", DateTime.Now.Ticks), UriKind.Absolute)).GetResult();
+                    string.Format("http://ioklo.byus.net/dcview/pattern_dc.txt?nocache={0}", DateTime.Now.Ticks), UriKind.Absolute)).Result;
 
                 using (var stream = AdapterFactory.Instance.OpenWriteStorageFile("/pattern_dc.txt"))
                 using (var writer = new StreamWriter(stream, Encoding.UTF8))

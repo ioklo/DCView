@@ -251,7 +251,7 @@ namespace DCView
             const int maxWidth = 512;
             const int maxHeight = 1024;
 
-            var bitmap = Dispatcher.InvokeAsync(() => PictureDecoder.DecodeJpeg(stream)).GetResult();
+            var bitmap = Dispatcher.InvokeAsync(() => PictureDecoder.DecodeJpeg(stream)).Result;
 
             // 메모리를 적게 쓰기 위해서 다운 사이징
             // 1. width 최대치를 maxWidth로 고정
@@ -267,7 +267,7 @@ namespace DCView
                     // SaveJpeg만 리사이즈 기능을 갖고 있나보다..
                     bitmap.SaveJpeg(ms, downWidth, downHeight, 0, 90);
                     ms.Seek(0L, SeekOrigin.Begin);
-                    bitmap = Dispatcher.InvokeAsync(() => PictureDecoder.DecodeJpeg(ms)).GetResult();
+                    bitmap = Dispatcher.InvokeAsync(() => PictureDecoder.DecodeJpeg(ms)).Result;
                 }
             }
 
@@ -279,7 +279,7 @@ namespace DCView
             int chunk = maxHeight * bitmap.PixelWidth;
             for (int i = 0; i < n; i++)
             {
-                var wbmp = Dispatcher.InvokeAsync(() => new WriteableBitmap(bitmap.PixelWidth, maxHeight)).GetResult();
+                var wbmp = Dispatcher.InvokeAsync(() => new WriteableBitmap(bitmap.PixelWidth, maxHeight)).Result;
                 Array.Copy(bitmap.Pixels, i * chunk, wbmp.Pixels, 0, chunk);
                 bitmaps.Add(wbmp);
             }
@@ -288,7 +288,7 @@ namespace DCView
             int restHeight = bitmap.PixelHeight % maxHeight;
             if (restHeight != 0)
             {
-                var wbmp = Dispatcher.InvokeAsync(() => new WriteableBitmap(bitmap.PixelWidth, restHeight)).GetResult();
+                var wbmp = Dispatcher.InvokeAsync(() => new WriteableBitmap(bitmap.PixelWidth, restHeight)).Result;
                 Array.Copy(bitmap.Pixels, n * chunk, wbmp.Pixels, 0, bitmap.PixelWidth * restHeight);
                 bitmaps.Add(wbmp);
             }
@@ -442,7 +442,7 @@ namespace DCView
             title.Style = Application.Current.Resources["DCViewTextMediumStyle"] as Style;
             title.Text = HttpUtility.HtmlDecode(article.Title);
             title.FontWeight = FontWeights.Bold;
-            title.Margin = new Thickness(0, 12, 0, 12);
+            title.Margin = new Thickness(6, 9, 6, 9);
             panel.Items.Add(title);
 
             // * 그림 불러오기 버튼
@@ -469,6 +469,7 @@ namespace DCView
             // * 본문
             foreach (var elem in HtmlElementConverter.GetUIElementFromString(data.Text, tapAction))
             {
+                elem.Margin = new Thickness(9);
                 panel.Items.Add(elem);
 
                 if (elem is Grid && elem.Tag is Picture)
@@ -480,8 +481,10 @@ namespace DCView
             status.DataContext = new ArticleViewModel(article);
             status.HorizontalAlignment = HorizontalAlignment.Right;
             panel.Items.Add(status);
-            
+
             // * 댓글
+
+            var cmtStackPanel = new StackPanel();
             foreach (var cmt in data.Comments)
             {
                 var commentView = new CommentView();
@@ -489,14 +492,26 @@ namespace DCView
                 
                 foreach (var grid in HtmlElementConverter.GetUIElementFromString(cmt.Text, tapAction))
                 {
+                    grid.Margin = new Thickness(0);
                     commentView.Contents.Children.Add(grid);
 
                     if (grid is Grid && grid.Tag is Picture)
                         imgContainers.Add((Grid)grid);
                 }
 
-                panel.Items.Add(commentView);
+                cmtStackPanel.Children.Add(commentView);
             }
+
+            var border = new Border()
+            {
+                BorderThickness = new Thickness(0, 1, 0, 0),
+                BorderBrush = (Brush)Resources["PhoneSubtleBrush"],
+                Margin = new Thickness(0, 12, 0, 0),
+            };
+
+            border.Child = cmtStackPanel;
+            panel.Items.Add(border);
+            
 
             // * 댓글을 달 수 있으면 ReplyTextBox 넣기
             if (article.CanWriteComment)

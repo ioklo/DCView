@@ -240,7 +240,7 @@ namespace DCView.Misc
                 parser.ConsumeUntil("'", out value, true);
                 return true;
             }
-            else if (parser.ConsumeIf(c => Char.IsLetterOrDigit(c), out value))
+            else if (parser.ConsumeIf(c => !Char.IsWhiteSpace(c) && c != '>', out value))
             {
                 return true;
             }

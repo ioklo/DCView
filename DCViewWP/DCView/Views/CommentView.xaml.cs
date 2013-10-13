@@ -10,7 +10,7 @@ using Microsoft.Phone.Shell;
 
 namespace DCView
 {
-    public partial class CommentView : Grid
+    public partial class CommentView : UserControl
     {
         public CommentView()
         {

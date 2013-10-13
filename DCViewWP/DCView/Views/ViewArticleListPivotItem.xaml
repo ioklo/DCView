@@ -10,8 +10,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
-                    Margin="0"
-    d:DesignHeight="480" d:DesignWidth="480">
+    Margin="0" d:DesignHeight="480" d:DesignWidth="480">
 
     <controls:PivotItem.Resources>
         <my:BoolToColorConverter x:Key="BoolToColorConverter" />
@@ -54,13 +53,13 @@
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderThickness="0, 0, 0, 1" BorderBrush="{StaticResource PhoneSubtleBrush}">
+                    <Border BorderThickness="0, 0, 0, 1" HorizontalAlignment="Stretch" BorderBrush="{StaticResource PhoneSubtleBrush}">
                         <Grid Margin="0" Tap="ArticleListItem_Tap" Tag="{Binding Article}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="6" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Rectangle Grid.Column="0" Width="6" HorizontalAlignment="Stretch" Fill="{Binding HasImageBrush}" />
+                            <Rectangle Grid.Column="0" HorizontalAlignment="Stretch" Fill="{Binding HasImageBrush}" />
                             <StackPanel Grid.Column="1" Margin="0, 12">
                                 <TextBlock Text="{Binding Title}" 
                                            Style="{StaticResource DCViewTextMediumStyle}"

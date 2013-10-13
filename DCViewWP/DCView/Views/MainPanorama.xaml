@@ -62,21 +62,13 @@
             </controls:PanoramaItem>
 
             <!--Panorama 항목 2-->
-            <controls:PanoramaItem x:Name="PanoramaAll">
-                <!--controls:PanoramaItem.Header>
-                    <TextBlock>전체</TextBlock>
-                </controls:PanoramaItem.Header-->
+            <controls:PanoramaItem x:Name="PanoramaAll">                
                 
                 <Grid>                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    
-                    <!--<Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>-->
+                    </Grid.RowDefinitions>                    
 
                     <StackPanel Grid.Row="0">
                         <toolkit:ListPicker x:Name="SearchSite"
@@ -152,9 +144,12 @@
 
                     <RichTextBox Grid.Row="1" VerticalAlignment="Top" Margin="0, 0, 0, 20" >
                         <RichTextBox.Blocks>
-                            <Paragraph>DCView 1.4.5, Copyright © &lt;IOKLO 2012
+                            <Paragraph>DCView
+                                <Run x:Name="VersionText"/>,
                                 <LineBreak />
-                                <Hyperlink Click="Hyperlink_Click">http://dcview.codeplex.com/</Hyperlink>
+                                Copyright © &lt;IOKLO 2013
+                                <LineBreak />
+                                <Hyperlink Click="Hyperlink_Click">https://github.com/ioklo/dcview</Hyperlink>
                             </Paragraph>
                         </RichTextBox.Blocks>
                     </RichTextBox>

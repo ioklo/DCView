@@ -45,6 +45,7 @@
     <Compile Include="Board\DCInside\DCInsideComment.cs" />
     <Compile Include="Board\DCInside\DCInsideCredential.cs" />
     <Compile Include="Board\DCInside\DCInsideSite.cs" />
+    <Compile Include="Board\Factory.cs" />
     <Compile Include="Board\IArticle.cs" />
     <Compile Include="Board\IBoard.cs" />
     <Compile Include="Board\IComment.cs" />

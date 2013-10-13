@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SandBox", "SandBox\SandBox.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsingLib", "ParsingLib\ParsingLib.csproj", "{2C38445D-5DA5-4D46-88C2-2BBC5EE2FC53}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS.Windows.Controls.WP7", "CS.Windows.Controls.WP7\CS.Windows.Controls.WP7.csproj", "{62249A43-7585-4C60-91E3-31BF0AF18C21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,8 @@ Global
 		{97ED78CB-AEBE-46E7-B090-DF2844C5442F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{97ED78CB-AEBE-46E7-B090-DF2844C5442F}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{97ED78CB-AEBE-46E7-B090-DF2844C5442F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{97ED78CB-AEBE-46E7-B090-DF2844C5442F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{97ED78CB-AEBE-46E7-B090-DF2844C5442F}.Release|Mixed Platforms.Deploy.0 = Release|Any CPU
 		{97ED78CB-AEBE-46E7-B090-DF2844C5442F}.Release|x86.ActiveCfg = Release|Any CPU
 		{B2568A8B-E9A8-46AE-BBB3-F290F3F49625}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B2568A8B-E9A8-46AE-BBB3-F290F3F49625}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -57,6 +61,16 @@ Global
 		{2C38445D-5DA5-4D46-88C2-2BBC5EE2FC53}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2C38445D-5DA5-4D46-88C2-2BBC5EE2FC53}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2C38445D-5DA5-4D46-88C2-2BBC5EE2FC53}.Release|x86.ActiveCfg = Release|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{62249A43-7585-4C60-91E3-31BF0AF18C21}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

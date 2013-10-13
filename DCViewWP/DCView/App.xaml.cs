@@ -86,7 +86,7 @@ namespace DCView
             }
             else
             {
-                const float alpha = 0.3f;
+                const float alpha = 0.5f;
                 const float inv = 1.0f - alpha;
 
                 SolidColorBrush brush = (SolidColorBrush)Resources["PhoneAccentBrush"];

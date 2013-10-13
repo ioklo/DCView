@@ -18,12 +18,9 @@ namespace DCView
             Comment = comment;
         }
 
-        public Thickness MarginByLevel
+        public GridLength LeftMarginByLevel
         {
-            get
-            {
-                return new Thickness(Comment.Level * 20, 0, 0, 0);
-            }
+            get { return new GridLength(Comment.Level * 20); }
         }
 
         public string Name

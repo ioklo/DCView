@@ -16,6 +16,7 @@ using Microsoft.Phone.Tasks;
 using System.Linq;
 using DCView.Board;
 using DCView.Misc;
+using System.Reflection;
 
 namespace DCView
 {
@@ -37,30 +38,24 @@ namespace DCView
             public string Name { get { return Site.Name; } }
             public ISite Site { get; set; }
         }
+        
 
-        // 이벤트: 게시판 목록이 모두 로딩되었을 때
-        private void OnLoadingCompleted()
+        // WP7 compatibility
+        private static string GetVersionNumber()
         {
-            foreach (var site in App.Current.SiteManager.Sites)
-                SearchSite.Items.Add(new SearchSiteItem() { Site = site });
-
-            SearchResult.ItemsSource = App.Current.SiteManager.Sites.First().Boards;
-            bLoadingCompleted = true;
+            var asm = Assembly.GetExecutingAssembly();
+            var parts = asm.FullName.Split(',');
+            return parts[1].Split('=')[1];
         }
 
         public MainPanorama()
         {
             InitializeComponent();
+            VersionText.Text = GetVersionNumber();
             InitializeApplicationBar();
 
             ApplicationBar = favoriteApplicationBar;
             Favorites.ItemsSource = App.Current.Favorites.All;            
-
-            Task.Factory.StartNew(() =>
-            {
-                App.Current.SiteManager.WaitForLoadingComplete(null);
-                Dispatcher.BeginInvoke(OnLoadingCompleted);
-            });
         }
 
         // 내부 함수
@@ -100,9 +95,7 @@ namespace DCView
 
             PassiveLoadImgCheckBox.IsChecked = (bool)IsolatedStorageSettings.ApplicationSettings["DCView.passive_loadimg"];
             FontSizeCheckBox.IsChecked = (App.FontSize)IsolatedStorageSettings.ApplicationSettings["DCView.fontsize"] == App.FontSize.Large;
-        }
-
-        
+        }        
 
         
         private void PanoramaMain_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -114,12 +107,17 @@ namespace DCView
             else if (PanoramaMain.SelectedItem == PanoramaAll)
             {
                 ApplicationBar = allApplicationBar;
+
+                if (SearchSite.Items.Count == 0)
+                {
+                    foreach (var site in Factory.Sites)
+                        SearchSite.Items.Add(new SearchSiteItem() { Site = site });
+                }
             }
             else if (PanoramaMain.SelectedItem == PanoramaSetting)
             {
                 ApplicationBar = settingApplicationBar;
             }
-
         }
 
 
@@ -178,12 +176,10 @@ namespace DCView
         }
         
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            
+        {            
             // 1초 기다리는 타이머가 없다면 만든다.
             if (dt == null)
             {
-
                 dt = new DispatcherTimer();
                 dt.Interval = new TimeSpan(0, 0, 0, 1, 500);
 
@@ -198,7 +194,7 @@ namespace DCView
 
                     if (SearchBox.Text.Length == 0)
                     {
-                        SearchResult.ItemsSource = siteItem.Site.Boards;
+                        SearchResult.ItemsSource = siteItem.Site.GetBoards().Result;
                         return;
                     }
 
@@ -266,7 +262,7 @@ namespace DCView
             if (!result)
                 MessageBox.Show("갤러리 목록을 얻어내는데 실패했습니다. 잠시 후 다시 실행해보세요");
 
-            SearchResult.ItemsSource = site.Boards;
+            SearchResult.ItemsSource = await site.GetBoards();
 
             SearchBox.Text = "";
             SearchBox.Visibility = Visibility.Visible;
@@ -291,17 +287,19 @@ namespace DCView
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             WebBrowserTask task = new WebBrowserTask();
-            task.Uri = new Uri("http://dcview.codeplex.com/", UriKind.Absolute);
+            task.Uri = new Uri("https://github.com/ioklo/dcview/", UriKind.Absolute);
             task.Show();
         }
 
-        private void SearchSite_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void SearchSite_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             SearchSiteItem siteItem = SearchSite.SelectedItem as SearchSiteItem;
             if (siteItem == null) return;
 
-            SearchResult.ItemsSource = siteItem.Site.Boards;
             SearchBox.Text = "";
+            SearchBox.IsEnabled = false;
+            SearchResult.ItemsSource = await siteItem.Site.GetBoards();
+            SearchBox.IsEnabled = true;
         }
 
         // 시작 메뉴에 추가

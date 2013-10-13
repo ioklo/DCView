@@ -124,7 +124,7 @@ namespace DCView
             string boardID = NavigationContext.QueryString["boardID"];
             string boardName = NavigationContext.QueryString["boardName"];
 
-            IBoard board = App.Current.SiteManager.GetBoard(siteID, boardID, boardName);
+            IBoard board = Factory.GetBoard(siteID, boardID, boardName);
 
             if (!board.Site.CanLogin)
                 LoginStatus.Visibility = Visibility.Collapsed;
@@ -225,14 +225,14 @@ namespace DCView
         public void ShowLoginDialog()
         {
             // TODO: WatermarkTextBox의 IsEnabled가 false가 되면 예외 발생
-            // MainPivot.IsEnabled = false;
+            MainPivot.IsEnabled = false;
             ApplicationBar.IsMenuEnabled = false;
-
             LoginPanel.Visibility = Visibility.Visible;
         }
 
         public void HideLoginDialog()
         {
+            MainPivot.IsEnabled = true;
             ApplicationBar.IsMenuEnabled = true;
             LoginPanel.Visibility = Visibility.Collapsed;
         }

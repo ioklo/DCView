@@ -1,26 +1,35 @@
-﻿<Grid x:Class="DCView.CommentView"
+﻿<UserControl x:Class="DCView.CommentView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="480" d:DesignWidth="480" Margin="{Binding MarginByLevel}">
-    
-    <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="5" />
-        <ColumnDefinition Width="*" />
-    </Grid.ColumnDefinitions>
+    d:DesignHeight="480" d:DesignWidth="480" HorizontalContentAlignment="Stretch">
 
-    <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{StaticResource DCViewAccentBrush}" Grid.Column="0" />
-    <StackPanel Margin="6, 0, 0, 0" Grid.Column="1">
-        <StackPanel x:Name="Contents" />
+    <Grid Margin="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding LeftMarginByLevel}" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <StackPanel Orientation="Horizontal">
+        <Border Grid.Column="1" BorderThickness="0, 0, 0, 1" BorderBrush="{StaticResource PhoneSubtleBrush}">
+            <Grid Margin="0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Rectangle Grid.Column="0" HorizontalAlignment="Stretch" Fill="{StaticResource DCViewAccentLightBrush}" />
+                <StackPanel Grid.Column="1" Margin="6">
+                    <StackPanel x:Name="Contents" HorizontalAlignment="Stretch"/>
 
-            <TextBlock Text="{Binding Name}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0, 3, 0, 3"/>
-            <Rectangle Margin="2" Width="10" Height="10" VerticalAlignment="Bottom" 
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0, 3, 0, 3"/>
+                        <Rectangle Margin="2" Width="10" Height="10" VerticalAlignment="Bottom" 
                             Stroke="Gray" Fill="{Binding MemberStatusBrush}"
                             Visibility="{Binding MemberStatusVisibility}"/>
-        </StackPanel>
-    </StackPanel>
-</Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

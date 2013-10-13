@@ -47,10 +47,12 @@ namespace DCView.Board
                 if (id < minID) minID = id;
 
                 if (id < lastArticleID)
-                    resultList.Add(article);                                    
+                {
+                    resultList.Add(article);
+                    lastArticleID = minID;
+                }
             }
 
-            lastArticleID = minID;
             result = resultList;
             return true;            
         }        
@@ -176,7 +178,7 @@ namespace DCView.Board
             }
 
             // 페이지를 받고
-            string result = AdapterFactory.Instance.CreateWebClient().DownloadStringAsyncTask(new Uri(url, UriKind.Absolute)).GetResult();
+            string result = AdapterFactory.Instance.CreateWebClient().DownloadStringAsyncTask(new Uri(url, UriKind.Absolute)).Result;
                 
             // 결과스트링에서 게시물 목록을 뽑아낸다.                
             articles = GetArticleListFromString(result);
@@ -188,7 +190,7 @@ namespace DCView.Board
         {            
             string url = string.Format("http://m.dcinside.com/view.php?id={0}&no={1}&nocache={2}", id, article.ID, DateTime.Now.Ticks);
 
-            string result = AdapterFactory.Instance.CreateWebClient().DownloadStringAsyncTask(new Uri(url, UriKind.Absolute)).GetResult();
+            string result = AdapterFactory.Instance.CreateWebClient().DownloadStringAsyncTask(new Uri(url, UriKind.Absolute)).Result;
 
             List<Picture> pictures;
             List<DCInsideComment> comments;
@@ -213,7 +215,7 @@ namespace DCView.Board
             client.SetHeader("Referer", string.Format("http://m.dcinside.com/list.php?id={0}", id));
 
             string response = client.DownloadStringAsyncTask(
-                new Uri("http://m.dcinside.com/write.php?id=windowsphone&mode=write", UriKind.Absolute)).GetResult();
+                new Uri("http://m.dcinside.com/write.php?id=windowsphone&mode=write", UriKind.Absolute)).Result;
             
             StringEngine se = new StringEngine(response);
             Match match;
@@ -247,7 +249,7 @@ namespace DCView.Board
                 AdapterFactory.Instance.UrlEncode(text)
                 );
 
-            client.UploadStringAsyncTask(new Uri("http://m.dcinside.com/_option_write.php", UriKind.Absolute), "POST", data).GetResult();
+            client.UploadStringAsyncTask(new Uri("http://m.dcinside.com/_option_write.php", UriKind.Absolute), "POST", data).Wait();
             return true;
         }
 
@@ -277,7 +279,7 @@ namespace DCView.Board
                 article.CommentUserID
                 );
 
-            var result = client.UploadStringAsyncTask(new Uri("http://m.dcinside.com/_option_write.php", UriKind.Absolute), "POST", data).GetResult();
+            var result = client.UploadStringAsyncTask(new Uri("http://m.dcinside.com/_option_write.php", UriKind.Absolute), "POST", data).Result;
             return true;
         }
 
@@ -499,7 +501,7 @@ namespace DCView.Board
             HttpWebResponse response = (HttpWebResponse)Task<WebResponse>.Factory.FromAsync(
                 httpRequest.BeginGetResponse, 
                 httpRequest.EndGetResponse, 
-                null).GetResult();
+                null).Result;
             Stream responseStream = response.GetResponseStream();
 
             // 여기서 FL_DATA와 OFL_DATA를 뽑아낸다
@@ -545,7 +547,7 @@ namespace DCView.Board
             // httpRequest.Referer = string.Format("http://m.dcinside.com/write.php?id={0}&mode=write", id);
 
             Stream stream = Task<Stream>.Factory.FromAsync(
-                httpRequest.BeginGetRequestStream, httpRequest.EndGetRequestStream, null).GetResult();            
+                httpRequest.BeginGetRequestStream, httpRequest.EndGetRequestStream, null).Result;            
             StreamWriter writer = new StreamWriter(stream);
             writer.AutoFlush = true;
 
@@ -579,7 +581,7 @@ namespace DCView.Board
             writer.WriteLine("--" + boundary + "--");
             stream.Flush();
 
-            WebResponse response = Task<WebResponse>.Factory.FromAsync(httpRequest.BeginGetResponse, httpRequest.EndGetResponse, null).GetResult();
+            WebResponse response = Task<WebResponse>.Factory.FromAsync(httpRequest.BeginGetResponse, httpRequest.EndGetResponse, null).Result;
 
             var mem = new MemoryStream();
             response.GetResponseStream().CopyTo(mem);

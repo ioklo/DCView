@@ -131,8 +131,7 @@ namespace DCView.Util
                     {
                         TextWrapping = TextWrapping.Wrap,
                         LineHeight = 1.2,
-                        Style = Application.Current.Resources["DCViewTextNormalStyle"] as Style,
-                        Margin = new Thickness(0, 3, 0, 3),
+                        Style = Application.Current.Resources["DCViewTextNormalStyle"] as Style,                        
                         // Foreground = new SolidColorBrush(Colors.Blue),
                     };
 
@@ -156,8 +155,7 @@ namespace DCView.Util
                     {
                         TextWrapping = TextWrapping.Wrap,
                         LineHeight = 1.2,
-                        Style = Application.Current.Resources["DCViewTextNormalStyle"] as Style,
-                        Margin = new Thickness(0, 3, 0, 3),
+                        Style = Application.Current.Resources["DCViewTextNormalStyle"] as Style,                        
                         Text = splitted.Content,
                     };
 

@@ -93,7 +93,7 @@ namespace DCView.Board
             {
                 string result = AdapterFactory.Instance.CreateWebClient(false).DownloadStringAsyncTask(
                     new Uri(string.Format("http://www.clien.net/cs2/bbs/board.php?bo_table={0}&page={1}&{2}", id, page + 1, DateTime.Now.Ticks), UriKind.Absolute))
-                    .GetResult();
+                    .Result;
 
                 StringEngine se = new StringEngine(result);
 
@@ -125,8 +125,7 @@ namespace DCView.Board
                     curBool = !curBool;
 
                     // 글 제목과 댓글 개수
-                    if (!se.GetNextLine(out line)) continue;
-                    match = Regex.Match(line, @"<a[^>]*?>(.*?)</a>\s*(<span>\[(\d+)\]</span>)?");
+                    if (!se.Next(new Regex(@"<td\s+class=""post_subject"">.*?<a[^>]*?>(.*?)</a>\s*(<span>\[(\d+)\]</span>)?"), out match)) continue;
                     if (!match.Success) continue;
 
                     article.Title = match.Groups[1].Value;

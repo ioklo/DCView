@@ -59,7 +59,7 @@ namespace DCView.Board
                 DateTime.Now.Ticks);
 
             // 페이지를 받고
-            string result = webClient.DownloadStringAsyncTask(new Uri(url, UriKind.Absolute)).GetResult();
+            string result = webClient.DownloadStringAsyncTask(new Uri(url, UriKind.Absolute)).Result;
 
             // 결과스트링에서 게시물 목록을 뽑아낸다.                
             articles = GetArticleListFromString(result);

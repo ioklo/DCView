@@ -9,16 +9,19 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using DCView.Adapter;
 using DCView.Misc;
+using System.Threading.Tasks;
 
 namespace DCView.Board
 {
     public class DCInsideSite : ISite
     {
-        List<IBoard> boards = new List<IBoard>();
+        List<IBoard> boards;
         DCInsideCredential credential = new DCInsideCredential();
         
-        public void Load()
+        private List<IBoard> LoadBoards()
         {
+            List<IBoard> result = new List<IBoard>();
+
             // DCView_list.txt 생성
             AdapterFactory.Instance.CopyResourceToStorage("Data/idlist.txt", "/DCView_list.txt");
 
@@ -42,9 +45,11 @@ namespace DCView.Board
 
                     // 성인갤은 집어넣질 않는다
                     if (adult) continue;
-                    boards.Add(new DCInsideBoard(this, id, name));
+                    result.Add(new DCInsideBoard(this, id, name));
                 }
             }
+
+            return result;
         }
 
         ICredential ISite.Credential
@@ -62,12 +67,7 @@ namespace DCView.Board
             get { return "디시인사이드"; }
         }
 
-        bool ISite.CanLogin { get { return true; } }
-
-        IEnumerable<IBoard> ISite.Boards
-        {
-            get { return boards; }
-        }
+        bool ISite.CanLogin { get { return true; } }        
 
         bool ISite.Refresh(Action<string, int> OnStatusChanged)
         {
@@ -83,7 +83,7 @@ namespace DCView.Board
                 };
 
                 CancellationTokenSource cts = new CancellationTokenSource();
-                var result = client.DownloadStringAsyncTask(new Uri("http://m.dcinside.com/category_gall_total.html", UriKind.Absolute)).GetResult();
+                var result = client.DownloadStringAsyncTask(new Uri("http://m.dcinside.com/category_gall_total.html", UriKind.Absolute)).Result;
 
                 OnStatusChanged("결과 분석중입니다", 80);
 
@@ -125,6 +125,28 @@ namespace DCView.Board
         IBoard ISite.GetBoard(string boardID, string boardName)
         {
             return new DCInsideBoard(this, boardID, boardName);
+        }
+
+
+        public IBoard GetBoardByURL(string url)
+        {
+            return null;
+        }
+
+        public IArticle GetArticleByURL(string url)
+        {
+            return null;
+        }
+
+        // 
+        public async Task<IEnumerable<IBoard>> GetBoards()
+        {
+            if (boards == null)
+            {
+                boards = await Task<List<IBoard>>.Factory.StartNew(LoadBoards);
+            }
+
+            return boards;
         }
     }
 }

@@ -12,6 +12,11 @@ namespace SandBox
 {
     class Program
     {
+        static void Test()
+        {
+            // IArticle article = Factory.GetArticleByURL("http://gall.dcinside.com/board/view/?id=windowsphone&no=33333&page=1");            
+        }
+
         static void Main(string[] args)
         {
             SandboxAdapterFactory.Init();

@@ -9,7 +9,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
-    d:DesignHeight="480" d:DesignWidth="480">
+    d:DesignHeight="480" d:DesignWidth="480" Margin="0">
     
     <controls:PivotItem.Resources>
         <ItemsPanelTemplate x:Key="ListBoxItemsPanelTemplate">
@@ -26,20 +26,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
-        <!--ListBox toolkit:TiltEffect.SuppressTilt="True" Grid.Row="0" x:Name="ArticleText" Margin="12, 12" ManipulationCompleted="ArticleText_ManipulationCompleted">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Loaded="VirtualizingStackPanel_Loaded"/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem" >
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            </Style>
-
-                        </ListBox.ItemContainerStyle>
-                    </ListBox-->
+        
         <Grid x:Name="Contents" Grid.Row="0" toolkit:TiltEffect.SuppressTilt="True"/>
         
         <toolkit:PerformanceProgressBar Grid.Row="1" 
