@@ -25,12 +25,12 @@ namespace DCView.Board
             return null;
         }
 
-        static public IBoard GetBoard(string siteID, string boardID, string boardName)
+        static public IBoard GetBoard(string siteID, string boardID)
         {
             foreach (var site in sites)
             {
                 if (site.ID == siteID)
-                    return site.GetBoard(boardID, boardName);
+                    return site.GetBoard(boardID);
             }
 
             // board가 없으면 리턴

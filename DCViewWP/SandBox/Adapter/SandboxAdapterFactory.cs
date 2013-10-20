@@ -81,5 +81,10 @@ namespace SandBox
                 return false;
             }
         }
+
+        public override void SetReferer(HttpWebRequest httpRequest, string referer)
+        {
+            httpRequest.Referer = referer;
+        }
     }
 }

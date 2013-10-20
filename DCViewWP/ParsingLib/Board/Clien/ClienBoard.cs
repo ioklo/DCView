@@ -15,11 +15,10 @@ namespace DCView.Board
         string id;
         string name;
 
-        public ClienBoard(ClienSite clien, string id, string name)
+        public ClienBoard(ClienSite clien, string id)
         {
             this.site = clien;
             this.id = id;
-            this.name = name;
         }
 
         public string DisplayTitle
@@ -40,16 +39,15 @@ namespace DCView.Board
         public string Name
         {
             get { return name; }
+            set { name = value; }
         }
 
         public bool CanWriteArticle { get { return false; } }
 
-        Uri IBoard.Uri
+        public Uri Uri
         {
-            get { throw new NotImplementedException(); }
+            get { return new Uri(string.Format("http://www.clien.net/cs2/bbs/board.php?bo_table={0}", id), UriKind.Absolute); }
         }
-
-        public bool CanSearch { get { return false; } }
 
         public IEnumerable<IBoardOption> BoardOptions
         {
@@ -64,13 +62,21 @@ namespace DCView.Board
             return new ArticleLister(this, id, page);
         }
 
-        ILister<IArticle> IBoard.GetSearchLister(string text, SearchType searchType)
+        [NotSupported]
+        public ILister<IArticle> GetSearchLister(string text, SearchType searchType)
         {
             // 지원하지 않는 기능
             throw new NotSupportedException();
         }
 
-        bool IBoard.WriteArticle(string title, string text, System.Collections.Generic.List<AttachmentStream> attachments)
+        [NotSupported]
+        public bool WriteArticle(string title, string text, System.Collections.Generic.List<AttachmentStream> attachments)
+        {
+            return false;
+        }
+
+        [NotSupported]
+        public bool DeleteArticle(string articleID)
         {
             return false;
         }

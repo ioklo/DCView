@@ -16,7 +16,6 @@ namespace DCView.Board
         {
             ContentType = "application/octet-stream";
         }
-        
     }
 
     public enum SearchType
@@ -37,16 +36,14 @@ namespace DCView.Board
     {
         ISite Site { get; }
         string ID { get; }   // 게시판 접근용 아이디
-        string Name { get; } // 게시판의 이름
+        string Name { get; set; } // 게시판의 이름
         string DisplayTitle { get; } // 화면 위에 보여줄 이름
-
-        bool CanWriteArticle { get; }
-        bool CanSearch { get; }
 
         Uri Uri { get; }
         ILister<IArticle> GetArticleLister(int page);
         ILister<IArticle> GetSearchLister(string text, SearchType searchType);
         bool WriteArticle(string title, string text, List<AttachmentStream> attachments);
+        bool DeleteArticle(string articleID);
 
         // 토글 가능한 옵션
         // 옵션 메뉴

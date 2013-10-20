@@ -27,5 +27,7 @@ namespace DCView.Adapter
         public abstract Stream OpenReadResourceFile(string fileName);
 
         public abstract bool CopyResourceToStorage(string appPath, string storagePath, bool bForce = false);
+
+        public abstract void SetReferer(HttpWebRequest httpRequest, string referer);        
     }
 }

@@ -11,6 +11,8 @@ using System.Text;
 using DCView.Misc;
 using DCView.Adapter;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 
 namespace DCView.Board
@@ -65,19 +67,16 @@ namespace DCView.Board
         string id;
         string name;
         
-        public DCInsideBoard(DCInsideSite site, string id, string name)
+        public DCInsideBoard(DCInsideSite site, string id)
         {
             this.site = site;
             this.id = id;
-            this.name = name;
         }
 
         public ISite Site { get { return site; } }
-        public string Name { get { return name; } }
+        public string Name { get { return name; } set { name = value; } }
         public string ID { get { return id; } }
         public string DisplayTitle { get { return name + " 갤러리"; } }
-        public bool CanWriteArticle { get { return true; } }
-        public bool CanSearch { get { return true; } }
         public bool ViewRecommend { get; set; }
 
         // 개념글
@@ -150,6 +149,36 @@ namespace DCView.Board
             return true;
         }
 
+        public bool DeleteArticle(string articleID)
+        {
+            // 성공했다는것은 어찌 알 수 있을까..            
+            // 내 UserID를 알아야 한다
+            string url = string.Format("http://m.dcinside.com/view.php?id={0}&no={1}&nocache={2}", id, articleID, DateTime.Now.Ticks);
+            string result = AdapterFactory.Instance.CreateWebClient().DownloadStringAsyncTask(new Uri(url, UriKind.Absolute)).Result;
+
+            var userIDRegex = new Regex(@"<input type=""hidden"" name=""user_no"" id=""user_no"" value=""(\d+)"">");
+
+            var match = userIDRegex.Match(result);
+            if (!match.Success)
+                return false;
+
+            var userNo = match.Groups[1].Value;
+
+            var client = AdapterFactory.Instance.CreateWebClient();
+
+            client.SetHeader("Content-Type", "application/x-www-form-urlencoded");
+            client.SetHeader("Referer", string.Format("http://m.dcinside.com/view.php?id={0}&no={1}", id, articleID));
+
+            string data = string.Format(
+                "id={0}&no={1}&mode=board_del&user_no={2}&page=1",
+                AdapterFactory.Instance.UrlEncode(id),
+                AdapterFactory.Instance.UrlEncode(articleID),
+                AdapterFactory.Instance.UrlEncode(userNo)
+                );
+
+            result = client.UploadStringAsyncTask(new Uri("http://m.dcinside.com/_option_write.php", UriKind.Absolute), "POST", data).Result;
+            return result == "1";
+        }
 
         // 인터페이스 끝
         public Uri GetArticleUri(DCInsideArticle article)
@@ -430,165 +459,85 @@ namespace DCView.Board
 
         private bool UploadPictures(List<AttachmentStream> attachmentStreams, out string flData, out string oflData)
         {
-            var httpRequest = (HttpWebRequest)WebRequest.Create(@"http://upload.dcinside.com/upload_imgfree_mobile.php");
-
-            // var httpRequest = AdapterFactory.Instance.CreateWebRequest(@"http://upload.dcinside.com/upload_imgfree_mobile.php");
-
-            // 그림 업로드
-            string boundary = DateTime.Now.Ticks.ToString("x");
-            httpRequest.ContentType = "multipart/form-data; boundary=" + boundary;
-            httpRequest.CookieContainer = AdapterFactory.Instance.CookieContainer;
-            httpRequest.Method = "POST";
-
-            Task<Stream> requestStreamTask = Task.Factory.FromAsync<Stream>(
-                httpRequest.BeginGetRequestStream, httpRequest.EndGetRequestStream, null);
-            requestStreamTask.Wait();
-
-            Stream stream = requestStreamTask.Result;
-
-            var writer = new StreamWriter(stream);
-            writer.AutoFlush = true;
-
-            // upload[0]의 이름을 업로드
-            int count = 0;
-            foreach (var attachmentStream in attachmentStreams)
+            using (var handler = new HttpClientHandler() { CookieContainer = AdapterFactory.Instance.CookieContainer })
+            using (var client = new HttpClient())
             {
-                // 헤더
-                writer.WriteLine("--" + boundary);
-                writer.WriteLine("Content-Disposition: form-data; name=\"upload[{0}]\"; filename=\"{1}\"",
-                        count,
-                        attachmentStream.Filename
-                    );
-                writer.WriteLine("Content-Type: {0}", attachmentStream.ContentType);
-                writer.WriteLine(); // 헤더가 끝났을 때 새 줄
+                MultipartFormDataContent content = new MultipartFormDataContent();
 
-                attachmentStream.Stream.CopyTo(stream);
-
-                writer.WriteLine(); // 내용이 끝났을 때 새 줄을 넣어준다
-
-                count++;
-            }
-
-            // 그 다음에 붙여야 할 것들..
-            // upload의 끝을 알려야 하나..
-            writer.WriteLine("--" + boundary);
-            writer.WriteLine("Content-Disposition: form-data; name=\"upload[{0}]\"; filename=\"\"", count);
-            writer.WriteLine("Content-Type: application/octet-stream");
-            writer.WriteLine(); // 헤더가 끝났을 때 새 줄
-
-            // 아무 내용 없고,
-            writer.WriteLine(); // 내용이 끝났을 때 새 줄을 넣어준다
-
-            var dict = new Dictionary<string, string>();
-            dict.Add("imgId", id);
-            dict.Add("mode", "write");
-            dict.Add("mobile_key", "1");
-
-            foreach (var kv in dict)
-            {
-                // 여기에 필요한 변수들을 넣는다
-                writer.WriteLine("--" + boundary);
-                writer.WriteLine("Content-Disposition: form-data; name=\"{0}\"", kv.Key);
-                writer.WriteLine();
-                writer.WriteLine(kv.Value);
-            }
-            // 스트림의 끝을 알림
-            writer.WriteLine("--" + boundary + "--");
-            // stream.Close();
-            stream.Flush();
-
-
-            HttpWebResponse response = (HttpWebResponse)Task<WebResponse>.Factory.FromAsync(
-                httpRequest.BeginGetResponse, 
-                httpRequest.EndGetResponse, 
-                null).Result;
-            Stream responseStream = response.GetResponseStream();
-
-            // 여기서 FL_DATA와 OFL_DATA를 뽑아낸다
-            
-            flData = null;
-            oflData = null;
-            using (var reader = new StreamReader(responseStream))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
+                int count = 0;
+                foreach (var attachmentStream in attachmentStreams)
                 {
-                    if (flData == null)
+                    var streamContent = new StreamContent(attachmentStream.Stream);
+                    streamContent.Headers.ContentType = new MediaTypeHeaderValue(attachmentStream.ContentType);
+                    streamContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                     {
-                        var flDataRegexMatch = DCRegexManager.WriteFLData.Match(line);
-                        if (flDataRegexMatch.Success)
-                            flData = flDataRegexMatch.Groups[1].Value;
-                        continue;
-                    }
+                        FileName = attachmentStream.Filename,
+                        Name = string.Format("upload[{0}]", count),
+                    };
 
-                    if (oflData == null)
+                    content.Add(streamContent);
+                    count++;
+                }
+
+                content.Add(new StringContent(id), "imgId");
+                content.Add(new StringContent("write"), "mode");
+                content.Add(new StringContent("mobile_key"), "1");
+
+                var msg = client.PostAsync(@"http://upload.dcinside.com/upload_imgfree_mobile.php", content).Result;
+                var responseStream = msg.Content.ReadAsStreamAsync().Result;
+
+                // 여기서 FL_DATA와 OFL_DATA를 뽑아낸다                
+                flData = null;
+                oflData = null;
+                using (var reader = new StreamReader(responseStream))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        var oflDataRegexMatch = DCRegexManager.WriteOFLData.Match(line);
-                        if (oflDataRegexMatch.Success)
-                            oflData = oflDataRegexMatch.Groups[1].Value;
+                        if (flData == null)
+                        {
+                            var flDataRegexMatch = DCRegexManager.WriteFLData.Match(line);
+                            if (flDataRegexMatch.Success)
+                                flData = flDataRegexMatch.Groups[1].Value;
+                            continue;
+                        }
+
+                        if (oflData == null)
+                        {
+                            var oflDataRegexMatch = DCRegexManager.WriteOFLData.Match(line);
+                            if (oflDataRegexMatch.Success)
+                                oflData = oflDataRegexMatch.Groups[1].Value;
+                        }
                     }
                 }
-            }
+            }            
 
             return true;
         }
 
         private bool UploadArticle(string title, string text, string code, string mobileKey, string flData, string oflData)
         {
-            // 이제 
-            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(@"http://upload.dcinside.com/g_write.php");
-
-            string boundary = "---------" + DateTime.Now.Ticks.ToString("x");
-            httpRequest.ContentType = "multipart/form-data; boundary=" + boundary;
-            httpRequest.CookieContainer = AdapterFactory.Instance.CookieContainer;
-            httpRequest.Method = "POST";
-
-            httpRequest.Headers["Referer"] = string.Format("http://m.dcinside.com/write.php?id={0}&mode=write", id);
-            // httpRequest.Referer = string.Format("http://m.dcinside.com/write.php?id={0}&mode=write", id);
-
-            Stream stream = Task<Stream>.Factory.FromAsync(
-                httpRequest.BeginGetRequestStream, httpRequest.EndGetRequestStream, null).Result;            
-            StreamWriter writer = new StreamWriter(stream);
-            writer.AutoFlush = true;
-
-            
-            var nvc = new List<Tuple<string, string>>();
-
-            nvc.Add(Tuple.Create("subject", title));
-            nvc.Add(Tuple.Create("memo", text));
-            // nvc.Add("user_id", HttpUtility.UrlEncode("dcviewtest"));
-            nvc.Add(Tuple.Create("mode", "write"));
-            nvc.Add(Tuple.Create("id", id));
-            nvc.Add(Tuple.Create("code", code));
-            nvc.Add(Tuple.Create("mobile_key", mobileKey));
-            if (flData != null)
-                nvc.Add(Tuple.Create("FL_DATA", flData));
-
-            if (oflData != null)
-                nvc.Add(Tuple.Create("OFL_DATA", oflData));
-
-            foreach (var kv in nvc)
+            using (var handler = new HttpClientHandler() { CookieContainer = AdapterFactory.Instance.CookieContainer })
+            using (var client = new HttpClient())
             {
-                // 여기에 필요한 변수들을 넣는다
-                writer.WriteLine("--" + boundary);
-                writer.WriteLine("Content-Disposition: form-data; name=\"{0}\"", kv.Item1);
-                writer.WriteLine("Content-Type: text/plain; charset=utf-8");
-                writer.WriteLine();
-                writer.WriteLine(kv.Item2);
+                client.DefaultRequestHeaders.Referrer = new Uri(string.Format("http://m.dcinside.com/write.php?id={0}&mode=write", id), UriKind.Absolute);
+                MultipartFormDataContent content = new MultipartFormDataContent();
+
+                content.Add(new StringContent(title), "subject");
+                content.Add(new StringContent(text), "memo");
+                content.Add(new StringContent("write"), "mode");
+                content.Add(new StringContent(id), "id");
+                content.Add(new StringContent(code), "code");
+                content.Add(new StringContent(mobileKey), "mobile_key");
+
+                if (flData != null)
+                    content.Add(new StringContent(flData), "FL_DATA");
+
+                if (oflData != null)
+                    content.Add(new StringContent(oflData), "OFL_DATA");
+
+                var response = client.PostAsync(@"http://upload.dcinside.com/g_write.php", content).Result;
             }
-
-            // 다 됐으면 
-            writer.WriteLine("--" + boundary + "--");
-            stream.Flush();
-
-            WebResponse response = Task<WebResponse>.Factory.FromAsync(httpRequest.BeginGetResponse, httpRequest.EndGetResponse, null).Result;
-
-            var mem = new MemoryStream();
-            response.GetResponseStream().CopyTo(mem);
-
-            string s = Encoding.UTF8.GetString(mem.ToArray(), 0, (int)mem.Length);
-
-            int a = s.Length;
 
             return true;
         }

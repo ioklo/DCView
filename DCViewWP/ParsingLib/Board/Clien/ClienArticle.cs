@@ -22,11 +22,8 @@ namespace DCView.Board
             HasImage = false;
         }
 
-        public string ID
-        {
-            get { return id; }
-        }
-
+        public IBoard Board { get { return board; } }
+        public string ID { get { return id; } }
         public string Name{ get; set;}        
         public string Title {get; set;}        
         public DateTime Date {get; set;}
@@ -37,7 +34,7 @@ namespace DCView.Board
 
         public Uri Uri
         {
-            get { return new Uri(string.Format("http://clien.career.co.kr/cs2/bbs/board.php?bo_table={0}&wr_id={1}", ((IBoard)board).ID, id), UriKind.Absolute); }
+            get { return new Uri(string.Format("http://www.clien.net/cs2/bbs/board.php?bo_table={0}&wr_id={1}", board.ID, id), UriKind.Absolute); }
         }
 
         public bool HasImage

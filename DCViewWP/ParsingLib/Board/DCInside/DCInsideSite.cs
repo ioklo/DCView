@@ -22,13 +22,15 @@ namespace DCView.Board
         {
             List<IBoard> result = new List<IBoard>();
 
-            // DCView_list.txt 생성
-            AdapterFactory.Instance.CopyResourceToStorage("Data/idlist.txt", "/DCView_list.txt");
+            // dc_list.txt 생성
+            AdapterFactory.Instance.CopyResourceToStorage("Data/dc_list.txt", "/dc_list.txt");
 
-            using (var stream = AdapterFactory.Instance.OpenReadStorageFile("/DCView_list.txt"))
+            using (var stream = AdapterFactory.Instance.OpenReadStorageFile("/dc_list.txt"))
             using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                string line = null;
+                string line = reader.ReadLine();
+                
+                // 첫줄은 버전 용도.. (일단 쓰지 말자)
                 while (true)
                 {
                     string id, name;
@@ -45,31 +47,24 @@ namespace DCView.Board
 
                     // 성인갤은 집어넣질 않는다
                     if (adult) continue;
-                    result.Add(new DCInsideBoard(this, id, name));
+                    result.Add(new DCInsideBoard(this, id) { Name = name });
                 }
             }
 
             return result;
         }
 
-        ICredential ISite.Credential
+        public ICredential Credential
         {
             get { return credential; }
         }
-
-        string ISite.ID
+        public string ID
         {
             get { return "dcinside";  }
         }
-
-        string ISite.Name
-        {
-            get { return "디시인사이드"; }
-        }
-
-        bool ISite.CanLogin { get { return true; } }        
-
-        bool ISite.Refresh(Action<string, int> OnStatusChanged)
+        public string Name { get { return "디시인사이드"; } }
+        public bool CanLogin { get { return true; } }
+        public bool Refresh(Action<string, int> OnStatusChanged)
         {
             try
             {
@@ -94,16 +89,18 @@ namespace DCView.Board
                               let name = match.Groups[2].Value
                               let adult = (match.Groups[5].Value != String.Empty)
                               where !adult
-                              select new DCInsideBoard(this, id, name);
+                              select new DCInsideBoard(this, id) { Name = name };
 
                 OnStatusChanged("리스트를 저장합니다", 90);
 
                 // 3. 변경된 내용을 파일에 저장하면서 갤러리 초기화
                 boards.Clear();
-                
-                using (var stream = AdapterFactory.Instance.OpenWriteStorageFile("/DCView_list.txt"))
+
+                using (var stream = AdapterFactory.Instance.OpenWriteStorageFile("/dc_list.txt"))
                 using (var writer = new StreamWriter(stream))
                 {
+                    writer.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
                     foreach (DCInsideBoard board in results)
                     {
                         writer.WriteLine(board.ID);
@@ -119,14 +116,12 @@ namespace DCView.Board
                 return false;
             }
             return true;
-        }
+        }        
 
-        
-        IBoard ISite.GetBoard(string boardID, string boardName)
+        public IBoard GetBoard(string boardID)
         {
-            return new DCInsideBoard(this, boardID, boardName);
+            return new DCInsideBoard(this, boardID);
         }
-
 
         public IBoard GetBoardByURL(string url)
         {

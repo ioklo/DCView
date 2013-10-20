@@ -17,14 +17,14 @@ using System.Linq;
 using DCView.Board;
 using DCView.Misc;
 using System.Reflection;
+using DCView.Adapter;
+using System.IO;
+using System.Collections.Generic;
 
 namespace DCView
 {
     public partial class MainPanorama : PhoneApplicationPage
     {
-        // 게시판 목록 로딩 여부
-        private bool bLoadingCompleted = false;
-
         // application bar 설정
         ApplicationBar favoriteApplicationBar, allApplicationBar, settingApplicationBar;  
 
@@ -47,7 +47,7 @@ namespace DCView
             var parts = asm.FullName.Split(',');
             return parts[1].Split('=')[1];
         }
-
+        
         public MainPanorama()
         {
             InitializeComponent();
@@ -55,7 +55,7 @@ namespace DCView
             InitializeApplicationBar();
 
             ApplicationBar = favoriteApplicationBar;
-            Favorites.ItemsSource = App.Current.Favorites.All;            
+            Favorites.ItemsSource = App.Current.Favorites.All;
         }
 
         // 내부 함수
@@ -239,14 +239,7 @@ namespace DCView
 
         // 즐겨찾기 갱신
         private async void RefreshGalleryListButton_Click(object sender, EventArgs e)
-        {            
-
-            if (!bLoadingCompleted)
-            {
-                MessageBox.Show("아직 목록을 다 읽어들이지 못했습니다. 목록을 다 읽어 들인 다음 새로고침 해주세요.");
-                return;
-            }
-
+        {
             // 현재 선택된 사이트에 대해서 갱신
             SearchSiteItem siteItem = SearchSite.SelectedItem as SearchSiteItem;
             if (siteItem == null) return;
@@ -298,8 +291,14 @@ namespace DCView
 
             SearchBox.Text = "";
             SearchBox.IsEnabled = false;
+            foreach (var button in allApplicationBar.Buttons)
+                ((ApplicationBarIconButton)button).IsEnabled = false;
+
             SearchResult.ItemsSource = await siteItem.Site.GetBoards();
             SearchBox.IsEnabled = true;
+            foreach (var button in allApplicationBar.Buttons)
+                ((ApplicationBarIconButton)button).IsEnabled = true;           
+            
         }
 
         // 시작 메뉴에 추가

@@ -16,7 +16,7 @@ namespace DCView.Board
 
         // 전체 보드를 다 읽어들인다
         Task<IEnumerable<IBoard>> GetBoards();
-        IBoard GetBoard(string boardID, string boardName);
+        IBoard GetBoard(string boardID);
 
         IBoard GetBoardByURL(string url);
         IArticle GetArticleByURL(string url);

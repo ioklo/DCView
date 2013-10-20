@@ -59,7 +59,7 @@ namespace DCView
         }
 
         // 글쓰기 제출
-        private async void Submit()
+        private async Task Submit()
         {
             if (FormTitle.Text.Trim().Length == 0 || FormText.Text.Trim().Length == 0)
             {
@@ -109,7 +109,7 @@ namespace DCView
                 if (result)
                 {
                     // 글쓰기 창을 닫고..
-                    viewArticlePage.RemoveWriteForm();                            
+                    viewArticlePage.RemoveWriteForm();
 
                     // 글 목록을 reload
                     viewArticlePage.RefreshArticleList();                        
@@ -209,11 +209,11 @@ namespace DCView
             viewArticlePage.ApplicationBar = appBar;
         }
 
-        void submitButton_Click(object sender, EventArgs e)
+        async void submitButton_Click(object sender, EventArgs e)
         {
             this.Focus();
 
-            Submit();
+            await Submit();
         }
 
         void cancelButton_Click(object sender, EventArgs e)

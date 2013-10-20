@@ -54,7 +54,7 @@ namespace DCView
             refreshListIconButton.Click += refreshListIconButton_Click;
             appBar.Buttons.Add(refreshListIconButton);
 
-            if (board.CanWriteArticle)
+            if (board.CanWriteArticle())
             {
                 var writeIconButton = new ApplicationBarIconButton()
                 {
@@ -65,7 +65,7 @@ namespace DCView
                 appBar.Buttons.Add(writeIconButton);
             }
 
-            if (board.CanSearch)
+            if (board.CanSearch())
             {
                 var searchIconButton = new ApplicationBarIconButton()
                 {
@@ -185,9 +185,25 @@ namespace DCView
             SearchTextBox.Focus();
         }
 
-        
+        // 해당 Entry 삭제
+        public void DeleteArticleEntry(string articleID)
+        {
+            int size = ArticleList.Items.Count;
+            for(int t = 0; t < size; t++)
+            {
+                var viewModel = ArticleList.Items[t] as ArticleViewModel;
+                if (viewModel == null) continue;
+
+                if (viewModel.Article.ID == articleID)
+                {
+                    ArticleList.Items.RemoveAt(t);                    
+                    return;
+                }
+            }
+        }
+
         /* 이벤트 핸들러 */
-        
+
         // 검색창의 검색 버튼 클릭
         protected void SearchButton_Click(object sender, RoutedEventArgs e)
         {
@@ -246,7 +262,7 @@ namespace DCView
         // 검색 아이콘 클릭
         private void searchIconButton_Click(object sender, EventArgs e)
         {
-            if (!board.CanSearch)
+            if (!board.CanSearch())
             {
                 MessageBox.Show("검색을 지원하지 않습니다");
                 return;

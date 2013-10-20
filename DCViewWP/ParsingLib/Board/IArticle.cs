@@ -8,6 +8,7 @@ namespace DCView.Board
     public interface IArticle
     {
         // 기본 정보
+        IBoard Board { get; }
         string ID { get; }
         string Name { get; }
         MemberStatus MemberStatus { get; }

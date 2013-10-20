@@ -138,6 +138,7 @@ namespace DCView.Board
 
             return false;
         }
+
         public async Task<bool> Login(string id, string password, bool? saveLoginInfo, bool? autoLogin)
         {
             MemberID = id;
@@ -169,6 +170,7 @@ namespace DCView.Board
 
             return result;
         }
+
         public void Logout()
         {
             Status = LoginStatus.MemberNoLogin;

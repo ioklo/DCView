@@ -124,7 +124,8 @@ namespace DCView
             string boardID = NavigationContext.QueryString["boardID"];
             string boardName = NavigationContext.QueryString["boardName"];
 
-            IBoard board = Factory.GetBoard(siteID, boardID, boardName);
+            IBoard board = Factory.GetBoard(siteID, boardID);
+            board.Name = boardName;
 
             if (!board.Site.CanLogin)
                 LoginStatus.Visibility = Visibility.Collapsed;
@@ -176,7 +177,6 @@ namespace DCView
             if (viewArticleTextPivotItem == null)
                 viewArticleTextPivotItem = new ViewArticleTextPivotItem(this);
 
-
             // '내용' 탭이 없다면 이제 추가해 준다            
             if (!MainPivot.Items.Contains(viewArticleTextPivotItem))
                 MainPivot.Items.Insert(1, viewArticleTextPivotItem);
@@ -184,6 +184,17 @@ namespace DCView
             // '내용' 탭으로 화면 전환
             MainPivot.SelectedItem = viewArticleTextPivotItem;
             viewArticleTextPivotItem.SetArticle(article);
+        }
+
+        public void RemoveArticleTab()
+        {
+            if (viewArticleTextPivotItem == null)
+                return;
+
+            MainPivot.Items.Remove(viewArticleTextPivotItem);
+            MainPivot.SelectedIndex = 0;
+
+            writeArticlePivotItem = null;
         }
 
         public void ShowWriteForm(IBoard board)
@@ -240,6 +251,16 @@ namespace DCView
         private void LoginStatus_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             ShowLoginDialog();            
+        }
+
+        // 현재 활성화된 ViewArticleListPivot에서 id가 articleID인 entry를 제거한다
+        public void DeleteArticleEntry(string articleID)
+        {
+            // 목록창은 항상 0번에
+            var pivotItem = MainPivot.Items[0] as ViewArticleListPivotItem;
+            if (pivotItem == null) return;
+
+            pivotItem.DeleteArticleEntry(articleID);
         }
     }
 }

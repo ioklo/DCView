@@ -11,6 +11,7 @@ namespace DCView.Board
         private DCInsideBoard board;
 
         // 기본 정보
+        public IBoard Board { get { return board; } }
         public string ID { get; set; }
         public string Name { get; set; }
         public MemberStatus MemberStatus { get; set; }

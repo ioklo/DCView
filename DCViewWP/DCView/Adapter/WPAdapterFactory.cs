@@ -77,5 +77,10 @@ namespace DCView.Adapter
         {
             return StorageUtil.CopyResourceToStorage(appPath, storagePath, bForce);
         }
+
+        public override void SetReferer(HttpWebRequest httpRequest, string referer)
+        {
+            httpRequest.Headers["Referer"] = referer;
+        }
     }
 }

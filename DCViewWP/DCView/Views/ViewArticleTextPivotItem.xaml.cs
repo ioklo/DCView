@@ -25,6 +25,7 @@ using CS.Windows.Controls;
 using Microsoft.Phone;
 using DCView.Board;
 using DCView.Misc;
+using System.Net.Http;
 
 namespace DCView
 {
@@ -82,6 +83,16 @@ namespace DCView
             refreshTextIconButton.Click += refreshTextIconButton_Click;
             textAppBar.Buttons.Add(refreshTextIconButton);
 
+            var deleteArticleIconButton = new ApplicationBarIconButton()
+            {
+                IconUri = new Uri("/Data/delete.png", UriKind.Relative),
+                Text = "삭제"
+            };
+
+            deleteArticleIconButton.Click += deleteArticleIconButton_Click;
+            textAppBar.Buttons.Add(deleteArticleIconButton);
+
+
             var webViewText = new ApplicationBarMenuItem();
             webViewText.Text = "웹브라우저로 보기";
             webViewText.Click += webViewText_Click;
@@ -106,6 +117,44 @@ namespace DCView
             };
             submitReplyIconButton.Click += submitReplyIconButton_Click;
             replyAppBar.Buttons.Add(submitReplyIconButton);
+        }
+
+        private async void deleteArticleIconButton_Click(object sender, EventArgs e)
+        {
+            if (!article.Board.CanDeleteArticle())
+            {
+                MessageBox.Show("글 삭제를 지원하지 않습니다");
+                return;
+            }
+
+            // 삭제하시겠냐고 먼저 물어봐야 한다.
+            var confirmResult = MessageBox.Show("이 글을 삭제하시겠습니까?", "확인", MessageBoxButton.OKCancel);
+            if (confirmResult != MessageBoxResult.OK) return;
+
+            viewArticlePage.IsEnabled = false;
+
+            var deleteResult = await Task<bool>.Factory.StartNew(() =>
+            {
+                try
+                {
+                    return article.Board.DeleteArticle(article.ID);
+                }
+                catch
+                {
+                    return false;
+                }                
+            });
+
+            viewArticlePage.IsEnabled = true;
+
+            if (!deleteResult)
+            {
+                MessageBox.Show("글 삭제에 실패했습니다");
+                return;
+            }
+
+            viewArticlePage.DeleteArticleEntry(article.ID);
+            viewArticlePage.RemoveArticleTab();
         }
 
         private void wifiSetting_Click(object sender, EventArgs e)
@@ -304,80 +353,81 @@ namespace DCView
 
             try
             {
-                status.Text = "[이미지를 불러오는 중..]";
+                status.Text = "[이미지를 불러오는 중...]";
                 grid.Children.Add(status);
 
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(HttpUtility.HtmlDecode(pic.Uri));
-                request.UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
-                request.Method = "GET";
-
-                // 빈 스트링인 경우 요청이 예외가 난다
-                if (pic.Referer != string.Empty)
-                    request.Headers["Referer"] = pic.Referer;
-                request.CookieContainer = WebClientEx.CookieContainer;
-                
-                HttpWebResponse response = (HttpWebResponse)await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null);
-
-                MemoryStream stream = new MemoryStream((int)response.ContentLength);
-                await response.GetResponseStream().CopyToAsync(stream);
-                               
-                stream.Seek(0, SeekOrigin.Begin);
-
-                if (response.ContentType.Equals("image/gif", StringComparison.CurrentCultureIgnoreCase))
+                using(var handler = new HttpClientHandler() { CookieContainer = WebClientEx.CookieContainer})
+                using (var client = new HttpClient(handler))
                 {
-                    // grid의 위치를 알아내고
-                    int i = panel.Items.IndexOf(grid) + 1;
+                    client.DefaultRequestHeaders.Add("UserAgent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
 
-                    ExtendedImage source = new ExtendedImage();
-                    source.SetSource(stream);
+                    if (pic.Referer != string.Empty)
+                        client.DefaultRequestHeaders.Referrer = new Uri(pic.Referer, UriKind.Absolute);
 
-                    var image = new AnimatedImage();
-                    image.Source = source;
-                    image.Tap += image_Tap;
-                    image.Tag = pic;
-                    image.LoadingFailed += (o, e) =>
+                    var response = await client.GetAsync(HttpUtility.HtmlDecode(pic.Uri));
+
+                    var stream = await response.Content.ReadAsStreamAsync();
+                    var contentType = response.Content.Headers.ContentType;
+                    string extension = GetExtension(response.Content.Headers.ContentDisposition);                    
+
+                    if (contentType.MediaType.Equals("image/gif", StringComparison.CurrentCultureIgnoreCase) || 
+                        extension == ".gif")
                     {
-                        var tb = new TextBlock();
-                        tb.Text = "로딩 실패";
-                        tb.Foreground = new SolidColorBrush(Colors.Red);
-                        grid.Children.Add(tb);
-                    };
-                    panel.Items.Insert(i, image);
-                }
+                        // grid의 위치를 알아내고
+                        int i = panel.Items.IndexOf(grid) + 1;
 
-                // 이상하게도 PictureDecoder.DecodeJpeg이 png까지 디코딩을 할 수가 있어서.. 그냥 쓰고 있다
-                else if (response.ContentType.Equals("image/jpg", StringComparison.CurrentCultureIgnoreCase) ||
-                         response.ContentType.Equals("image/jpeg", StringComparison.CurrentCultureIgnoreCase) ||
-                         response.ContentType.Equals("image/png", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    // 큰 이미지를 잘게 나눈다
-                    var wbmps = await Task.Factory.StartNew(() => LoadImage(stream));
+                        ExtendedImage source = new ExtendedImage();
+                        source.SetSource(stream);
 
-                    // grid의 위치를 알아내고
-                    int i = panel.Items.IndexOf(grid) + 1;
-                    foreach (var wbmp in wbmps)
+                        var image = new AnimatedImage();
+                        image.Source = source;
+                        image.Tap += image_Tap;
+                        image.Tag = pic;
+                        image.LoadingFailed += (o, e) =>
+                        {
+                            var tb = new TextBlock();
+                            tb.Text = "로딩 실패";
+                            tb.Foreground = new SolidColorBrush(Colors.Red);
+                            grid.Children.Add(tb);
+                        };
+                        panel.Items.Insert(i, image);
+                    }
+
+                    // 이상하게도 PictureDecoder.DecodeJpeg이 png까지 디코딩을 할 수가 있어서.. 그냥 쓰고 있다
+                    else if (contentType.MediaType.Equals("image/jpg", StringComparison.CurrentCultureIgnoreCase) ||
+                             contentType.MediaType.Equals("image/jpeg", StringComparison.CurrentCultureIgnoreCase) ||
+                             contentType.MediaType.Equals("image/png", StringComparison.CurrentCultureIgnoreCase) || 
+                             extension == ".jpg" || extension == ".png")
                     {
+                        // 큰 이미지를 잘게 나눈다
+                        var wbmps = await Task.Factory.StartNew(() => LoadImage(stream));
+
+                        // grid의 위치를 알아내고
+                        int i = panel.Items.IndexOf(grid) + 1;
+                        foreach (var wbmp in wbmps)
+                        {
+                            var image = new Image();
+                            image.Source = wbmp;
+                            image.Tag = pic;
+                            image.Tap += image_Tap;
+                            panel.Items.Insert(i, image);
+                            i++;
+                        }
+                        // panel.Items.RemoveAt(i);
+                    }
+                    else
+                    {
+                        var source = new BitmapImage();
+                        source.SetSource(stream);
+
+                        int i = panel.Items.IndexOf(grid) + 1;
+
                         var image = new Image();
-                        image.Source = wbmp;
+                        image.Source = source;
                         image.Tag = pic;
                         image.Tap += image_Tap;
                         panel.Items.Insert(i, image);
-                        i++;
                     }
-                    // panel.Items.RemoveAt(i);
-                }
-                else
-                {
-                    var source = new BitmapImage();
-                    source.SetSource(stream);
-
-                    int i = panel.Items.IndexOf(grid) + 1;
-
-                    var image = new Image();
-                    image.Source = source;
-                    image.Tag = pic;
-                    image.Tap += image_Tap;
-                    panel.Items.Insert(i, image);
                 }
 
                 grid.Children.Clear();
@@ -387,6 +437,28 @@ namespace DCView
                 status.Text = "[이미지 불러오기 실패]";
             }
    
+        }
+
+        private string GetExtension(System.Net.Http.Headers.ContentDispositionHeaderValue disp)
+        {
+            if (disp == null) return string.Empty;
+
+            var fileName = disp.FileName;
+            if (fileName == null) return string.Empty;
+            if (fileName.Length < 4) return string.Empty;
+
+            if ((fileName[0] == '"' && fileName[fileName.Length - 1] == '"') || 
+                (fileName[0] == '\'' && fileName[fileName.Length - 1] == '\''))
+                fileName = fileName.Substring(1, fileName.Length - 2);
+
+            try
+            {
+                return System.IO.Path.GetExtension(fileName).ToLower();
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         

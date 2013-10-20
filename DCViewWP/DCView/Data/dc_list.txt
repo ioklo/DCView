@@ -1,14 +1,9 @@
-bag
-가방
-0
+2013-10-20 14:02:43
 kpop
 가요
 0
 kyungwon
 가천대
-0
-catholic
-가톨릭대
 0
 nursing
 간호학
@@ -19,12 +14,6 @@ gangnam
 gangdong
 강동구
 0
-gangbuk
-강북구
-0
-gangseo
-강서구
-0
 kangsora
 강소라
 0
@@ -34,14 +23,14 @@ ksy
 37
 강원/제주/해외지역
 0
-kangwon
-강원대
-0
 kjy
 강지영
 0
 kangjh
 강지환
+0
+gummy
+거미
 0
 konkuk
 건국대
@@ -61,17 +50,11 @@ fight
 fight_game
 격투게임
 0
-kyonggi
-경기대
-0
 knu
 경북대
 0
 gsnu
 경상대
-0
-ks
-경성대
 0
 economy
 경제
@@ -82,26 +65,17 @@ police
 khu
 경희대
 0
-kmu
-계명대
-0
-koreauniversity
-고려대
-0
 agony
 고민
 0
 exam_gosi
 고시, 시험
 0
-ara
-고아라
-0
-goyang
-고양(일산)
-0
 game_classic
 고전게임
+0
+hj
+고현정
 0
 insect
 곤충
@@ -118,14 +92,8 @@ event
 gongik_new
 공익
 0
-princess_k
-공주의 남자
-0
 horror
 공포이야기
-0
-engineering
-공학
 0
 khjin
 공효진
@@ -133,17 +101,8 @@ khjin
 sweets
 과자, 빵
 0
-science
-과학
-0
 scienceexam
 과학
-0
-gwanak
-관악구
-0
-gwangmyeong
-광명
 0
 kwangwoon
 광운대
@@ -151,28 +110,16 @@ kwangwoon
 35
 광주/전라지역
 0
-gwangjin
-광진구
-0
 univ_edu
 교육 대학교
-0
-guro
-구로구
-0
-jobhunt
-구인구직
 0
 hara
 구하라
 0
-yeonpyeongdo
-국가안보(연평도 북괴도발)
-0
 travel
 여행-국내
 0
-baseball_new1
+baseball_new2
 국내야구
 0
 entertainment
@@ -187,32 +134,32 @@ kookmin
 k_car
 국산자동차
 0
-give
-그냥드립니다
+guckkasten
+국카스텐
+0
+gooddoctor
+굿 닥터
 0
 granadoespada
 그라나도에스파다
 0
+gravity
+그래비티
+0
 grey
 그레이 아나토미
 0
+goldout
+금 나와라, 뚝딱!
+0
 kumoh
 금오공대
-0
-geumcheongo
-금천구
 0
 arm
 기갑
 0
 wcaster
 기상캐스터
-0
-parasite
-기생충
-0
-kia
-기아자동차
 0
 food
 기타음식
@@ -223,32 +170,17 @@ drama
 f_drama
 기타 미국드라마
 0
-etc_drama
-기타 해외드라마
-0
-etcsell
-팝니다-기타물품
-0
-etcbuy
-삽니다-기타물품
-0
-etc_program
+etc_program1
 기타프로그램
 0
 kimkyungho
 김경호
-0
-kimmoonsoo
-김문수
 0
 kimbeom
 김범
 0
 kimbumsoo
 김범수
-0
-kimsuna
-김선아
 0
 kimsungmo
 김성모
@@ -265,20 +197,20 @@ yeona
 kyw
 김연우
 0
+kwbin
+김우빈
+0
 yusik
 김유식 대표 에세이
-0
-kimjaewon
-김재원
 0
 jaejoong
 김재중
 0
-kimjungil
-김정일 死後
+kjh
+김정환
 0
-johan
-김조한
+junsu
+김준수
 0
 taewon
 김태원
@@ -292,14 +224,14 @@ kimhyeona
 khj
 김현중
 0
+hyesoo
+김혜수
+0
+heeseon
+김희선
+0
 sundaynight
 나는 가수다
-0
-ngs
-나는 꼼수다
-0
-badboy
-나쁜남자
 0
 naul
 나얼
@@ -307,32 +239,20 @@ naul
 knife
 나이프
 0
+9muses
+나인뮤지스
+0
 fishing
 낚시
-0
-wildromance
-난폭한 로맨스
-0
-ngm
-남궁민
-0
-nsu
-남서울대
-0
-nyj
-남양주
 0
 m_entertainer
 남자 연예인
 0
-mq
-남자의 자격
-0
-friend_boy
-남자친구
-0
 friend_boy_1
 남자친구
+0
+yourvoice
+너의 목소리가 들려
 0
 nf
 네이비필드
@@ -340,14 +260,20 @@ nf
 sh
 넥센 히어로즈
 0
-nowon
-노원구
+nell
+넬
 0
 nanjoong
 노회찬 대표
 0
 basketball
 농구
+0
+farming
+농업
+0
+nuest
+뉴이스트
 0
 23
 니콘
@@ -357,9 +283,6 @@ nc
 0
 nintendo
 닌텐도 DS
-0
-davichi
-다비치
 0
 diary
 다이어리
@@ -376,14 +299,8 @@ dalshabet
 34
 대구/경북지역
 0
-cu
-대구가톨릭대
-0
 daegu
 대구대
-0
-daesung
-대성
 0
 36
 대전/충청지역
@@ -391,32 +308,29 @@ daesung
 daejin
 대진대
 0
-pgschool
-대학원
+dancing9
+댄싱9
 0
-dance
-댄스
-0
-king2hearts
-더킹 투하츠
-0
-duksung
-덕성여대
+ds
+던전스트라이커
 0
 d_fighter_new
 던전앤파이터
 0
+devilmaker
+데빌메이커
+0
 gambling
 도박, 경마
-0
-dobong
-도봉구
 0
 book
 도서
 0
 city
 도시
+0
+dota2
+도타 2
 0
 slife
 독거
@@ -427,17 +341,8 @@ dokdo
 readingroom
 독서실
 0
-dongguk
-동국대
-0
 travel_asia
 여행-동남아
-0
-ddm
-동대문구
-0
-dongduk
-동덕여대
 0
 animal
 동물,기타
@@ -445,7 +350,7 @@ animal
 touhou
 동방 프로젝트
 0
-dongbang
+dongbang_new
 동방신기
 0
 dongau
@@ -467,6 +372,9 @@ exam_2004
 디시수갤러스
 0
 anigallers
+이전 디시애갤러스
+0
+anigallers_new
 디시애갤러스
 0
 diablo
@@ -475,17 +383,11 @@ diablo
 diablo3
 디아블로3
 0
-design
-디자인, 일러스트
-0
-dcbuy
-삽니다-디지탈카메라
-0
-dc_sell
-팝니다-디지탈 카메라
-0
 etc_g
 디지털카메라
+0
+dickpunks
+딕펑스
 0
 radio
 라디오
@@ -496,17 +398,17 @@ latale
 rock
 락
 0
-rustyhearts
-러스티하츠
-0
-racinggirl
-레이싱모델
-0
 rainbow
 레인보우
 0
 lotto2
 로또
+0
+rp
+로맨틱펀치
+0
+roykim
+로이킴
 0
 giants_new
 롯데 자이언츠
@@ -514,10 +416,19 @@ giants_new
 lotteria
 롯데리아
 0
+lunaraid
+루나레이드
+0
 deokhwan
 류덕환
 0
-leagueoflegends
+seungryong
+류승룡
+0
+hyunjin
+류현진
+0
+leagueoflegends1
 리그 오브 레전드
 0
 lineage
@@ -526,38 +437,35 @@ lineage
 rhythmgame
 리듬게임
 0
-rift
-리프트
-0
 ma_essay
 마광수 교수 에세이
 0
 ma9
 마구마구
 0
-game_mabinogi
+game_mabinogi1
 마비노기
 0
 mabi_heroes
 마비노기 영웅전
 0
-mapo
-마포구
+majak
+마작
 0
-accident
+accident_new
 막장
 0
-comic_new
+comic_new1
 만화
-0
-mary
-매리는 외박 중
 0
 mcdonalds
 맥도날드
 0
 dog
 멍멍이
+0
+topteam
+메디컬 탑팀
 0
 makeup
 메이크업
@@ -571,11 +479,11 @@ food_noodle
 mju
 명지대
 0
-model
-모델
+mobilegame
+모바일게임
 0
-atrix
-아트릭스
+monnani
+못난이 주의보
 0
 atheism
 무신론
@@ -592,17 +500,11 @@ tattoo
 chaewon
 문채원
 0
-literature
-문학
-0
 fish
 물고기
 0
 physicalscience
 물리학
-0
-barter
-물물교환
 0
 mystery3j
 미갤러스
@@ -610,11 +512,11 @@ mystery3j
 top_f_drama
 미국 드라마
 0
-usa_show
-미국 쇼프로그램
-0
 pop
 미국음악
+0
+mirae
+미래의 선택
 0
 finearts
 미술
@@ -625,26 +527,17 @@ mystery
 lovegame
 미연시
 0
-travel_america
-여행-미주
-0
 mkyunghoon
 민경훈
 0
 military2
 밀리터리
 0
-military3
-밀리터리 내무반
-0
 baram
 바람의 나라
 0
 hwawon
 바람의 화원
-0
-bobbykim
-바비킴
 0
 vibe
 바이브
@@ -655,11 +548,20 @@ bike
 pgr
 박규리
 0
+pgeunhye
+박근혜
+0
 parkboyoung
 박보영
 0
+parkseojun
+박서준
+0
 parksihoo
 박시후
+0
+parkshinhye
+박신혜
 0
 pwk
 박완규
@@ -673,23 +575,29 @@ pjb
 lenapark
 박정현
 0
-parkjisung
-박지성
-0
 phs
 박하선
 0
 parkhyoshin
 박효신
 0
+heevon
+박희본
+0
+yeadam
+방예담
+0
+bts
+방탄소년단
+0
 volleyball
 배구
 0
-pcu
-배재대
+ayeon
+백아연
 0
-battlefield3
-배틀필드3
+jh
+백진희
 0
 chungkang
 백청강
@@ -703,9 +611,6 @@ bus
 buskerbusker
 버스커 버스커
 0
-news_society
-범죄
-0
 law
 법학
 0
@@ -714,6 +619,9 @@ boardgame
 0
 boa
 보아
+0
+event_voicere
+보이스리플
 0
 boxing
 복싱
@@ -730,47 +638,38 @@ immovables
 pusanu
 부산대
 0
-bucheon
-부천
-0
 north_korea
 북한
 0
-browneyedgirls
-브라운 아이드 걸스
+firejung
+불의 여신 정이
 0
-brain
-브레인
+blockb
+블락비
+0
+blackbox
+블랙박스
+0
+bns
+블레이드&소울
 0
 rain
 비
 0
-video_game
-비디오게임
-0
-nonrw
-비정규직
+secretlove
+비밀
 0
 bigbang
 빅뱅
 0
-lichtundschatten
-빛과 그림자
-0
 accident2
 사고
-0
-loverain
-사랑비
 0
 coe
 사범 대학교
 0
 jcexam
 사법
-0
-cyber_university
-사이버대학
 0
 cyphers
 사이퍼즈
@@ -787,16 +686,19 @@ samgugji
 samsunglions
 삼성 라이온즈
 0
-syu
-삼육대
+dcbuy
+삽니다
 0
-smu
-상명대
+theheirs
+상속자들
 0
-fashion_new
+shark
+상어
+0
+fashion_new1
 상의
 0
-shinee
+shinee_new
 샤이니
 0
 sogang
@@ -804,9 +706,6 @@ sogang
 0
 seokyeong
 서경대
-0
-seodaemun
-서대문구
 0
 snut
 서울과학기술대
@@ -817,9 +716,6 @@ seouluniversity
 uos
 서울시립대
 0
-swu
-서울여대
-0
 30
 서울지역
 0
@@ -829,26 +725,14 @@ sig
 seocho
 서초구
 0
+seotaiji
+서태지
+0
 seojuhyun
 서현
 0
-vessel
-선박
-0
-sungkyul
-성결대
-0
 skku
 성균관대
-0
-seongnam
-성남(분당)
-0
-sd
-성동구
-0
-seongbuk
-성북구
 0
 sikyung
 성시경
@@ -862,6 +746,9 @@ radio_actor
 plastic_s
 성형
 0
+seven
+세븐
+0
 sejong
 세종대
 0
@@ -871,29 +758,17 @@ girlsgeneration_new
 25
 소니
 0
-scommerce
-소셜커머스
-0
 sojisub
 소지섭
 0
-sonhk
-손학규
-0
-sbg
-송병구
+sonyeonjae
+손연재
 0
 sjk
 송중기
 0
 changeui
 송창의
-0
-songpa
-송파구
-0
-tigerdivision
-수기사(맹호)
 0
 exam_new
 수능
@@ -904,14 +779,11 @@ mathexam
 watersports
 수상스포츠
 0
-key
-수수께끼
+bock_nye
+수상한 가정부
 0
 sy
 수영
-0
-suwonsi
-수원
 0
 suwon
 수원대
@@ -922,29 +794,23 @@ vm
 f_car
 수입자동차
 0
+suzy
+수지
+0
 supernatural
 수퍼내추럴
 0
 mathematics
 수학
 0
-sookmyungwomans_univ
-숙명여대
-0
-sch
-순천향대
-0
 ssu
 숭실대
-0
-gmdm
-쉐보레
 0
 shooting
 슈팅 게임
 0
 superstark
-슈퍼스타K 3
+슈퍼스타K
 0
 superj
 슈퍼주니어
@@ -952,14 +818,17 @@ superj
 smartphone
 스마트폰
 0
-starcraft_vod
-동영상-스타크래프트
+scd
+스캔들
 0
 starcraft_new
 스타크래프트
 0
-starcraft2
+starcraft2_new
 스타크래프트 II
+0
+spica
+스피카
 0
 watch
 시계
@@ -967,14 +836,8 @@ watch
 secret
 시크릿
 0
-siheung
-시흥
-0
 tree
 식물
-0
-syndrome
-신드롬
 0
 footwear
 신발
@@ -985,14 +848,26 @@ sinsegyeong
 creditcard
 신용카드
 0
+hakyun
+신하균
+0
 shinhwa
 신화
 0
 psychology
 심리학
 0
+shimjiho
+심지호
+0
+psy
+싸이
+0
 sunny
 써니
+0
+sunnyhill
+써니힐
 0
 sistar
 씨스타
@@ -1003,17 +878,17 @@ baby
 announcer2
 아나운서
 0
+arang4to
+아랑 사또전
+0
 arbeit
 아르바이트
 0
-outback
-아웃백
+go_father
+아빠! 어디가?
 0
 outsiders
 아웃사이더
-0
-aion
-아이온
 0
 iu
 아이유
@@ -1024,29 +899,20 @@ iphone
 ajou
 아주대
 0
-africa
-여행-아프리카
+archeage
+아키에이지
 0
 instruments
 악기
 0
-fashion_acc
-악세사리
+akdong
+악동뮤지션
 0
 eye
 안구
 0
 androidphone
 안드로이드폰
-0
-ansan
-안산
-0
-anyang
-안양
-0
-anyang_university
-안양대
 0
 america_ani
 애니-미국
@@ -1056,9 +922,6 @@ ani1_new1
 0
 korea_ani
 애니-한국
-0
-animator
-애니메이터
 0
 afterschool
 애프터 스쿨
@@ -1072,14 +935,14 @@ pharmacy
 westernfood
 양식
 0
-yangcheon
-양천구
-0
 child
 어린이
 0
 lsa
 어학연수
+0
+unleashed
+언리쉬드
 0
 languageexam
 언어
@@ -1090,26 +953,23 @@ language
 eom
 엄상익 변호사 에세이
 0
-umtw
-엄태웅
-0
-conan
-에이지 오브 코난
+ericnam
+에릭남
 0
 apink
 에이핑크
 0
-epikhigh
-에픽하이
-0
 elsword
 엘소드
+0
+qc
+여왕의 교실
 0
 w_entertainer
 여자 연예인
 0
-girl
-여자친구
+yjg
+여진구
 0
 history
 역사
@@ -1120,14 +980,11 @@ divination
 theaterM
 연극, 뮤지컬
 0
-yonseiuniversity
-연세대
-0
 loveconsultation
 연애상담
 0
-rumor
-연예 루머
+yeonwoojin
+연우진
 0
 biza
 엽기
@@ -1138,29 +995,23 @@ england_drama
 ynu
 영남대
 0
-ydp
-영등포구
-0
 English
 영어
 0
-westhero
-영웅서유기
+ec
+영어회화
 0
 movie2
 영화
 0
-ottang
-오땅
-0
-okprince
-옥탑방 왕세자
+aurora
+오로라 공주
 0
 online
 온라인게임
 0
-22
-올림푸스
+kingsfamily
+왕가네 식구들
 0
 foreign_university
 외국대학
@@ -1174,9 +1025,6 @@ faexam
 yongsan
 용산구
 0
-yongin
-용인
-0
 married
 우리 결혼했어요
 0
@@ -1185,12 +1033,6 @@ universe
 0
 ulala
 울랄라 세션
-0
-anigif
-움짤
-0
-warcraft
-워크래프트
 0
 warhammer
 워해머
@@ -1201,8 +1043,17 @@ wonkwang
 wondergirls_new
 원더걸스
 0
-audition
-위대한 탄생
+wonbin
+원빈
+0
+worldoftanks
+월드 오브 탱크
+0
+webtoon
+웹툰
+0
+winner
+위너
 0
 windowsphone
 윈도우폰
@@ -1213,17 +1064,20 @@ uknow
 travel_europe
 여행-유럽
 0
-europop
-유럽음악
-0
 kwonyuri
 유리
 0
-youseungho
-유승호
+ysw
+유승우
 0
 yai
 유아인
+0
+inna
+유인나
+0
+ukiss
+유키스
 0
 foreignu
 유학, 해외유저
@@ -1231,8 +1085,8 @@ foreignu
 army
 육군
 0
-ydh
-윤도현
+yoongun
+윤건
 0
 siyoon
 윤시윤
@@ -1246,44 +1100,29 @@ jongshin
 yunha
 윤하
 0
-eunjung
-은정
-0
-eunjiwon
-은지원
-0
-eunpyeong
-은평구
-0
 disc
 음반
 0
 music
 음악
 0
-medicine
-의약
-0
-ujb
-의정부
-0
 medicalscience
 의학
 0
-lmb
-이명박
+kwang
+이광수
 0
-minwoo
-이민우
-0
-leeminjung
-이민정
+dahee
+이다희
 0
 minho
 이민호
 0
 jobkorea2012_event
 잡코리아 이벤트 응모
+0
+leesangyeob
+이상엽
 0
 leesangwoo
 이상우
@@ -1297,14 +1136,20 @@ leeseunggi
 earphone
 이어폰, 헤드폰
 0
-youngho
-이영호
-0
 yowon
 이요원
 0
+leejuck
+이적
+0
+leejungjae
+이정재
+0
 jehoon
 이제훈
+0
+jongsuk
+이종석
 0
 leejungi
 이준기
@@ -1312,14 +1157,23 @@ leejungi
 ejia
 이지아
 0
-ewhawomans_univ
-이화여대
+ljw
+이진욱
+0
+leehi
+이하이
+0
+hyunwoo
+이현우
+0
+leehyolee
+이효리
+0
+heejun
+이희준
 0
 itlecture
 인강
-0
-middle_east
-여행-인도, 터키, 중동
 0
 indieband
 인디밴드
@@ -1336,14 +1190,17 @@ incheon
 ib
 인터넷방송
 0
+infinite
+인피니트
+0
 inha
 인하대
 0
+doll
+인형
+0
 elec
 일렉트로니카
-0
-self
-일반셀프
 0
 travel_japan
 여행-일본
@@ -1360,11 +1217,17 @@ jpop
 japanese
 일어
 0
+siwan
+임시완
+0
 jaebum
 임재범
 0
 imjuhwan
 임주환
+0
+LimChangJung
+임창정
 0
 preparatoryschool
 입시학원
@@ -1375,11 +1238,11 @@ coq
 car_new
 자동차
 0
-carsell
-팝니다-자동차용품
-0
 pride
 자랑거리
+0
+jaurim
+자우림
 0
 bicycle
 자전거
@@ -1390,9 +1253,6 @@ compose
 jgs
 장근석
 0
-jji
-장재인
-0
 ne
 재수
 0
@@ -1402,26 +1262,14 @@ jazz
 johnnys
 쟈니스
 0
-jukdo
-적도의 남자
-0
 chonnam
 전남대
 0
 chonbuk
 전북대
 0
-electronway
-전자
-0
-jdh
-정동하
-0
 jsg_essay
 정세균 대표 에세이
-0
-jungyup
-정엽
 0
 jyh
 정용화
@@ -1429,29 +1277,26 @@ jyh
 ilwoo
 정일우
 0
-jungjaehyung
-정재형
+jjy
+정준영
 0
 news_new
 정치, 사회
 0
+starempire
+제국의 아이들
+0
 Jessica
 제시카
-0
-cheju
-제주대
-0
-jkw
-조관우
 0
 chosun
 조선대
 0
-csh
-조성하
+chosw
+조승우
 0
-cjw
-조진웅
+jjseok
+조정석
 0
 johnpark
 존박
@@ -1459,14 +1304,17 @@ johnpark
 religion
 종교
 0
-jongno
-종로구
-0
 gsc
 종합편성채널
 0
 frustration
 좌절
+0
+juguntaeyang
+주군의 태양
+0
+juniel
+주니엘
 0
 alcohol
 주류
@@ -1474,14 +1322,11 @@ alcohol
 stock_new
 주식
 0
-junggu
-중구
+joowon
+주원
 0
 china
 여행-중국, 홍콩, 마카오
-0
-jungnang
-중랑구
 0
 cau
 중앙대
@@ -1492,20 +1337,26 @@ cau
 earthquake
 지진
 0
+changwook
+지창욱
+0
+shingeki
+진격의 거인
+0
 jinjungK
 진중권
+0
+realman
+진짜 사나이
 0
 tea
 차, 음료
 0
+taehyun
+차태현
+0
 changup
 창업
-0
-changwon
-창원대
-0
-smile
-창작유머
 0
 train
 철도(지하철)
@@ -1522,11 +1373,8 @@ gun
 changmin
 최강창민
 0
-memory
-추억거리
-0
-cnu
-충남대
+jinhyuk
+최진혁
 0
 chungbuk
 충북대
@@ -1543,15 +1391,6 @@ chicken
 kara
 카라
 0
-acbuy
-삽니다-카메라악세사리
-0
-ac_sell
-팝니다-카메라악세사리
-0
-chaos
-카오스
-0
 cartoon_s
 카툰-단편
 0
@@ -1561,41 +1400,32 @@ cartoon_ad
 cartoon
 카툰-연재
 0
-cartoonlq
-카툰-연재 LQ
-0
 canong
 캐논
 0
 pridepc_new3
 컴퓨터 본체
 0
-comsell
-팝니다-컴퓨터,주변기기
-0
-combuy
-삽니다-컴퓨터,주변기기
-0
 comedy_new1
 코미디 프로그램
 0
-costume
-코스튬플레이
+crayonpop
+크레용팝
+0
+kritika
+크리티카
 0
 classic
 클래식
 0
-tarocard
-타로카드
-0
-tartaros
-타르타로스
-0
 tabletpc
 태블릿PC
 0
-taeyeon_new
+taeyeon_new1
 태연
+0
+tennis
+테니스
 0
 tera
 테라
@@ -1603,14 +1433,20 @@ tera
 toy
 토이
 0
+toeic
+토익
+0
 lotto
 토토
+0
+toxic
+톡식
 0
 2month
 투개월
 0
-special_forces
-특수부대
+2w
+투윅스
 0
 t_ara
 티아라
@@ -1621,14 +1457,14 @@ tiffany
 teentop
 틴탑
 0
-paju
-파주
-0
 reptile
 파충류, 양서류
 0
-fantasy
+fantasy_new
 판타지
+0
+dc_sell
+팝니다
 0
 fashionking
 패션왕
@@ -1636,8 +1472,8 @@ fashionking
 fastfood
 패스트푸드
 0
-fund
-펀드
+pad
+퍼즐앤드래곤
 0
 cs
 편의점
@@ -1645,14 +1481,14 @@ cs
 admission
 편입
 0
-pyeongtaek
-평택
-0
-painself
-폐인셀프
+pokemon
+포켓몬스터
 0
 postech
 포항공대
+0
+programming
+프로그래밍
 0
 wwe
 프로레슬링
@@ -1666,6 +1502,9 @@ flash
 figureskating
 피겨스케이팅
 0
+pia
+피아
+0
 piano
 피아노
 0
@@ -1675,8 +1514,8 @@ pizza
 pants
 하의
 0
-highkick3
-하이킥3
+hajungwoo
+하정우
 0
 acbs
 학점은행제
@@ -1687,23 +1526,11 @@ kpu
 hufs
 한국외국어대
 0
-korean_war
-한국전쟁
-0
 hangkong
 한국항공대
 0
 hannam
 한남대
-0
-handong
-한동대
-0
-hallym
-한림대
-0
-hsk
-한석규
 0
 hansung
 한성대
@@ -1723,38 +1550,17 @@ hanwhaeagles
 hantangee
 한효주
 0
-composition_p
-합성-그림
-0
-composition
-합성-기타
-0
-compositionsi
-합성-시사
-0
 composition_dc
-합성-필수요소
+합성
 0
 aircraft
 항공기
 0
-flightattendant
-항공승무원
-0
 aviationfight
 항공전
 0
-navy
-해군
-0
-sunNmoon
-해를 품은 달
-0
 marinecorps
 해병대
-0
-maritime_university
-해양대
 0
 baseball_ab
 해외야구
@@ -1762,11 +1568,11 @@ baseball_ab
 etc_entertainment
 해외연예
 0
-football_new4
-해외축구
+etc_ent_19
+해외연예(성인)
 0
-seafight
-해전
+football_new5
+해외축구
 0
 adexam
 행정
@@ -1777,11 +1583,14 @@ cosmetic
 huhgak
 허각
 0
-heva
-헤바 클로니아
+honeyg
+허니지
 0
 hair
 헤어스타일
+0
+hellovenus
+헬로비너스
 0
 extra
 헬스
@@ -1789,50 +1598,47 @@ extra
 hyundai_motor
 현대자동차
 0
-modernwar
-현대전
-0
 hyunbin
 현빈
 0
 australia
 여행-호주, 뉴질랜드
 0
+hdk
+홍대광
+0
 soohyun
 홍수현
 0
-hongik
-홍익대
+hjonghyun
+홍종현
 0
 hong_essay
 홍준표 의원 에세이
 0
-sfamily
-화려한 일족
+hwhy
+화이
 0
-hwaseong
-화성
+ma
+확산성 밀리언아서
+0
+jungmin
+황정민
 0
 jungeum
 황정음
 0
-hyoyeonn
-효연
-0
-wheesung
-휘성
+Fnpp
+후쿠시마 원전
 0
 cellularphone
 휴대폰
 0
-phonebuy
-삽니다-휴대폰
+hiddensinger
+히든싱어
 0
-phonesell
-팝니다-휴대폰
-0
-hope
-희망
+sphero
+히어로
 0
 hiphop
 힙합
@@ -1840,17 +1646,11 @@ hiphop
 teens
 10대 여성
 0
-1starmy
-1군
-0
-1corps
-1군단
+15and
+15&
 0
 twodays
 1박 2일
-0
-jjdivision
-1사단(전진)
 0
 2year_university
 2,3년제 대학
@@ -1858,56 +1658,29 @@ jjdivision
 twenties
 20대 여성
 0
-dbdivision
-20사단(결전)
-0
-igjdivision
-27사단(이기자)
-0
-2corps
-2군단
-0
-worldwar2
-2차 세계대전
-0
 thirties
 30대 여성
-0
-3rdarmy
-3군
-0
-wbdivision
-3사단(백골)
 0
 4year_university
 4년제 대학
 0
-5corps
-5군단
+aoa
+AOA
 0
-bsdivision
-6사단(청성)
-0
-7corps
-7군단
-0
-greatbear
-7사단(칠성)
-0
-tbdivision
-8사단(오뚜기)
+bap
+B.A.P
 0
 b1a4
 B1A4
 0
-composition3d
-CG, 3D
+B2ST
+B2ST
+0
+btob
+BTOB
 0
 cnblue
 CNBLUE
-0
-fd
-ELW
 0
 eveonline
 EVE Online
@@ -1915,20 +1688,20 @@ EVE Online
 exo
 EXO
 0
+fcseoul
+FC 서울
+0
 fps
 FPS게임
 0
-ftisland
-FT 아일랜드
+hstory
+HISTORY
 0
 hit
 HIT
 0
 jk
 JK 김동욱
-0
-kaist
-KAIST
 0
 kbs_drama
 KBS드라마
@@ -1942,17 +1715,17 @@ K팝스타
 lgtwins
 LG 트윈스
 0
-mbc_drama
+mbc_drama1
 MBC 드라마
 0
-mp3sell
-팝니다-MP3플레이어
+MBLAQ
+MBLAQ
 0
-mp3buy
-삽니다-MP3플레이어
+mot
+Mot
 0
-pc
-PC방
+ncdinos
+NC 다이노스
 0
 psp
 PSP
@@ -1966,20 +1739,17 @@ SBS드라마
 skwyverns
 SK 와이번스
 0
-slr_g
-SLR
-0
 topband
 TOP 밴드
 0
-wow_new
-이이전 WOW
+vixx
+VIXX
 0
 wow_new3
 WOW
 0
-xbox
-XBOX 360
+ydh
+YB
 0
 fx
 f(x)
@@ -1989,6 +1759,9 @@ miss A
 0
 gamun
 가문의 영광
+0
+bag
+가방
 0
 gavynj
 가비엔제이
@@ -2001,6 +1774,12 @@ appliance
 0
 family
 가족
+0
+catholic
+가톨릭대
+0
+gaksital
+각시탈
 0
 kwoosung
 감우성
@@ -2019,6 +1798,15 @@ crime
 0
 kangmin
 강민
+0
+gangbuk
+강북구
+0
+gangseo
+강서구
+0
+kangwon
+강원대
 0
 kangjeok
 강적들
@@ -2062,8 +1850,20 @@ wedding
 notmarried
 결혼 못하는 남자
 0
+kyonggi
+경기대
+0
+ks
+경성대
+0
 sscandal
 경성스캔들
+0
+kmu
+계명대
+0
+koreauniversity
+고려대
 0
 thankyou
 고맙습니다
@@ -2074,11 +1874,17 @@ gosu
 exam_qna
 고시,시험Q&A
 0
-hj
-고현정
+ara
+고아라
+0
+goyang
+고양(일산)
 0
 gold
 골드
+0
+goldentime
+골든 타임
 0
 golf
 골프
@@ -2089,14 +1895,23 @@ gongsin
 0u
 공유
 0
+princess_k
+공주의 남자
+0
 free_notice
 공짜의 달인 당첨자 발표
+0
+engineering
+공학
 0
 speedscandal
 과속스캔들
 0
 fruit
 과일, 야채
+0
+science
+과학
 0
 kwaak_essay
 곽영훈 박사
@@ -2107,11 +1922,20 @@ jungouk
 physiognomy
 관상
 0
+gwanak
+관악구
+0
 cf
 광고
 0
+gwangmyeong
+광명
+0
 asiangames
 광저우 아시안 게임
+0
+gwangjin
+광진구
 0
 okdad
 괜찮아 아빠딸
@@ -2119,17 +1943,29 @@ okdad
 kyocera
 교세라
 0
+gufamilybook
+구가의 서
+0
 google
 구글어스
 0
 shoes
 구두
 0
+guro
+구로구
+0
 2010gumiho
 구미호 여우누이뎐
 0
+jobhunt
+구인구직
+0
 guhyesun
 구혜선
+0
+yeonpyeongdo
+국가안보
 0
 goodbyesolo
 굿바이솔로
@@ -2139,6 +1975,12 @@ gung2
 0
 gungs
 궁S
+0
+baramibunda
+그 겨울, 바람이 분다
+0
+give
+그냥드립니다
 0
 yousmile
 그대웃어요
@@ -2158,14 +2000,35 @@ kingbaekje
 gloria
 글로리아
 0
+geumcheongo
+금천구
+0
+parasite
+기생충
+0
+kia
+기아자동차
+0
 journalist
 기자
 0
 4
 기타
 0
+etc_drama
+기타 해외드라마
+0
+etcsell
+팝니다-기타물품
+0
+etcbuy
+삽니다-기타물품
+0
 sos24
 긴급출동SOS24
+0
+kimkangwoo
+김강우
 0
 kimnamgil
 김남길
@@ -2181,6 +2044,9 @@ kimraewon
 0
 kimmyungmin
 김명민
+0
+kimmoonsoo
+김문수
 0
 kims_essay
 김문수 의원 에세이
@@ -2199,6 +2065,9 @@ sarang
 0
 kimsangkyung
 김상경
+0
+kimsuna
+김선아
 0
 kimsoyeon
 김소연
@@ -2224,11 +2093,17 @@ kimilsung
 jaewook
 김재욱
 0
+kimjaewon
+김재원
+0
 kimjungil
 김정일 死後
 0
 kimjunghun
 김정훈
+0
+johan
+김조한
 0
 kj
 김준
@@ -2257,11 +2132,17 @@ Beemovie
 dream
 꿈
 0
+ngs
+나는 꼼수다
+0
 meflower
 나도, 꽃!
 0
 naro
 나로호
+0
+badboy
+나쁜남자
 0
 nike
 나이키
@@ -2269,14 +2150,35 @@ nike
 nahyemi
 나혜미
 0
+wildromance
+난폭한 로맨스
+0
+ngm
+남궁민
+0
 namsangmi
 남상미
+0
+nsu
+남서울대
 0
 2010worldcup
 남아공 2010
 0
+nyj
+남양주
+0
+mil
+남자가 사랑할 때
+0
+mq
+남자의 자격
+0
 slingshot
 남자이야기
+0
+friend_boy
+남자친구
 0
 myheart
 내 마음이 들리니
@@ -2286,6 +2188,9 @@ lastscandal
 0
 mygumiho
 내 여자친구는 구미호
+0
+myromance
+내 연애의 모든 것
 0
 kimsamsoon
 내 이름은 김삼순
@@ -2311,9 +2216,6 @@ byul
 navigation
 네비게이션
 0
-nell
-넬
-0
 nodame
 노다메 칸타빌레
 0
@@ -2322,6 +2224,9 @@ nmh
 0
 northface
 노스페이스
+0
+nowon
+노원구
 0
 nohongcheol
 노홍철
@@ -2356,6 +2261,12 @@ wolf
 nintendowii
 닌텐도 Wii
 0
+davichi
+다비치
+0
+5fingers
+다섯 손가락
+0
 qa_etc
 Q&A 다양한질문
 0
@@ -2370,6 +2281,9 @@ darkknight
 0
 drkkang
 닥터깽
+0
+drjin
+닥터진
 0
 doctorchamp
 닥터챔프
@@ -2389,8 +2303,14 @@ spy
 billiards
 당구
 0
+cu
+대구가톨릭대
+0
 president
 대물
+0
+daesung
+대성
 0
 3jong
 대왕세종
@@ -2404,14 +2324,26 @@ djy
 loan
 대출
 0
+pgschool
+대학원
+0
 law_mbc
 대한민국 변호사
 0
 dho
 대항해시대
 0
+dance
+댄스
+0
 thegame
 더 게임
+0
+king2hearts
+더킹 투하츠
+0
+duksung
+덕성여대
 0
 dexter
 덱스터
@@ -2422,17 +2354,35 @@ citygallers
 planb
 도망자 Plan B
 0
+dobong
+도봉구
+0
 toshiba_g
 도시바
 0
 challenge
 도전
 0
+sbsmoney
+돈의 화신
+0
+smoney
+돈지랄
+0
 iljimae_mbc
 돌아온 일지매
 0
 cbsoonae
 돌아와요 순애씨
+0
+dongguk
+동국대
+0
+ddm
+동대문구
+0
+dongduk
+동덕여대
 0
 babyface
 동안미녀
@@ -2448,6 +2398,9 @@ backdrum
 0
 dramacity
 드라마시티
+0
+dramaking
+드라마의 제왕
 0
 dt
 드렁큰 타이거
@@ -2467,6 +2420,9 @@ assistance
 dcinsideshow
 디시인사이드쇼
 0
+design
+디자인, 일러스트
+0
 workpen
 디지타이저
 0
@@ -2482,11 +2438,17 @@ lastgodfather
 sbslineup
 라인업
 0
+rustyhearts
+러스티하츠
+0
 red
 레드
 0
 racing_game
 레이싱게임
+0
+racinggirl
+레이싱모델
 0
 lexus
 렉서스
@@ -2518,6 +2480,9 @@ louisvuitton
 ryupark
 류수영&박예진
 0
+seungbeom
+류승범
+0
 ryujin
 류진
 0
@@ -2530,8 +2495,17 @@ scoop
 lineage2
 리니지2
 0
+leessang
+리쌍
+0
 ricoh_g
 리코
+0
+retouching
+리터칭
+0
+rift
+리프트
 0
 sbs_devils
 마녀유희
@@ -2541,6 +2515,9 @@ mother2009
 0
 devil
 마왕
+0
+horsedoctor
+마의
 0
 myprincess
 마이 프린세스
@@ -2560,11 +2537,20 @@ jackson
 majaeyun
 마재윤
 0
+mapo
+마포구
+0
+mary
+매리는 외박 중
+0
 manddang
 맨땅에 헤딩
 0
 manutd
 맨체스터 유나이티드
+0
+money
+머니
 0
 merrydaegu
 메리대구 공방전
@@ -2572,17 +2558,23 @@ merrydaegu
 maybee
 메이비
 0
+mayqueen
+메이퀸
+0
 shaving
 면도
 0
 luxury
 명품
 0
+model
+모델
+0
 mobile
 모바일(폰카)
 0
-mobilegame
-모바일게임
+atrix
+아트릭스
 0
 badlove
 못된 사랑
@@ -2614,11 +2606,20 @@ sorim
 munjh
 문정혁
 0
+literature
+문학
+0
 moonheejun
 문희준
 0
+barter
+물물교환
+0
 mvideo
 뮤직비디오
+0
+usa_show
+미국 쇼프로그램
 0
 anjell
 미남이시네요
@@ -2641,6 +2642,12 @@ migo
 mida
 미워도 다시 한 번
 0
+travel_america
+여행-미주
+0
+military3
+밀리터리 내무반
+0
 vanillalucy
 바닐라루시
 0
@@ -2656,6 +2663,9 @@ baram_drama
 jungdoman
 바르게 살자
 0
+bobbykim
+바비킴
+0
 violet
 바이올렛
 0
@@ -2664,9 +2674,6 @@ bike_q
 0
 batang
 바탕화면
-0
-pgeunhye
-박근혜
 0
 kiwoong
 박기웅
@@ -2686,9 +2693,6 @@ parksj
 pshinyang
 박신양
 0
-parkshinhye
-박신혜
-0
 parkyongha
 박용하
 0
@@ -2700,6 +2704,9 @@ parkjs
 0
 parkjunghee
 박정희
+0
+parkjisung
+박지성
 0
 pjs
 박지수
@@ -2743,17 +2750,26 @@ baeseulki
 byongjoon
 배용준
 0
+pcu
+배재대
+0
 baechigi
 배치기
 0
 battle
 배틀
 0
+battlefield3
+배틀필드3
+0
 millionaire
 백만장자와 결혼하기
 0
 vancouver2010
 밴쿠버 동계올림픽
+0
+news_society
+범죄
 0
 bestiz
 베스티즈(임시)
@@ -2772,6 +2788,9 @@ chosunpolice
 0
 mw
 보건복지가족부
+0
+bogo
+보고싶다
 0
 boss
 보스를 지켜라
@@ -2794,6 +2813,9 @@ lovewar
 bujatan
 부자의 탄생
 0
+bucheon
+부천
+0
 lifeagain
 부활
 0
@@ -2815,11 +2837,20 @@ leesunsin
 bulhan
 불한당
 0
-blockb
-블락비
+browneyedgirls
+브라운 아이드 걸스
+0
+brain
+브레인
 0
 blue
 블루
+0
+video_game
+비디오게임
+0
+nonrw
+비정규직
 0
 bichunmu
 비천무
@@ -2833,14 +2864,23 @@ beatles
 flyingsimul
 비행 시뮬레이션
 0
+big
+빅
+0
 ices
 빙과
 0
 skating
 빙상
 0
+lichtundschatten
+빛과 그림자
+0
 root
 뿌리깊은 나무
+0
+loverain
+사랑비
 0
 loveholic
 사랑에 미치다
@@ -2854,6 +2894,9 @@ iloveu
 oa
 사무기기
 0
+cyber_university
+사이버대학
+0
 sanyo_g
 산요
 0
@@ -2866,11 +2909,20 @@ samsungg
 samsungkhan
 삼성전자 칸
 0
+syu
+삼육대
+0
+smu
+상명대
+0
 sangsang
 상상플러스
 0
 lustcaution
 색, 계
+0
+seodaemun
+서대문구
 0
 seodong
 서동요
@@ -2881,11 +2933,11 @@ minjung
 seoul1945
 서울1945
 0
+swu
+서울여대
+0
 seojh
 서지훈
-0
-seotaiji
-서태지
 0
 seonduk
 선덕여왕
@@ -2893,20 +2945,47 @@ seonduk
 sunmi
 선미
 0
+vessel
+선박
+0
 sunwoosun
 선우선
+0
+snowpiercer2013
+설국열차
+0
+sungkyul
+성결대
 0
 scandal
 성균관 스캔들
 0
+seongnam
+성남(분당)
+0
+sd
+성동구
+0
+seongbuk
+성북구
+0
 yuri
 성유리
 0
-seven
-세븐
+shayne
+셰인
+0
+srn
+소라넷
+0
+scommerce
+소셜커머스
 0
 software
 소프트웨어
+0
+underwear
+속옷
 0
 flexion_crease
 손금
@@ -2917,6 +2996,9 @@ sondambi
 sonyejin
 손예진
 0
+sonhk
+손학규
+0
 sonhk_1
 손학규 전 지사 에세이
 0
@@ -2925,6 +3007,9 @@ sb
 0
 songgangho
 송강호
+0
+sbg
+송병구
 0
 songseungheon
 송승헌
@@ -2938,6 +3023,9 @@ songilkuk
 songjh
 송지효
 0
+songpa
+송파구
+0
 songhyekyo
 송혜교
 0
@@ -2947,14 +3035,32 @@ showvival
 handicraft
 수공예
 0
+tigerdivision
+수기사(맹호)
+0
+key
+수수께끼
+0
 suae
 수애
+0
+suwonsi
+수원
+0
+sookmyungwomans_univ
+숙명여대
 0
 hotel_1
 숙박
 0
+sch
+순천향대
+0
 sgs
 숭례문
+0
+gmdm
+쉐보레
 0
 shield
 쉴드
@@ -2980,6 +3086,9 @@ style
 star_boarder
 스타중계진
 0
+starcraft_vod
+동영상-스타크래프트
+0
 storm
 스톰
 0
@@ -2998,6 +3107,9 @@ speedracer
 victory
 승리
 0
+sinawe
+시나위
+0
 secretgarden
 시크릿 가든
 0
@@ -3006,6 +3118,9 @@ cityhunter
 0
 cityhall
 시티홀
+0
+siheung
+시흥
 0
 bestchef
 식객
@@ -3022,23 +3137,32 @@ cinderellaman
 sindon
 신돈
 0
+syndrome
+신드롬
+0
 mina
 신민아
+0
+sinsa
+신사의 품격
 0
 ssh
 신승훈
 0
+greatdoctor
+신의
+0
 scales
 신의 저울
-0
-hakyun
-신하균
 0
 silver
 실버
 0
 missing2009
 실종
+0
+simcity
+심시티
 0
 singlepapa
 싱글파파는 열애중
@@ -3076,17 +3200,29 @@ threepapa
 audi
 아우디
 0
+outback
+아웃백
+0
 imsam
 아이 엠 샘
 0
+idoido
+아이두 아이두
+0
 iris
 아이리스
+0
+iris2
+아이리스 2
 0
 ivy
 아이비
 0
 ironman
 아이언맨
+0
+aion
+아이온
 0
 ajussi2010
 아저씨
@@ -3100,11 +3236,29 @@ morningdrama
 athena
 아테나: 전쟁의 여신
 0
+africa
+여행-아프리카
+0
+fashion_acc
+악세사리
+0
+ansan
+안산
+0
+anyang
+안양
+0
+anyang_university
+안양대
+0
 junghwan
 안정환
 0
 alex
 알렉스
+0
+animator
+애니메이터
 0
 aeja
 애자
@@ -3118,8 +3272,14 @@ apple
 6
 야경
 0
+yawang
+야왕
+0
 yangdonggeun
 양동근
+0
+yangcheon
+양천구
 0
 yangpa
 양파
@@ -3136,11 +3296,20 @@ umkijoon
 angrymom
 엄마가 뿔났다
 0
+umtw
+엄태웅
+0
 eastofeden
 에덴의 동쪽
 0
 aircity
 에어시티
+0
+conan
+에이지 오브 코난
+0
+epikhigh
+에픽하이
 0
 xpeed
 엑스피드 플레이
@@ -3160,6 +3329,9 @@ scent
 womensoccer
 여자축구
 0
+girl
+여자친구
+0
 foreign
 여행-기타
 0
@@ -3172,11 +3344,17 @@ queen
 ygsm
 연개소문
 0
+yonseiuniversity
+연세대
+0
 marriage
 연애결혼
 0
 yeonae
 연애시대
+0
+rumor
+연예 루머
 0
 lovers
 연인
@@ -3187,8 +3365,14 @@ yjh
 timessquare
 영등포 타임스퀘어
 0
+ydp
+영등포구
+0
 Imagenovel
 영상 소설
+0
+westhero
+영웅서유기
 0
 yellow
 옐로우
@@ -3198,6 +3382,9 @@ ogame
 0
 audio
 오디오
+0
+ottang
+오땅
 0
 ohmanseok
 오만석
@@ -3211,11 +3398,17 @@ ohzio
 5000man
 오천만의 대질문
 0
+okprince
+옥탑방 왕세자
+0
 online_shopping
 온라인 쇼핑
 0
 onair
 온에어
+0
+22
+올림푸스
 0
 wife
 와이프
@@ -3232,14 +3425,20 @@ doctorbong
 desire
 욕망의 불꽃
 0
+yongin
+용인
+0
 village
 우리동네
+0
+anigif
+움짤
 0
 wjstars
 웅진스타즈
 0
-wonbin
-원빈
+warcraft
+워크래프트
 0
 wanted
 원티드
@@ -3250,8 +3449,20 @@ oneh_essay
 desperate
 위기의주부들
 0
+audition
+위대한 탄생
+0
+europop
+유럽음악
+0
+phantom
+유령
+0
 seyoon
 유세윤
+0
+youseungho
+유승호
 0
 usimin
 유시민
@@ -3292,8 +3503,8 @@ eugene
 eugenepark
 유진박
 0
-ukiss
-유키스
+ue
+유학시험
 0
 heeyeol
 유희열
@@ -3307,6 +3518,21 @@ ysh
 yeh
 윤은혜
 0
+eunjung
+은정
+0
+eunjiwon
+은지원
+0
+eunpyeong
+은평구
+0
+medicine
+의약
+0
+ujb
+의정부
+0
 leekyungkyu
 이경규
 0
@@ -3319,8 +3545,17 @@ leedahae
 dongwook
 이동욱
 0
+lmb
+이명박
+0
 mingi
 이민기
+0
+minwoo
+이민우
+0
+leeminjung
+이민정
 0
 bumsu
 이범수
@@ -3340,6 +3575,9 @@ leeseojin
 leesk
 이선균
 0
+sungmin
+이성민
+0
 leesungeun
 이성은
 0
@@ -3348,6 +3586,9 @@ saeun
 0
 leesooyoung
 이수영
+0
+lshyuk
+이수혁
 0
 leesy
 이승엽
@@ -3358,6 +3599,9 @@ lsh
 leeseunghyo
 이승효
 0
+siyoung
+이시영
+0
 yeonhee
 이연희
 0
@@ -3367,8 +3611,14 @@ lee0e
 leeyoungpyo
 이영표
 0
+youngho
+이영호
+0
 leeyoonyeol
 이윤열
+0
+yoonji
+이윤지
 0
 leejaedong
 이제동
@@ -3378,6 +3628,9 @@ leejonghyeuk
 0
 ijuksa
 이죽일놈의사랑
+0
+junhyuk
+이준혁
 0
 leephilip
 이필립
@@ -3391,17 +3644,17 @@ hana
 lhc
 이해찬
 0
-hyunwoo
-이현우
-0
 lhk
 이현지
 0
 lhj
 이현진
 0
-leehyolee
-이효리
+ewhawomans_univ
+이화여대
+0
+middle_east
+여행-인도, 터키, 중동
 0
 indianajones
 인디아나 존스
@@ -3421,11 +3674,8 @@ internet_tech
 internet_site
 인터넷-사이트
 0
-infinite
-인피니트
-0
-doll
-인형
+self
+일반셀프
 0
 japan
 일본인과 성문화
@@ -3448,20 +3698,17 @@ limjs
 limjueun
 임주은
 0
-LimChangJung
-임창정
-0
 car_center
 자동차 주차장
 0
 car_diy
 자동차 튜닝
 0
+carsell
+팝니다-자동차용품
+0
 go
 자명고
-0
-jaurim
-자우림
 0
 giant
 자이언트
@@ -3484,6 +3731,12 @@ jdonggun
 seohee
 장서희
 0
+jangokjeong
+장옥정, 사랑에 살다
+0
+jji
+장재인
+0
 jangjy
 장진영
 0
@@ -3492,6 +3745,9 @@ janghyuk
 0
 jaehee
 재희
+0
+jukdo
+적도의 남자
 0
 cdh
 전두환
@@ -3508,8 +3764,14 @@ yeook
 jeonwoochi
 전우치
 0
+jwc
+전우치
+0
 country
 전원
+0
+electronway
+전자
 0
 edictionary
 전자사전
@@ -3535,11 +3797,17 @@ kyungho
 cdy
 정동영
 0
+jdh
+정동하
+0
 ryeowon
 정려원
 0
 snconference8
 정상회담
+0
+jungyup
+정엽
 0
 jws
 정우성
@@ -3547,14 +3815,14 @@ jws
 jym
 정유미
 0
+jungjaehyung
+정재형
+0
 p_debate
 정치토론게시판
 0
 5gong
 제 5공화국
-0
-starempire
-제국의 아이들
 0
 zera
 제라
@@ -3562,8 +3830,14 @@ zera
 takku
 제빵왕 김탁구
 0
+cheju
+제주대
+0
 jejungwon
 제중원
+0
+jkw
+조관우
 0
 minki
 조민기
@@ -3571,14 +3845,26 @@ minki
 chosun_np
 조선일보
 0
+csh
+조성하
+0
 joyounwoo
 조연우
+0
+younhee
+조윤희
 0
 joinsung
 조인성
 0
+cjw
+조진웅
+0
 hyunjae
 조현재
+0
+jongno
+종로구
 0
 general_hospital2
 종합병원2
@@ -3589,17 +3875,20 @@ jumong2
 sangwook
 주상욱
 0
-joowon
-주원
-0
 joojihun
 주지훈
 0
 joojinmo
 주진모
 0
+junggu
+중구
+0
 china_entertainment
 중국연예
+0
+jungnang
+중랑구
 0
 chinafood
 중식
@@ -3625,6 +3914,9 @@ jijinhee
 jihyunwoo
 지현우
 0
+misskim
+직장의 신
+0
 truthgame
 진실게임
 0
@@ -3649,8 +3941,20 @@ cyr
 illusion
 착시
 0
+innocentman
+착한남자
+0
 usan
 찬란한 유산
+0
+changwon
+창원대
+0
+smile
+창작유머
+0
+fugitive
+천명
 0
 thegrace
 천상지희
@@ -3676,6 +3980,9 @@ parkjunggum
 chungae
 청계천
 0
+alice
+청담동 앨리스
+0
 free_write
 공짜의 달인 후기작성 게시판
 0
@@ -3687,6 +3994,9 @@ chilwoo
 0
 kangjjang
 최강희
+0
+soonsin
+최고다 이순신
 0
 greatestlove
 최고의 사랑
@@ -3700,6 +4010,9 @@ chyunsung
 choijw
 최정원
 0
+cy
+최창엽
+0
 cch
 최철호
 0
@@ -3709,17 +4022,38 @@ thechaser
 chuno
 추노
 0
+memory
+추억거리
+0
+chaser
+추적자
+0
 congratulation
 축하
+0
+cnu
+충남대
 0
 friend_girl_q
 친구,애인Q&A
 0
+acbuy
+삽니다-카메라악세사리
+0
+ac_sell
+팝니다-카메라악세사리
+0
 20
 카시오
 0
+chaos
+카오스
+0
 cain
 카인과 아벨
+0
+cartoonlq
+카툰-연재 LQ
 0
 kart
 카트라이더
@@ -3733,6 +4067,9 @@ canon_q
 character
 캐릭터
 0
+camping
+캠핑
+0
 coupleg
 커플
 0
@@ -3741,6 +4078,12 @@ coffeeprince
 0
 coffeehouse
 커피하우스
+0
+comsell
+팝니다-컴퓨터,주변기기
+0
+combuy
+삽니다-컴퓨터,주변기기
 0
 pc_network
 컴퓨터-네트워킹
@@ -3751,6 +4094,9 @@ pc_etc
 queserasera
 케세라세라
 0
+kwill
+케이윌
+0
 konica_minota_g
 코니카미놀타
 0
@@ -3759,6 +4105,9 @@ konica_minota_g
 0
 gottalent
 코리아 갓 탤런트
+0
+costume
+코스튬플레이
 0
 honggildong
 쾌도 홍길동
@@ -3774,6 +4123,12 @@ christmas
 0
 kkisland
 크크섬의 비밀
+0
+tarocard
+타로카드
+0
+tartaros
+타르타로스
 0
 tazza
 타짜
@@ -3793,8 +4148,8 @@ sunwoman
 legend
 태왕사신기
 0
-tennis
-테니스
+tei
+테이
 0
 transformers
 트랜스포머
@@ -3805,8 +4160,14 @@ triple
 kbswanted
 특명 공개수배
 0
+special_forces
+특수부대
+0
 different
 틀린곳찾기
+0
+tyr
+티르
 0
 panasonic
 파나소닉
@@ -3817,6 +4178,9 @@ panorama
 pasta
 파스타
 0
+paju
+파주
+0
 partner
 파트너
 0
@@ -3825,6 +4189,9 @@ panic
 0
 parody
 패러디
+0
+family_kbs
+패밀리
 0
 sunday_family
 패밀리가 떴다
@@ -3844,11 +4211,20 @@ biza_1
 scrap_smile
 퍼온유머
 0
+fund
+펀드
+0
 pentax_g
 펜탁스
 0
+pyeongtaek
+평택
+0
 pain
 폐인 동호회
+0
+painself
+폐인셀프
 0
 podo
 포도밭 그 사나이
@@ -3868,9 +4244,6 @@ Peugeot
 5
 풍경-기타
 0
-programming
-프로그래밍
-0
 prisonbreak
 프리즌브레이크
 0
@@ -3889,20 +4262,35 @@ whitepower
 house
 하우스
 0
-hajungwoo
-하정우
+highkick3
+하이킥3
 0
 hajiwon
 하지원
 0
+school
+학교 2013
+0
 hangain
 한가인
+0
+korean_war
+한국전쟁
+0
+handong
+한동대
+0
+hallym
+한림대
 0
 fta
 한미 FTA
 0
 sangjinh
 한상진
+0
+hsk
+한석규
 0
 kbs_hansung
 한성별곡
@@ -3925,8 +4313,29 @@ hancy
 hanwha
 한화
 0
-football_new4
-이전 해외축구
+composition_p
+합성-그림
+0
+composition
+합성-기타
+0
+compositionsi
+합성-시사
+0
+flightattendant
+항공승무원
+0
+navy
+해군
+0
+sunNmoon
+해를 품은 달
+0
+maritime_university
+해양대
+0
+seafight
+해전
 0
 politicalscience
 행정
@@ -3943,6 +4352,9 @@ huryoungman
 hw
 허욱
 0
+heva
+헤바 클로니아
+0
 hellgate
 헬게이트 런던
 0
@@ -3954,6 +4366,9 @@ healthq
 0
 hyundaig
 현대
+0
+modernwar
+현대전
 0
 hon
 혼
@@ -3967,11 +4382,20 @@ home_shopping
 hometheater
 홈씨어터
 0
+hongik
+홍익대
+0
 hongjinho
 홍진호
 0
+sfamily
+화려한 일족
+0
 rememberu518
 화려한 휴가
+0
+hwaseong
+화성
 0
 lecafoz
 화승 오즈
@@ -3985,17 +4409,35 @@ couple
 goldenapple
 황금사과
 0
+eog
+황금의 제국
+0
 hwang
 황진이
 0
+hyoyeonn
+효연
+0
 26
 후지필름
+0
+wheesung
+휘성
+0
+phonebuy
+삽니다-휴대폰
+0
+phonesell
+팝니다-휴대폰
 0
 portablephoneq
 휴대폰 q&a
 0
 monochrome
 흑백
+0
+hope
+희망
 0
 hero2009
 히어로
@@ -4012,8 +4454,17 @@ hitler
 100toron
 100분 토론
 0
+1starmy
+1군
+0
+1corps
+1군단
+0
 1liter
 1리터의 눈물
+0
+jjdivision
+1사단(전진)
 0
 2006worldcup
 2006월드컵
@@ -4033,11 +4484,23 @@ hitler
 2012movie
 2012
 0
+daesun
+2012 대선
+0
+olympic
+2012 런던올림픽
+0
 ge
 2012 총선
 0
+dbdivision
+20사단(결전)
+0
 24
 24
+0
+igjdivision
+27사단(이기자)
 0
 2AM
 2AM
@@ -4047,12 +4510,24 @@ ge
 0
 2PM
 2PM
+0
+2corps
+2군단
+0
+worldwar2
+2차 세계대전
 0
 35_g
 35만 화소급
 0
 3d_qna
 3D갤 Q&A
+0
+3rdarmy
+3군
+0
+wbdivision
+3사단(백골)
 0
 49
 49일
@@ -4063,6 +4538,24 @@ canal
 5dolls
 5DOLLS
 0
+5corps
+5군단
+0
+bsdivision
+6사단(청성)
+0
+7corps
+7군단
+0
+7th
+7급 공무원
+0
+greatbear
+7사단(칠성)
+0
+tbdivision
+8사단(오뚜기)
+0
 90days
 90일, 사랑할 시간
 0
@@ -4071,9 +4564,6 @@ canal
 0
 talk
 행설수담
-0
-B2ST
-B2ST
 0
 bmw
 BMW
@@ -4084,6 +4574,9 @@ C&C
 c9
 C9
 0
+composition3d
+CG, 3D
+0
 cjentus
 CJ ENTUS
 0
@@ -4092,6 +4585,12 @@ COOL
 0
 csi
 CSI
+0
+fd
+ELW
+0
+ftisland
+FT 아일랜드
 0
 Gdragon
 G-Dragon
@@ -4111,6 +4610,9 @@ joo
 jyj
 JYJ
 0
+kaist
+KAIST
+0
 kbs
 KBS
 0
@@ -4126,9 +4628,6 @@ MBC
 hero
 MBC게임 HERO
 0
-MBLAQ
-MBLAQ
-0
 mcmong
 MC몽
 0
@@ -4137,6 +4636,18 @@ MP3P
 0
 mp3use
 MP3플레이어사용기
+0
+mp3sell
+팝니다-MP3플레이어
+0
+mp3buy
+삽니다-MP3플레이어
+0
+band
+MUST 밴드의 시대
+0
+pc
+PC방
 0
 pmp
 PMP
@@ -4153,8 +4664,14 @@ SK
 t1
 SKT T1
 0
+slr_g
+SLR
+0
 userinfoslr
 SLR유저정보
+0
+snl
+SNL 코리아
 0
 ss501
 SS501
@@ -4173,4 +4690,7 @@ VS
 0
 xgame
 X-GAME
+0
+xbox
+XBOX 360
 0
