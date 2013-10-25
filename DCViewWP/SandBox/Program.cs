@@ -47,7 +47,7 @@ namespace SandBox
 
     class ClienTest
     {
-        static void ListArticle(string[] args)
+        public static void ListArticle()
         {
             
             // ISite dcinside = new DCInsideSite();
@@ -57,12 +57,19 @@ namespace SandBox
             IBoard board = site.GetBoard("news");
             board.Name = "모두의 공원";
 
-            ILister<IArticle> articles = board.GetArticleLister(0);
+            //ILister<IArticle> articles = board.GetArticleLister(0);
+            ILister<IArticle> articles = board.GetSearchLister("검색", SearchType.Subject); // .GetArticleLister(0);
 
             IEnumerable<IArticle> result;
             if (articles.Next(out result))
             {
-                string text;
+                foreach (var article in result)
+                {
+                    Console.WriteLine(article.Title);
+                }
+
+
+                /*string text;
                 result.First().GetText(out text);
 
                 Console.WriteLine(text);
@@ -71,7 +78,7 @@ namespace SandBox
                 foreach (IHtmlEntity entity in HtmlLexer.Lex(text))
                 {
                     Console.WriteLine(entity);
-                }
+                }*/
             }
         }
     }
@@ -82,7 +89,8 @@ namespace SandBox
         {
             SandboxAdapterFactory.Init();
 
-            DCInsideTest.DeleteArticle();
+            // DCInsideTest.DeleteArticle();
+            ClienTest.ListArticle();
             return;
         }
     }

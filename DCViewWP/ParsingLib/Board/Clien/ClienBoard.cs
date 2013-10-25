@@ -59,14 +59,12 @@ namespace DCView.Board
 
         ILister<IArticle> IBoard.GetArticleLister(int page)
         {
-            return new ArticleLister(this, id, page);
+            return new ClienArticleLister(this, id, page);
         }
-
-        [NotSupported]
+        
         public ILister<IArticle> GetSearchLister(string text, SearchType searchType)
         {
-            // 지원하지 않는 기능
-            throw new NotSupportedException();
+            return new ClienSearchArticleLister(this, id, text, searchType);
         }
 
         [NotSupported]
@@ -79,98 +77,6 @@ namespace DCView.Board
         public bool DeleteArticle(string articleID)
         {
             return false;
-        }
-
-        class ArticleLister : ILister<IArticle>
-        {
-            ClienBoard board;
-            string id;
-            int page;
-            int recentArticle = int.MaxValue;
-
-            public ArticleLister(ClienBoard board, string id, int page)
-            {
-                this.board = board;
-                this.id = id;
-                this.page = page;
-            }
-
-            public bool Next(out System.Collections.Generic.IEnumerable<IArticle> elems)
-            {
-                string result = AdapterFactory.Instance.CreateWebClient(false).DownloadStringAsyncTask(
-                    new Uri(string.Format("http://www.clien.net/cs2/bbs/board.php?bo_table={0}&page={1}&{2}", id, page + 1, DateTime.Now.Ticks), UriKind.Absolute))
-                    .Result;
-
-                StringEngine se = new StringEngine(result);
-
-                List<IArticle> articles = new List<IArticle>();
-                bool curBool = true;
-
-                while(true)
-                {
-                    Match match;
-                    if (!se.Next(new Regex("<tr class=\"mytr\">"), out match)) break;
-
-                    string line;
-                    if (!se.GetNextLine(out line)) continue;
-
-                    match = Regex.Match(line, @"<td>(\d+)</td>");
-                    if (!match.Success) continue;
-                    
-                    string articleID = match.Groups[1].Value;
-                    int curArticleID = int.Parse(articleID);
-
-                    if (recentArticle <= curArticleID)
-                        continue;
-
-                    recentArticle = curArticleID;
-
-                    ClienArticle article = new ClienArticle(board, articleID);
-
-                    article.HasImage = curBool;
-                    curBool = !curBool;
-
-                    // 글 제목과 댓글 개수
-                    if (!se.Next(new Regex(@"<td\s+class=""post_subject"">.*?<a[^>]*?>(.*?)</a>\s*(<span>\[(\d+)\]</span>)?"), out match)) continue;
-                    if (!match.Success) continue;
-
-                    article.Title = match.Groups[1].Value;
-                    if (match.Groups[3].Success)
-                        article.CommentCount = int.Parse(match.Groups[3].Value);
-                    else
-                        article.CommentCount = 0;
-
-                    // 이름
-                    if (!se.GetNextLine(out line)) continue;
-                    match = Regex.Match(line, @"<span class='member'>(.*?)</span>");
-                    if (match.Success)
-                    {
-                        article.Name = match.Groups[1].Value;
-                    }
-                    else 
-                    {
-                        match = Regex.Match(line, @"<img src='/cs2/data/member/.*?/(.*?).gif");
-                        if (!match.Success) continue;
-
-                        article.Name = match.Groups[1].Value;
-                    }                    
-
-                    // 시간
-                    if (!se.GetNextLine(out line)) continue;
-                    match = Regex.Match(line, "<span title=\"([^\"]*?)\">");
-                    if (!match.Success) continue;
-
-                    article.Date = DateTime.Parse(match.Groups[1].Value);
-
-                    
-
-                    articles.Add(article);
-                }
-
-                elems = articles;
-                page++;
-                return true;
-            }
-        }
+        }        
     }
 }

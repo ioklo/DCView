@@ -80,8 +80,8 @@ namespace DCView.Board
             pictures.Clear();
 
             if (se.Next(new Regex("<div class=\"attachedImage\"><img.*?src=(?<quote>'|\")(?<url>.*?)\\k<quote>"), out match))
-            {   
-                Picture pic = new Picture(string.Format("http://clien.career.co.kr/cs2/bbs/{0}", match.Groups["url"].Value), Uri.ToString());
+            {
+                Picture pic = new Picture(string.Format("http://www.clien.net/cs2/bbs/{0}", match.Groups["url"].Value), Uri.ToString());
                 
                 pictures.Add(pic);
                 HasImage = true;

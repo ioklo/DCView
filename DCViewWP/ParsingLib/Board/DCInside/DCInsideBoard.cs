@@ -381,8 +381,7 @@ namespace DCView.Board
                 if (fIdx != -1)
                     url = url.Substring(0, fIdx);
 
-                pictures.Add(
-                    new Picture(url, browseurl, "http://gall.dcinside.com"));
+                pictures.Add(new Picture(url, browseurl));
             }
 
             // div를 개수를 세서 안에 있는 div 

@@ -9,20 +9,17 @@ namespace DCView
     {
         public string Uri { get; private set; }
         public string BrowserUri { get; private set; }
-        public string Referer { get; private set; }
 
-        public Picture(string uri, string referer)
+        public Picture(string uri)
         {
             Uri = uri;
             BrowserUri = uri;
-            Referer = referer;
         }
 
-        public Picture(string uri, string browserUri,string referer)
+        public Picture(string uri, string browserUri)
         {
             Uri = uri;
             BrowserUri = browserUri;
-            Referer = referer;
         }
 
     }

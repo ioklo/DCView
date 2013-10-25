@@ -37,7 +37,9 @@
   <ItemGroup>
     <Compile Include="Board\BoardEx.cs" />
     <Compile Include="Board\Clien\ClienArticle.cs" />
+    <Compile Include="Board\Clien\ClienArticleLister.cs" />
     <Compile Include="Board\Clien\ClienBoard.cs" />
+    <Compile Include="Board\Clien\ClienSearchArticleLister.cs" />
     <Compile Include="Board\Clien\ClienComment.cs" />
     <Compile Include="Board\Clien\ClienSite.cs" />
     <Compile Include="Board\DCInside\DCInsideArticle.cs" />

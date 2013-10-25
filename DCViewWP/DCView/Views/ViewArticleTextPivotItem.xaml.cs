@@ -360,9 +360,7 @@ namespace DCView
                 using (var client = new HttpClient(handler))
                 {
                     client.DefaultRequestHeaders.Add("UserAgent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
-
-                    if (pic.Referer != string.Empty)
-                        client.DefaultRequestHeaders.Referrer = new Uri(pic.Referer, UriKind.Absolute);
+                    client.DefaultRequestHeaders.Referrer = article.Uri;
 
                     var response = await client.GetAsync(HttpUtility.HtmlDecode(pic.Uri));
 

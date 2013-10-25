@@ -163,31 +163,4 @@ namespace DCView.Board
 
 
     }
-
-    public class DCInsideBoardSearch
-    {
-        
-        // 내부 변수        
-        string searchText;
-        SearchType searchType;
-        
-        DCInsideBoard board;
-
-        public DCInsideBoardSearch(DCInsideBoard board, string searchText, SearchType searchType)
-        {
-            this.board = board;            
-            this.searchText = searchText;
-            this.searchType = searchType;
-        }
-
-        public Uri Uri 
-        {
-            get { return board.Uri; }
-        }
-        
-        public bool WriteArticle(string title, string text, List<AttachmentStream> attachments)
-        {
-            return board.WriteArticle(title, text, attachments);
-        }
-    }
 }
