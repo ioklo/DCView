@@ -17,6 +17,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using DCView.Board;
+using DCView.Misc;
 
 namespace DCView
 {

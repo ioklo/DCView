@@ -44,13 +44,15 @@
     <Compile Include="Board\Clien\ClienSite.cs" />
     <Compile Include="Board\DCInside\DCInsideArticle.cs" />
     <Compile Include="Board\DCInside\DCInsideBoard.cs" />
-    <Compile Include="Board\DCInside\DCInsideBoardSearch.cs" />
+    <Compile Include="Board\DCInside\DCInsideBoardSearchLister.cs" />
     <Compile Include="Board\DCInside\DCInsideComment.cs" />
     <Compile Include="Board\DCInside\DCInsideCredential.cs" />
+    <Compile Include="Board\DCInside\DCInsideLister.cs" />
     <Compile Include="Board\DCInside\DCInsideSite.cs" />
     <Compile Include="Board\Factory.cs" />
     <Compile Include="Board\IArticle.cs" />
     <Compile Include="Board\IBoard.cs" />
+    <Compile Include="Board\IBoardOption.cs" />
     <Compile Include="Board\IComment.cs" />
     <Compile Include="Board\ICredential.cs" />
     <Compile Include="Board\ILister.cs" />
@@ -61,7 +63,9 @@
     <Compile Include="Adapter\ISettings.cs" />
     <Compile Include="Adapter\RegexManager.cs" />
     <Compile Include="Board\NotSupportedAttribute.cs" />
+    <Compile Include="Misc\AttachmentStream.cs" />
     <Compile Include="Misc\IHtmlEntity.cs" />
+    <Compile Include="Misc\SearchType.cs" />
     <Compile Include="Misc\StringHtmlEntityConverter.cs" />
     <Compile Include="Misc\TaskUtil.cs" />
     <Compile Include="Adapter\IWebClient.cs" />

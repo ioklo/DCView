@@ -1,22 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Collections.Specialized;
-using System.Threading;
+using DCView.Board;
+using DCView.Misc;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Phone.Tasks;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using DCView.Board;
 
 namespace DCView
 {

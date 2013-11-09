@@ -1,36 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Threading;
-using System;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using DCView.Misc;
 
 namespace DCView.Board
 {
-    public class AttachmentStream
-    {
-        public string Filename { get; set; }
-        public Stream Stream { get; set; }
-        public string ContentType { get; set; }
-
-        public AttachmentStream()
-        {
-            ContentType = "application/octet-stream";
-        }
-    }
-
-    public enum SearchType
-    {
-        Subject = 1,
-        Content = 2,
-        Name    = 4,
-    }
-
-    public interface IBoardOption
-    {
-        string Display { get; }
-        bool Toggle { get; set; }
-    }
-
     // 게시판이 할 수 있는 일들 모음
     public interface IBoard
     {
