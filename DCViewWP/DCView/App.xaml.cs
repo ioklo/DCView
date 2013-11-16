@@ -76,32 +76,41 @@ namespace DCView
             }
         }
 
+        static Color Lerp(Color x, Color y, float alpha)
+        {
+            float invAlpha = 1.0f - alpha;
+
+            byte a = (byte)(x.A * invAlpha + y.A * alpha);
+            byte r = (byte)(x.R * invAlpha + y.R * alpha);
+            byte g = (byte)(x.G * invAlpha + y.G * alpha);
+            byte b = (byte)(x.B * invAlpha + y.B * alpha);
+
+            return Color.FromArgb(a, r, g, b);
+        }
+
         private void InitializeTheme()
         {
             if (DateTime.Now.Month == 12 && DateTime.Now.Day == 24)
             {
-                Resources.Add("DCViewAccentBrush", new SolidColorBrush(Color.FromArgb(0xFF, 0xE5, 0x14, 0x00)));
-                Resources.Add("DCViewAccentLightBrush", new SolidColorBrush(Color.FromArgb(0xFF, 0xF5, 0x24, 0x10)));
-                Resources.Add("DCViewAccentColor", Color.FromArgb(0xFF, 0xE5, 0x14, 0x00));
+                Color col = Color.FromArgb(0xFF, 0xE5, 0x14, 0x00);
+
+                Resources.Add("DCViewAccentBrush", new SolidColorBrush(col));
+                Resources.Add("DCViewAccentColor", col);
             }
             else
             {
-                const float alpha = 0.5f;
-                const float inv = 1.0f - alpha;
-
-                SolidColorBrush brush = (SolidColorBrush)Resources["PhoneAccentBrush"];
-                SolidColorBrush lightBrush = new SolidColorBrush(
-                    Color.FromArgb(255,
-                        (byte)Math.Min(255, (int)brush.Color.R * alpha + 255 * inv),
-                        (byte)Math.Min(255, (int)brush.Color.G * alpha + 255 * inv),
-                        (byte)Math.Min(255, (int)brush.Color.B * alpha + 255 * inv)));
-                        
-                Resources.Add("DCViewAccentBrush", brush);
-                Resources.Add("DCViewAccentLightBrush", lightBrush);
+                Resources.Add("DCViewAccentBrush", Resources["PhoneAccentBrush"]);
                 Resources.Add("DCViewAccentColor", Resources["PhoneAccentColor"]);
             }
-        }
 
+            Color bgColor = Colors.LightGray; // (Color)Resources["PhoneBackgroundColor"];
+            Color accentColor = (Color)Resources["DCViewAccentColor"];
+
+            Color lightColor = (Color)Resources["PhoneSubtleColor"]; // Lerp(bgColor, accentColor, 0.2f);
+
+            Resources.Add("DCViewAccentLightBrush", new SolidColorBrush(lightColor));
+        }
+         
         public enum FontSize
         {
             Normal, // 작게
