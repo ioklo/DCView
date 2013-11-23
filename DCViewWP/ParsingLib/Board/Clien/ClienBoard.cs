@@ -62,6 +62,7 @@ namespace DCView.Board
             return new ClienArticleLister(this, id, page);
         }
         
+        [NotSupported]
         public ILister<IArticle> GetSearchLister(string text, SearchType searchType)
         {
             return new ClienSearchArticleLister(this, id, text, searchType);

@@ -33,8 +33,8 @@ namespace DCView
             // appBar에 전체 목록 보기
             var listIconButton = new ApplicationBarIconButton()
             {
-                IconUri = new Uri("/Data/appbar.gotoslide.rest.png", UriKind.Relative),
-                Text = "전체보기"
+                IconUri = new Uri("/Data/appbar.stop.rest.png", UriKind.Relative),
+                Text = "검색 취소"
             };
             listIconButton.Click += listIconButton_Click;
             appBar.Buttons.Add(listIconButton);

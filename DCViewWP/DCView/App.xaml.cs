@@ -103,11 +103,7 @@ namespace DCView
                 Resources.Add("DCViewAccentColor", Resources["PhoneAccentColor"]);
             }
 
-            Color bgColor = Colors.LightGray; // (Color)Resources["PhoneBackgroundColor"];
-            Color accentColor = (Color)Resources["DCViewAccentColor"];
-
-            Color lightColor = (Color)Resources["PhoneSubtleColor"]; // Lerp(bgColor, accentColor, 0.2f);
-
+            Color lightColor = Lerp((Color)Resources["PhoneSubtleColor"], (Color)Resources["DCViewAccentColor"], 0.5f);
             Resources.Add("DCViewAccentLightBrush", new SolidColorBrush(lightColor));
         }
          
