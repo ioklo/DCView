@@ -54,7 +54,7 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border BorderThickness="0, 0, 0, 1" HorizontalAlignment="Stretch" BorderBrush="{StaticResource PhoneSubtleBrush}">
-                        <Grid Margin="0" Tap="ArticleListItem_Tap" Tag="{Binding Article}" Background="Yellow">
+                        <Grid Margin="0" Tap="ArticleListItem_Tap" Tag="{Binding Article}">
                             
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0" />
