@@ -83,7 +83,7 @@ namespace DCView.Util
                         string url;
                         if (tag.Attrs.TryGetValue("src", out url))
                         {
-                            var pic = new Picture(url, "");
+                            var pic = new Picture(url, url);
                             var grid = new Grid();
                             grid.Tag = pic;
 

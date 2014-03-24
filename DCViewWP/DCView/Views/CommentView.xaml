@@ -15,11 +15,11 @@
         <Border Grid.Column="1" BorderThickness="0, 0, 0, 1" BorderBrush="{StaticResource PhoneSubtleBrush}">
             <Grid Margin="0" >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="0" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Rectangle Grid.Column="0" HorizontalAlignment="Stretch" Fill="{StaticResource DCViewAccentLightBrush}" />
-                <StackPanel Grid.Column="1" Margin="6">
+                <StackPanel Grid.Column="1" Margin="10,6,10,6">
                     <StackPanel x:Name="Contents" HorizontalAlignment="Stretch"/>
 
                     <StackPanel Orientation="Horizontal">

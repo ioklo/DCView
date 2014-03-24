@@ -30,7 +30,10 @@ namespace DCView.Adapter
 
         public void Add(string key, object value)
         {
-            settings.Add(key, value);
+            if (settings.Contains(key))
+                settings[key] = value;
+            else
+                settings.Add(key, value);
         }
 
         public bool Remove(string key)

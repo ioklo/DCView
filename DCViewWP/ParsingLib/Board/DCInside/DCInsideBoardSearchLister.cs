@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using DCView.Adapter;
 using DCView.Misc;
+using System.Text;
 
 namespace DCView.Board
 {
@@ -112,7 +113,11 @@ namespace DCView.Board
                 if (!line.Contains("\"list_picture_a\""))
                     continue;
 
-                string line2 = sr.ReadLine();
+                // 임시코드: 9줄을 합쳐서 읽어들인다
+                var sb = new StringBuilder();
+                for (int t = 0; t < 9; t++)
+                    sb.AppendLine(sr.ReadLine());
+                string line2 = sb.ToString();
 
                 DCInsideArticle article = new DCInsideArticle(board);
 
@@ -124,12 +129,14 @@ namespace DCView.Board
                 Match matchArticleData = DCRegexManager.SearchListArticleData.Match(line2);
                 if (!matchArticleData.Success) continue;
 
-                // HasImage
-                article.HasImage = matchArticleData.Groups[3].Length != 0;
-                article.Title = AdapterFactory.Instance.HtmlDecode(HtmlParser.StripTags(matchArticleData.Groups[4].Value)).Trim();
-                article.CommentCount = matchArticleData.Groups[5].Length == 0 ? 0 : int.Parse(matchArticleData.Groups[6].Value);
-                article.Name = AdapterFactory.Instance.HtmlDecode(HtmlParser.StripTags(matchArticleData.Groups[7].Value)).Trim();
-                article.Date = DateTime.Parse(matchArticleData.Groups[9].Value);
+                article.HasImage = matchArticleData.Groups["HasPicture"].Length != 0;
+                article.Title = matchArticleData.Groups["Title"].Value;
+                article.CommentCount = matchArticleData.Groups["ReplyCount"].Length == 0 ? 0 : int.Parse(matchArticleData.Groups["ReplyCount"].Value);
+                article.Name = matchArticleData.Groups["Name"].Value.Trim();
+                article.Date = DateTime.Parse(matchArticleData.Groups["Date"].Value);
+
+                article.Title = AdapterFactory.Instance.HtmlDecode(HtmlParser.StripTags(article.Title)).Trim();
+                article.Name = AdapterFactory.Instance.HtmlDecode(HtmlParser.StripTags(article.Name)).Trim();
 
                 result.Add(article);
             }

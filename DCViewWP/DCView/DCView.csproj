@@ -59,30 +59,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZLib.Phone">
-      <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\ICSharpCode.SharpZLib.Phone.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageTools">
-      <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\ImageTools.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageTools.Controls">
-      <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\ImageTools.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageTools.Filtering">
-      <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\ImageTools.Filtering.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageTools.IO.Bmp">
-      <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\ImageTools.IO.Bmp.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageTools.IO.Gif">
-      <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\ImageTools.IO.Gif.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageTools.IO.Png">
-      <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\ImageTools.IO.Png.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageTools.Utils">
-      <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\ImageTools.Utils.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Controls, Version=7.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Phone.Controls.Toolkit, Version=7.0.1.0, Culture=neutral, PublicKeyToken=b772ad94eb9ca604, processorArchitecture=MSIL">
@@ -102,9 +78,6 @@
     <Reference Include="Microsoft.Threading.Tasks.Extensions.Phone, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.Extensions.Phone.dll</HintPath>
-    </Reference>
-    <Reference Include="PhoneCodeContractsAssemblies">
-      <HintPath>..\packages\ImageTools.0.3.1\lib\sl3-wp\PhoneCodeContractsAssemblies.dll</HintPath>
     </Reference>
     <Reference Include="System.IO, Version=1.5.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -225,7 +198,9 @@
     <Content Include="Data\pattern_dc.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\pattern_version.txt" />
+    <Content Include="Data\pattern_version.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="README_FIRST.txt" />
     <Content Include="SplashScreenImage1.jpg" />
     <Content Include="Toolkit.Content\ApplicationBar.Add.png" />
@@ -278,6 +253,18 @@
     <ProjectReference Include="..\CS.Windows.Controls.WP7\CS.Windows.Controls.WP7.csproj">
       <Project>{62249A43-7585-4C60-91E3-31BF0AF18C21}</Project>
       <Name>CS.Windows.Controls.WP7</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\imagetools\src\ImageTools\ImageTools.Controls.Phone\ImageTools.Controls.Phone.csproj">
+      <Project>{30BEDEDE-3224-49FA-9340-8A82447619CB}</Project>
+      <Name>ImageTools.Controls.Phone</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\imagetools\src\ImageTools\ImageTools.IO.Gif.Phone\ImageTools.IO.Gif.Phone.csproj">
+      <Project>{58E343B0-5342-4266-8F2E-E1D0554B9D11}</Project>
+      <Name>ImageTools.IO.Gif.Phone</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\imagetools\src\ImageTools\ImageTools.Phone\ImageTools.Phone.csproj">
+      <Project>{5876DA9E-C3DF-4D27-835F-DF998658CB6E}</Project>
+      <Name>ImageTools.Phone</Name>
     </ProjectReference>
     <ProjectReference Include="..\ParsingLib\ParsingLib.csproj">
       <Project>{2C38445D-5DA5-4D46-88C2-2BBC5EE2FC53}</Project>

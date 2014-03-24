@@ -1,31 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using System.Windows.Media.Imaging;
+using CS.Windows.Controls;
+using DCView.Board;
+using DCView.Lib;
+using DCView.Util;
+using ImageTools;
+using ImageTools.Controls;
+using Microsoft.Phone;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Phone.Tasks;
-using System.Threading;
-using System.Threading.Tasks;
-using System.IO.IsolatedStorage;
-using System.Windows.Media.Imaging;
-using DCView.Util;
-using DCView.Lib;
-using System.IO;
-using ImageTools.Controls;
-using ImageTools;
-using CS.Windows.Controls;
-using Microsoft.Phone;
-using DCView.Board;
-using DCView.Misc;
-using System.Net.Http;
 
 namespace DCView
 {
@@ -201,11 +198,11 @@ namespace DCView
             button.FontSize = 14;
             button.BorderThickness = new Thickness(1);
             button.HorizontalAlignment = HorizontalAlignment.Center;
-            button.Click += (o, e) =>
+            button.Click += async (o, e) =>
             {
                 button.IsEnabled = false;
                 button.Visibility = Visibility.Collapsed;
-                LoadImagesAsync(panel, imgContainers);
+                await LoadImagesAsync(panel, imgContainers);
             };
 
             var grid = new Grid();
@@ -278,21 +275,16 @@ namespace DCView
             submitButton.IsEnabled = true;
         }
 
-        private async void LoadImagesAsync(ListBox panel, List<Grid> imgContainers)
+        private async Task LoadImagesAsync(ListBox panel, List<Grid> imgContainers)
         {
-            List<Task> loadingTasks = new List<Task>();
-
             foreach(var v in imgContainers)
             {
                 Grid grid = v;
                 Picture pic = grid.Tag as Picture;
                 if (pic == null) continue;
 
-                var task = LoadImageAsync(panel, grid, pic);
-                loadingTasks.Add(task);
+                await LoadImageAsync(panel, grid, pic);
             }
-
-            await Task.Factory.StartNew(() => Task.WaitAll(loadingTasks.ToArray()));
         }
 
         private List<WriteableBitmap> LoadImage(Stream stream)
@@ -356,8 +348,8 @@ namespace DCView
                 status.Text = "[이미지를 불러오는 중...]";
                 grid.Children.Add(status);
 
-                using(var handler = new HttpClientHandler() { CookieContainer = WebClientEx.CookieContainer})
-                using (var client = new HttpClient(handler))
+                using(var handler = new HttpClientHandler() { CookieContainer = WebClientEx.CookieContainer })
+                using(var client = new HttpClient(handler))
                 {
                     client.DefaultRequestHeaders.Add("UserAgent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
                     client.DefaultRequestHeaders.Referrer = article.Uri;
@@ -366,7 +358,7 @@ namespace DCView
 
                     var stream = await response.Content.ReadAsStreamAsync();
                     var contentType = response.Content.Headers.ContentType;
-                    string extension = GetExtension(response.Content.Headers.ContentDisposition);                    
+                    string extension = GetExtension(response.Content.Headers);
 
                     if (contentType.MediaType.Equals("image/gif", StringComparison.CurrentCultureIgnoreCase) || 
                         extension == ".gif")
@@ -374,21 +366,30 @@ namespace DCView
                         // grid의 위치를 알아내고
                         int i = panel.Items.IndexOf(grid) + 1;
 
+                        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
                         ExtendedImage source = new ExtendedImage();
-                        source.SetSource(stream);
+                        source.SetSource(stream);                        
+                        source.LoadingCompleted += (e, o) => { tcs.TrySetResult(true); };
+                        source.LoadingFailed += (e, o) => { tcs.TrySetResult(false); };
 
-                        var image = new AnimatedImage();
-                        image.Source = source;
-                        image.Tap += image_Tap;
-                        image.Tag = pic;
-                        image.LoadingFailed += (o, e) =>
+                        bool bResult = await tcs.Task;
+                        if (!bResult)
                         {
                             var tb = new TextBlock();
-                            tb.Text = "로딩 실패";
+                            tb.Text = "gif 로딩 실패";
                             tb.Foreground = new SolidColorBrush(Colors.Red);
                             grid.Children.Add(tb);
-                        };
-                        panel.Items.Insert(i, image);
+                        }
+                        else
+                        {
+                            var image = new AnimatedImage();
+                            panel.Items.Insert(i, image);
+
+                            image.OnApplyTemplate();
+                            image.Source = source;
+                            image.Tap += image_Tap;
+                            image.Tag = pic;
+                        }
                     }
 
                     // 이상하게도 PictureDecoder.DecodeJpeg이 png까지 디코딩을 할 수가 있어서.. 그냥 쓰고 있다
@@ -437,11 +438,27 @@ namespace DCView
    
         }
 
-        private string GetExtension(System.Net.Http.Headers.ContentDispositionHeaderValue disp)
+        private string GetExtension(HttpContentHeaders headers)
         {
-            if (disp == null) return string.Empty;
+            if (headers.ContentDisposition == null)
+            {
+                IEnumerable<string> values;
 
-            var fileName = disp.FileName;
+                if (!headers.TryGetValues("Content-Disposition", out values))
+                    return string.Empty;
+
+                foreach(var value in values)
+                {
+                    if (value.Contains(".gif")) return ".gif";
+                    else if (value.Contains(".jpg")) return ".jpg";
+                    else if (value.Contains(".png")) return ".png";
+                }
+
+                return string.Empty;
+            }
+            
+
+            var fileName = headers.ContentDisposition.FileName;
             if (fileName == null) return string.Empty;
             if (fileName.Length < 4) return string.Empty;
 
@@ -490,7 +507,7 @@ namespace DCView
             }
         }
 
-        private void ShowArticleText(ArticleData data)
+        private async void ShowArticleText(ArticleData data)
         {
             if (!Dispatcher.CheckAccess())
             {
@@ -594,18 +611,18 @@ namespace DCView
             
             bool bPassiveLoading = (bool)IsolatedStorageSettings.ApplicationSettings["DCView.passive_loadimg"] && imgContainers.Count != 0;
 
-            // * 수동읽기가 설정이 되어있으면 버튼을 활성화
-            if (!bPassiveLoading)
-            {
-                loadImageButton.Visibility = Visibility.Collapsed;
-                LoadImagesAsync(panel, imgContainers);
-            }
-
             // Contents에 panel을 추가.
             Contents.Children.Add(panel);
 
             // *스크롤을 처음으로 되돌림
             panel.ScrollIntoView(title);
+
+            // * 수동읽기가 설정이 되어있으면 버튼을 활성화
+            if (!bPassiveLoading)
+            {
+                loadImageButton.Visibility = Visibility.Collapsed;
+                await LoadImagesAsync(panel, imgContainers);
+            }
         }
 
         // 글을 웹브라우저에서 읽기         

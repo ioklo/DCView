@@ -43,6 +43,21 @@ namespace SandBox
             board.DeleteArticle("16399");
         }
 
+        public static void ListArticle()
+        {
+            ISite dcinside = new DCInsideSite();
+            IBoard board = dcinside.GetBoard("windowsphone");
+
+            ILister<IArticle> articleLister = board.GetArticleLister(0);
+            IEnumerable<IArticle> articles;
+
+            if (articleLister.Next(out articles))
+            {
+                foreach (var article in articles)
+                    Console.WriteLine("{0} {1}", article.ID, article.Title);
+            }
+        }
+
     }
 
     class ClienTest
@@ -90,7 +105,7 @@ namespace SandBox
             SandboxAdapterFactory.Init();
 
             // DCInsideTest.DeleteArticle();
-            ClienTest.ListArticle();
+            DCInsideTest.ListArticle();
             return;
         }
     }

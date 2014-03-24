@@ -10,11 +10,11 @@ dc.write.oflData
 dc.list.articleNumber 
 no=(\d+)[^>]*>
 dc.list.articleData
-<span class="list_right"><span class="((list_pic_n)|(list_pic_y1?))"></span>(.*?)<span class="list_pic_re">(\[(\d+)\])?</span><br /><span class="list_pic_galler" ><span\s*>(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>
+<span class="list_right"><span class="((list_pic_n.*)|(?<HasPicture>list_pic_y1?))"></span>(?<Title>.*?)<span class="list_pic_re">(\[(?<ReplyCount>\d+)[^\]]*\])?</span>\s*<br />\s*<span class="list_pic_galler" >\s*<span\s*>(?<Name>.*?)</span>(?<GallerCon><img[^>]*>)?.*?<span>(?<Date>.*?)</span>\s*<span[^>]*>|</span>\s*<span>조회&nbsp;<span>(?<ReadCount>\d+)</span>
 dc.searchlist.articleNumber 
 no=(\d+)[^>]*>
 dc.searchlist.articleData 
-<span class="list_right"><span class="((list_pic_n)|(list_pic_y1?))"></span>(.*?)<span class="list_pic_re">(\[(\d+)\])?</span><br /><span class="list_pic_galler" ><span\s*>(.*?)</span>(<img[^>]*>)?.*?<span>(.*?)</span></span></span></a></li>
+<span class="list_right"><span class="((list_pic_n.*)|(?<HasPicture>list_pic_y1?))"></span>(?<Title>.*?)<span class="list_pic_re">(\[(?<ReplyCount>\d+)[^\]]*\])?</span>\s*<br />\s*<span class="list_pic_galler" >\s*<span\s*>(?<Name>.*?)</span>(?<GallerCon><img[^>]*>)?.*?<span>(?<Date>.*?)</span>\s*<span[^>]*>|</span>\s*<span>조회&nbsp;<span>(?<ReadCount>\d+)</span>
 dc.text.textImage 
 <img\s+id=dc_image_elm[^>]*src='(http://dcimg.*?)'
 dc.text.textStart 

@@ -7,12 +7,14 @@
     mc:Ignorable="d"
     d:DesignHeight="480" d:DesignWidth="480" Orientation="Horizontal" Margin="12, 0, 0, 0">    
     
-        <TextBlock Text="{Binding Name}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
-        <Rectangle Margin="2" Width="10" Height="10" VerticalAlignment="Bottom" 
-                            Stroke="Gray" Fill="{Binding MemberStatusBrush}"
-                            Visibility="{Binding MemberStatusVisibility}"/>
-        <TextBlock Text=" | " Style="{StaticResource DCViewTextSmallStyle}" Margin="0" />
-        <TextBlock Text="{Binding DateString}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
-        <TextBlock Text=" | 댓글 " Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
-        <TextBlock Text="{Binding CommentCount}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
-    </StackPanel>
+    <TextBlock Text="{Binding Name}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
+    <Rectangle Margin="2" Width="10" Height="10" VerticalAlignment="Bottom" 
+                        Stroke="Gray" Fill="{Binding MemberStatusBrush}"
+                        Visibility="{Binding MemberStatusVisibility}"/>
+    <TextBlock Text=" | " Style="{StaticResource DCViewTextSmallStyle}" Margin="0" />
+    <TextBlock Text="{Binding DateString}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
+    <TextBlock Text=" | " Style="{StaticResource DCViewTextSmallStyle}" Visibility="{Binding HasImageVisibility}" Margin="0" />
+    <TextBlock Text="짤" Style="{StaticResource DCViewTextSmallStyle}" Foreground="{StaticResource DCViewAccentLightBrush}" Visibility="{Binding HasImageVisibility}" Margin="0" />
+    <TextBlock Text=" | 댓글 " Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
+    <TextBlock Text="{Binding CommentCount}" Style="{StaticResource DCViewTextSmallStyle}" Margin="0"/>
+</StackPanel>

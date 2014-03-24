@@ -36,7 +36,6 @@ namespace DCView.Board
             StringEngine se = new StringEngine(result);
 
             List<IArticle> articles = new List<IArticle>();
-            bool curBool = true;
 
             while (true)
             {
@@ -58,9 +57,6 @@ namespace DCView.Board
                 recentArticle = curArticleID;
 
                 ClienArticle article = new ClienArticle(board, articleID);
-
-                article.HasImage = curBool;
-                curBool = !curBool;
 
                 // 글 제목과 댓글 개수
                 if (!se.Next(new Regex(@"<td\s+class=""post_subject"">.*?<a[^>]*?>(.*?)</a>\s*(<span>\[(\d+)\]</span>)?"), out match)) continue;

@@ -55,11 +55,14 @@
                 <DataTemplate>
                     <Border BorderThickness="0, 0, 0, 1" HorizontalAlignment="Stretch" BorderBrush="{StaticResource PhoneSubtleBrush}">
                         <Grid Margin="0" Tap="ArticleListItem_Tap" Tag="{Binding Article}">
+                            
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="0" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Rectangle Grid.Column="0" HorizontalAlignment="Stretch" Fill="{Binding HasImageBrush}" />
+                            <Rectangle Grid.Column="0" HorizontalAlignment="Stretch" >                                
+                            </Rectangle> 
+                            
                             <StackPanel Grid.Column="1" Margin="0, 12">
                                 <TextBlock Text="{Binding Title}" 
                                            Style="{StaticResource DCViewTextMediumStyle}"

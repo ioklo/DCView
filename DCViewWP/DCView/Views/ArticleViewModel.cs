@@ -32,7 +32,9 @@ namespace DCView
         public string Title { get { return HttpUtility.HtmlDecode(Article.Title); } }
 
         public string Name { get { return HttpUtility.HtmlDecode(Article.Name); } }
-        public DateTime Date { get { return Article.Date; } }        
+        public DateTime Date { get { return Article.Date; } }
+
+        public Visibility HasImageVisibility { get { return Article.HasImage ? Visibility.Visible : Visibility.Collapsed; } }
 
         public Brush MemberStatusBrush
         {
