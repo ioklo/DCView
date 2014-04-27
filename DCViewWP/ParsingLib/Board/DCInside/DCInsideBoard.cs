@@ -6,6 +6,7 @@ using DCView.Misc;
 using DCView.Adapter;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace DCView.Board
 {
@@ -193,7 +194,8 @@ namespace DCView.Board
             client.SetHeader("Referer", string.Format("http://m.dcinside.com/list.php?id={0}", id));
 
             string response = client.DownloadStringAsyncTask(
-                new Uri("http://m.dcinside.com/write.php?id=windowsphone&mode=write", UriKind.Absolute)).Result;
+                new Uri(
+                    string.Format("http://m.dcinside.com/write.php?id={0}&mode=write", id), UriKind.Absolute)).Result;
             
             StringEngine se = new StringEngine(response);
             Match match;
@@ -411,7 +413,7 @@ namespace DCView.Board
         private bool UploadPictures(List<AttachmentStream> attachmentStreams, out string flData, out string oflData)
         {
             using (var handler = new HttpClientHandler() { CookieContainer = AdapterFactory.Instance.CookieContainer })
-            using (var client = new HttpClient())
+            using (var client = new HttpClient(handler))
             {
                 MultipartFormDataContent content = new MultipartFormDataContent();
 
@@ -432,6 +434,7 @@ namespace DCView.Board
 
                 content.Add(new StringContent(id), "imgId");
                 content.Add(new StringContent("write"), "mode");
+                content.Add(new StringContent("6"), "img_num");
                 content.Add(new StringContent("mobile_key"), "1");
 
                 var msg = client.PostAsync(@"http://upload.dcinside.com/upload_imgfree_mobile.php", content).Result;
@@ -458,7 +461,10 @@ namespace DCView.Board
                             var oflDataRegexMatch = DCRegexManager.WriteOFLData.Match(line);
                             if (oflDataRegexMatch.Success)
                                 oflData = oflDataRegexMatch.Groups[1].Value;
+                            continue;
                         }
+
+                        break;
                     }
                 }
             }            
@@ -469,17 +475,17 @@ namespace DCView.Board
         private bool UploadArticle(string title, string text, string code, string mobileKey, string flData, string oflData)
         {
             using (var handler = new HttpClientHandler() { CookieContainer = AdapterFactory.Instance.CookieContainer })
-            using (var client = new HttpClient())
+            using (var client = new HttpClient(handler))
             {
                 client.DefaultRequestHeaders.Referrer = new Uri(string.Format("http://m.dcinside.com/write.php?id={0}&mode=write", id), UriKind.Absolute);
                 MultipartFormDataContent content = new MultipartFormDataContent();
 
                 content.Add(new StringContent(title), "subject");
-                content.Add(new StringContent(text), "memo");
-                content.Add(new StringContent("write"), "mode");
+                content.Add(new StringContent(text), "memo");                
+                content.Add(new StringContent("write"), "mode");                
                 content.Add(new StringContent(id), "id");
                 content.Add(new StringContent(code), "code");
-                content.Add(new StringContent(mobileKey), "mobile_key");
+                content.Add(new StringContent(mobileKey), "mobile_key");                
 
                 if (flData != null)
                     content.Add(new StringContent(flData), "FL_DATA");
@@ -487,7 +493,7 @@ namespace DCView.Board
                 if (oflData != null)
                     content.Add(new StringContent(oflData), "OFL_DATA");
 
-                var response = client.PostAsync(@"http://upload.dcinside.com/g_write.php", content).Result;
+                var response = client.PostAsync(@"http://upload.dcinside.com/g_write.php", content).Result;                
             }
 
             return true;
