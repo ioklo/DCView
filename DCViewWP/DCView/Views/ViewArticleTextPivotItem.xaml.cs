@@ -23,6 +23,7 @@ using Microsoft.Phone;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Phone.Tasks;
+using Microsoft.Xna.Framework.Media;
 
 namespace DCView
 {
@@ -387,7 +388,7 @@ namespace DCView
 
                             image.OnApplyTemplate();
                             image.Source = source;
-                            image.Tap += image_Tap;
+                            image.Tap += image_Tap;                            
                             image.Tag = pic;
                         }
                     }
@@ -407,8 +408,8 @@ namespace DCView
                         {
                             var image = new Image();
                             image.Source = wbmp;
-                            image.Tag = pic;
-                            image.Tap += image_Tap;
+                            RegisterContextMenu(image, stream);
+                            
                             panel.Items.Insert(i, image);
                             i++;
                         }
@@ -423,8 +424,7 @@ namespace DCView
 
                         var image = new Image();
                         image.Source = source;
-                        image.Tag = pic;
-                        image.Tap += image_Tap;
+                        RegisterContextMenu(image, stream); 
                         panel.Items.Insert(i, image);
                     }
                 }
@@ -474,6 +474,33 @@ namespace DCView
             {
                 return string.Empty;
             }
+        }
+
+        void SaveMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem elem = sender as MenuItem;
+            if (elem == null) return;
+
+            Stream stream = elem.Tag as Stream;
+            if (stream == null) return;
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            MediaLibrary library = new MediaLibrary();
+            string name = string.Format("dcview_{0}_{1}", article.Board.ID, DateTime.Now.ToString("HHmmss"));
+            var picture = library.SavePicture(name, stream);
+
+            MessageBox.Show("사진이 저장되었습니다");
+        }
+
+        void RegisterContextMenu(FrameworkElement elem, Stream stream)
+        {
+            var menu = new ContextMenu();
+            var saveMenuItem = new MenuItem() { Header = "사진 저장" };
+            saveMenuItem.Tag = stream;
+            saveMenuItem.Click += SaveMenuItem_Click;
+            menu.Items.Add(saveMenuItem);
+            ContextMenuService.SetContextMenu(elem, menu);
         }
 
         
