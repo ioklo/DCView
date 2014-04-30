@@ -179,8 +179,9 @@ namespace DCView
             textBox.SizeChanged += (o1, e1) =>
             {
                 if (FocusManager.GetFocusedElement() == textBox)
-                {                    
-                    VirtualizingStackPanel vstackPanel = (VirtualizingStackPanel)GetChildren(panel).FirstOrDefault(dobj => dobj is VirtualizingStackPanel);
+                {
+                    VirtualizingStackPanel vstackPanel = panel.Tag as VirtualizingStackPanel;
+
                     if(vstackPanel != null)
                         vstackPanel.SetVerticalOffset(vstackPanel.ExtentHeight - vstackPanel.ViewportHeight);
                 }
@@ -736,7 +737,7 @@ namespace DCView
             UpdateAppBar();
         }
 
-        /*private void VirtualizingStackPanel_Loaded(object sender, RoutedEventArgs e)
+        private void VirtualizingStackPanel_Loaded(object sender, RoutedEventArgs e)
         {
             // ItemsPanelTemplate 인 VirtualizingStackPanel을 얻기 위해서
             DependencyObject dep = sender as DependencyObject;
@@ -751,6 +752,6 @@ namespace DCView
 
                 dep = VisualTreeHelper.GetParent(dep);
             }
-        }*/
+        }
     }
 }

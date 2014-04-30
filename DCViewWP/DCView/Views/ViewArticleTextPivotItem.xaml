@@ -13,7 +13,7 @@
     
     <controls:PivotItem.Resources>
         <ItemsPanelTemplate x:Key="ListBoxItemsPanelTemplate">
-            <VirtualizingStackPanel />
+            <VirtualizingStackPanel Loaded="VirtualizingStackPanel_Loaded" />
         </ItemsPanelTemplate>
         
         <Style x:Key="ListBoxItemStyle" TargetType="ListBoxItem" >
