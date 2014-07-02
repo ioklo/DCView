@@ -51,7 +51,7 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\Rules_Phone.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>..\..\..\bin\Phone\ImageTools.IO.Gif.XML</DocumentationFile>
   </PropertyGroup>
