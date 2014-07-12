@@ -147,7 +147,7 @@
                             <Paragraph>DCView
                                 <Run x:Name="VersionText"/>,
                                 <LineBreak />
-                                Copyright © &lt;IOKLO 2013
+                                Copyright © &lt;IOKLO 2014
                                 <LineBreak />
                                 <Hyperlink Click="Hyperlink_Click">https://github.com/ioklo/dcview</Hyperlink>
                             </Paragraph>

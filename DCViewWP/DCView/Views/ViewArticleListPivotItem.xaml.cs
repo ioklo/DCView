@@ -249,6 +249,13 @@ namespace DCView
         // 글쓰기 아이콘 클릭
         private void writeIconButton_Click(object sender, EventArgs e)
         {
+            if (!board.Site.Credential.HasWritePermission)
+            {
+                MessageBox.Show("로그인 하셔야 합니다");
+                viewArticlePage.ShowLoginDialog();
+                return;
+            }
+
             viewArticlePage.ShowWriteForm(board);
         }
 

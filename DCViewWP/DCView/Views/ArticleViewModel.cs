@@ -25,7 +25,7 @@ namespace DCView
                 if (Article.HasImage)
                     return (Brush)Application.Current.Resources["DCViewAccentBrush"];
                 else
-                    return (Brush)Application.Current.Resources["DCViewAccentLightBrush"];
+                    return (Brush)Application.Current.Resources["PhoneSubtleBrush"];
             }
         }
 

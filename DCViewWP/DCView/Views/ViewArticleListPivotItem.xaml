@@ -47,23 +47,23 @@
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />                    
-                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Margin" Value="10,6" />
                 </Style>
             </ListBox.ItemContainerStyle>           
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderThickness="0, 0, 0, 1" HorizontalAlignment="Stretch" BorderBrush="{StaticResource PhoneSubtleBrush}">
-                        <Grid Margin="0" Tap="ArticleListItem_Tap" Tag="{Binding Article}">
+                    <Border BorderThickness="0, 0, 0, 0" HorizontalAlignment="Stretch" BorderBrush="{StaticResource PhoneSubtleBrush}">
+                        <Grid Margin="0, 0, 0, 0" Tap="ArticleListItem_Tap" Tag="{Binding Article}">
                             
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="6" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Rectangle Grid.Column="0" HorizontalAlignment="Stretch" >                                
+                            <Rectangle Grid.Column="0" Margin="0" HorizontalAlignment="Stretch" Fill="{Binding HasImageBrush}">                                
                             </Rectangle> 
                             
-                            <StackPanel Grid.Column="1" Margin="0, 12">
+                            <StackPanel Grid.Column="1" Margin="0, 3, 0, 9">
                                 <TextBlock Text="{Binding Title}" 
                                            Style="{StaticResource DCViewTextMediumStyle}"
                                            TextWrapping="Wrap" />

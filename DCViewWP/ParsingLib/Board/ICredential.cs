@@ -7,6 +7,7 @@ namespace DCView.Board
 {
     public interface ICredential
     {
+        bool HasWritePermission { get; }
         string StatusText { get; }
         event EventHandler OnStatusChanged;
     }

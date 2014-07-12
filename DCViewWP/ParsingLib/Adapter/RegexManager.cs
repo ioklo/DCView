@@ -16,24 +16,19 @@ namespace DCView.Misc
         // DCInside
         public static Regex WriteCode { get; private set; }
         public static Regex WriteMobileKey{ get; private set; }
+        public static Regex WriteBlockKey { get; private set; }
         public static Regex WriteFLData { get; private set; }
         public static Regex WriteOFLData { get; private set; }
 
-        public static Regex ListArticleNumber { get; private set; }
-        public static Regex ListArticleData { get; private set; }
-
-        public static Regex SearchListArticleNumber { get; private set; }
-        public static Regex SearchListArticleData { get; private set; }
-
+        public static Regex ListArticles { get; private set; }
+        public static Regex SearchListArticles { get; private set; }
+        
         public static Regex TextImage { get; private set; }
         public static Regex TextStart { get; private set; }
         public static Regex TextDIV { get; private set; }
-        public static Regex TextCommentUserID { get; private set; }       
+        public static Regex TextCommentUserID { get; private set; }
 
-        public static Regex CommentStart { get; private set; }
-        public static Regex CommentName { get; private set; }
-        public static Regex CommentText { get; private set; }
-
+        public static Regex Comments { get; private set; }
         private static ISettings setting = AdapterFactory.Instance.Settings;
 
         private static Regex GetRegex(string key, string def)
@@ -85,7 +80,7 @@ namespace DCView.Misc
             using (var stream = AdapterFactory.Instance.OpenReadStorageFile("/pattern_dc.txt"))
             using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                Dictionary<string, Regex> dict = new Dictionary<string, Regex>();
+                Dictionary<string, string> dict = new Dictionary<string, string>();
 
                 // 버전 읽을 필요가 있나..
                 string ver = reader.ReadLine();
@@ -96,30 +91,25 @@ namespace DCView.Misc
 
                     string regexStr = reader.ReadLine();
                     if (regexStr == null) break;
-                    Regex regex = new Regex(regexStr.Trim());
 
-                    dict[key.Trim()] = regex;
+                    dict[key.Trim()] = regexStr.Trim();
                 }
 
-                WriteCode = dict["dc.write.code"];
-                WriteMobileKey = dict["dc.write.mobileKey"];
-                WriteFLData = dict["dc.write.flData"];
-                WriteOFLData = dict["dc.write.oflData"];
+                WriteCode = new Regex(dict["dc.write.code"]);
+                WriteMobileKey = new Regex(dict["dc.write.mobileKey"]);
+                WriteBlockKey = new Regex(dict["dc.write.blockKey"]);
+                WriteFLData = new Regex(dict["dc.write.flData"]);
+                WriteOFLData = new Regex(dict["dc.write.oflData"]);
 
-                ListArticleNumber = dict["dc.list.articleNumber"];
-                ListArticleData = dict["dc.list.articleData"];
+                ListArticles = new Regex(dict["dc2.list.articles"]);                
+                SearchListArticles = new Regex(dict["dc2.searchlist.articles"]);
 
-                SearchListArticleNumber = dict["dc.searchlist.articleNumber"];
-                SearchListArticleData = dict["dc.searchlist.articleData"];
+                TextImage = new Regex(dict["dc.text.textImage"]);
+                TextStart = new Regex(dict["dc.text.textStart"]);
+                TextDIV = new Regex(dict["dc.text.textDIV"]);
+                TextCommentUserID = new Regex(dict["dc.text.commentUserID"]);
 
-                TextImage = dict["dc.text.textImage"];
-                TextStart = dict["dc.text.textStart"];
-                TextDIV = dict["dc.text.textDIV"];
-                TextCommentUserID = dict["dc.text.commentUserID"];
-
-                CommentStart = dict["dc.comment.start"];
-                CommentName = dict["dc.comment.name"];
-                CommentText = dict["dc.comment.text"];
+                Comments = new Regex(dict["dc2.comment.comments"]);
             }
         }
 

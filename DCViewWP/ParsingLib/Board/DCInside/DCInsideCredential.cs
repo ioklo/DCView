@@ -25,6 +25,7 @@ namespace DCView.Board
         public string MemberPassword { get; set; }
         public bool SaveLoginInfo { get; private set; }
         public bool AutoLogin { get; private set; }
+        public bool HasWritePermission { get { return Status == LoginStatus.MemberLogin; } }
 
         private LoginStatus status;
         public LoginStatus Status

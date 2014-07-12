@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DCView")]
-[assembly: AssemblyCopyright("Copyright © IOKLO 2013")]
+[assembly: AssemblyCopyright("Copyright © <IOKLO 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

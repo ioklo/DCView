@@ -105,42 +105,28 @@ namespace DCView.Board
         private List<DCInsideArticle> GetArticleListFromString(string input)
         {
             List<DCInsideArticle> result = new List<DCInsideArticle>();
-            var sr = new StringReader(input);
 
-            string line = null;
-            while ((line = sr.ReadLine()) != null)
+            foreach (Match match in DCRegexManager.SearchListArticles.Matches(input))
             {
-                if (!line.Contains("\"list_picture_a\""))
-                    continue;
-
-                // 임시코드: 9줄을 합쳐서 읽어들인다
-                var sb = new StringBuilder();
-                for (int t = 0; t < 9; t++)
-                    sb.AppendLine(sr.ReadLine());
-                string line2 = sb.ToString();
-
                 DCInsideArticle article = new DCInsideArticle(board);
 
-                // Number
-                Match matchGetNumber = DCRegexManager.SearchListArticleNumber.Match(line);
-                if (!matchGetNumber.Success) break;
-                article.ID = matchGetNumber.Groups[1].Value;
+                article.ID = match.Groups["ID"].Value;
+                article.HasImage = (match.Groups["HasImage"].Value == "ico_p_y");
+                article.Title = AdapterFactory.Instance.HtmlDecode(HtmlParser.StripTags(match.Groups["Title"].Value.Trim()));
+                article.CommentCount = match.Groups["ReplyCount"].Length == 0 ? 0 : int.Parse(match.Groups["ReplyCount"].Value);
+                article.Name = AdapterFactory.Instance.HtmlDecode(HtmlParser.StripTags(match.Groups["Name"].Value.Trim()));
+                article.Date = DateTime.Parse(match.Groups["Date"].Value);
 
-                Match matchArticleData = DCRegexManager.SearchListArticleData.Match(line2);
-                if (!matchArticleData.Success) continue;
-
-                article.HasImage = matchArticleData.Groups["HasPicture"].Length != 0;
-                article.Title = matchArticleData.Groups["Title"].Value;
-                article.CommentCount = matchArticleData.Groups["ReplyCount"].Length == 0 ? 0 : int.Parse(matchArticleData.Groups["ReplyCount"].Value);
-                article.Name = matchArticleData.Groups["Name"].Value.Trim();
-                article.Date = DateTime.Parse(matchArticleData.Groups["Date"].Value);
-
-                article.Title = AdapterFactory.Instance.HtmlDecode(HtmlParser.StripTags(article.Title)).Trim();
-                article.Name = AdapterFactory.Instance.HtmlDecode(HtmlParser.StripTags(article.Name)).Trim();
+                var statusValue = match.Groups["MemberStatus"].Value;
+                if (statusValue == "fixed")
+                    article.MemberStatus = MemberStatus.Default;
+                else if (statusValue == "flow")
+                    article.MemberStatus = MemberStatus.Fix;
+                else
+                    article.MemberStatus = MemberStatus.Anonymous;
 
                 result.Add(article);
             }
-
             return result;
         }
 
